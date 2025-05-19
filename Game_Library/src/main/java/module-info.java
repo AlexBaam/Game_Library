@@ -6,9 +6,14 @@ module org.example.game_library {
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
+    requires java.desktop;
 
     exports org.example.game_library.Client;
     opens org.example.game_library.Client to javafx.fxml;
+
+    exports org.example.game_library.Client.UI;
+    opens org.example.game_library.Client.UI to javafx.fxml;
+
     exports org.example.game_library.Server;
     opens org.example.game_library.Server to javafx.fxml;
 }

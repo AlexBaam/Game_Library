@@ -1,47 +1,45 @@
 package org.example.game_library.Client;
 
-import java.io.DataInputStream;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 
-public class ClientMain {
+public class ClientMain extends Application {
 
-    private Socket socket;
-    private DataInputStream input;
-    private DataOutputStream output;
-    private Scanner scanner;
+    public static Socket socket;
+    public static DataOutputStream out;
 
-    public ClientMain(String address, int port) {
+    @Override
+    public void start(Stage stage) throws Exception {
         try {
-            socket = new Socket(address, port);
-            System.out.println("Connected to server: " + address + ":" + port);
-
-            input = new DataInputStream(socket.getInputStream());
-            output = new DataOutputStream(socket.getOutputStream());
-            scanner = new Scanner(System.in);
-
-            String message = "";
-
-            // Keep sending until "End" is typed
-            while (!message.equals("End")) {
-                System.out.print("You: ");
-                message = scanner.nextLine();
-                output.writeUTF(message);
-            }
-
-            System.out.println("Closing connection...");
-            socket.close();
-            input.close();
-            output.close();
-
+            // Attempt to connect to the server
+            socket = new Socket("127.0.0.1", 5000);
+            out = new DataOutputStream(socket.getOutputStream());
+            System.out.println("✅ Connected to server.");
         } catch (IOException e) {
-            System.out.println("Connection error: " + e.getMessage());
+            System.out.println("❌ Failed to connect to server: " + e.getMessage());
+            return; // Stop if connection failed
         }
+
+        // Load and display the main menu
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/mainMenuForm.fxml"));
+        Scene scene = new Scene(loader.load(), 600, 400);
+
+        scene.setFill(Color.TRANSPARENT);
+
+        stage.initStyle(StageStyle.TRANSPARENT);
+        stage.setScene(scene);
+        stage.show();
     }
 
     public static void main(String[] args) {
-        new ClientMain("127.0.0.1", 5000);
+        launch(args);
     }
 }
