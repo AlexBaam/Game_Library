@@ -7,6 +7,7 @@ module org.example.game_library {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires java.desktop;
+    requires java.logging;
 
     exports org.example.game_library.Client;
     opens org.example.game_library.Client to javafx.fxml;

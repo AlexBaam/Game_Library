@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class MainMenuForm {
 
-    @FXML private AnchorPane rootPane;
+    @FXML private AnchorPane rootPane_MainMenu;
     @FXML private Button loginButton;
     @FXML private Button registerButton;
     @FXML private Button exitButton;
@@ -26,8 +26,8 @@ public class MainMenuForm {
         System.out.println("Main menu initialized.");
 
         // Make window draggable
-        rootPane.setOnMousePressed(this::handleMousePressed);
-        rootPane.setOnMouseDragged(this::handleMouseDragged);
+        rootPane_MainMenu.setOnMousePressed(this::handleMousePressed);
+        rootPane_MainMenu.setOnMouseDragged(this::handleMouseDragged);
     }
 
     @FXML
@@ -51,7 +51,7 @@ public class MainMenuForm {
     }
 
     private void handleMouseDragged(MouseEvent event) {
-        Stage stage = (Stage) rootPane.getScene().getWindow();
+        Stage stage = (Stage) rootPane_MainMenu.getScene().getWindow();
         stage.setX(event.getScreenX() - xOffset);
         stage.setY(event.getScreenY() - yOffset);
     }
@@ -59,7 +59,7 @@ public class MainMenuForm {
     private void switchTo(String fxml) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/" + fxml));
         Parent root = loader.load();
-        Stage stage = (Stage) rootPane.getScene().getWindow();
+        Stage stage = (Stage) rootPane_MainMenu.getScene().getWindow();
         stage.setScene(new Scene(root));
     }
 }

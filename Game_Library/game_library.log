@@ -1,0 +1,88 @@
+May 19, 2025 11:33:02 PM org.example.game_library.Client.ClientMain start
+INFO: Client connected
+May 19, 2025 11:38:07 PM org.example.game_library.Client.ClientMain start
+INFO: Client connected
+May 19, 2025 11:38:21 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:38:21 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: Username entered: 
+May 19, 2025 11:38:21 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: Password entered: 
+May 19, 2025 11:38:30 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:38:30 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: Username entered: 
+May 19, 2025 11:38:30 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: Password entered: 
+May 19, 2025 11:52:37 PM org.example.game_library.Client.ClientMain start
+INFO: Client connected
+May 19, 2025 11:52:41 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:52:42 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:52:43 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:52:44 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:52:44 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:52:44 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:52:44 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:53:40 PM org.example.game_library.Client.ClientMain start
+INFO: Client connected
+May 19, 2025 11:53:42 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:53:43 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:53:43 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:53:43 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:53:44 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:53:44 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:53:44 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 19, 2025 11:53:44 PM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 20, 2025 12:02:57 AM org.example.game_library.Client.ClientMain start
+INFO: Client connected
+May 20, 2025 12:02:59 AM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 20, 2025 12:02:59 AM org.example.game_library.Client.UI.LoginForm onLoginClick
+SEVERE: Validation error: Username cannot be blank
+May 20, 2025 12:03:06 AM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 20, 2025 12:03:06 AM org.example.game_library.Client.UI.LoginForm onLoginClick
+SEVERE: Validation error: Username cannot be blank
+May 20, 2025 12:03:22 AM org.example.game_library.Client.UI.LoginForm onLoginClick
+INFO: User pressed login
+May 20, 2025 12:03:22 AM org.example.game_library.Client.UI.LoginForm onLoginClick
+SEVERE: Validation error: Password cannot be blank
+May 20, 2025 12:13:18 AM org.example.game_library.Client.ClientMain start
+INFO: Client connected
+May 20, 2025 12:13:20 AM org.example.game_library.Client.UI.RegisterForm onRegisterClick
+INFO: User pressed register
+May 20, 2025 12:13:20 AM org.example.game_library.Client.UI.RegisterForm onRegisterClick
+SEVERE: Validation error: Username cannot be blank
+May 20, 2025 12:13:26 AM org.example.game_library.Client.UI.RegisterForm onRegisterClick
+INFO: User pressed register
+May 20, 2025 12:13:26 AM org.example.game_library.Client.UI.RegisterForm onRegisterClick
+SEVERE: Validation error: Password cannot be blank
+May 20, 2025 12:13:36 AM org.example.game_library.Client.UI.RegisterForm onRegisterClick
+INFO: User pressed register
+May 20, 2025 12:13:36 AM org.example.game_library.Client.UI.RegisterForm onRegisterClick
+SEVERE: Validation error: Email cannot be blank
+May 20, 2025 12:13:40 AM org.example.game_library.Client.UI.RegisterForm onRegisterClick
+INFO: User pressed register
+May 20, 2025 12:13:40 AM org.example.game_library.Client.UI.RegisterForm onRegisterClick
+INFO: Username entered: aa
+May 20, 2025 12:13:40 AM org.example.game_library.Client.UI.RegisterForm onRegisterClick
+INFO: Password entered: sssss
+May 20, 2025 12:13:40 AM org.example.game_library.Client.UI.RegisterForm onRegisterClick
+INFO: Email entered: ssss
+May 20, 2025 12:21:30 AM org.example.game_library.Client.ClientMain start
+INFO: Client connected

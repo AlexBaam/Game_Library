@@ -12,7 +12,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: transparent;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.game_library.Client.UI.MainMenuForm">
+<AnchorPane fx:id="rootPane_MainMenu" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: transparent;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.game_library.Client.UI.MainMenuForm">
    <children>
       <Ellipse layoutX="300.0" layoutY="200.0" radiusX="181.0" radiusY="110.0" stroke="BLACK" strokeType="INSIDE">
          <fill>
