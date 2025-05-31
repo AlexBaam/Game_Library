@@ -1,4 +1,4 @@
-package utils.loggers;
+package org.example.game_library.utils.loggers;
 import java.io.IOException;
 import java.util.logging.*;
 

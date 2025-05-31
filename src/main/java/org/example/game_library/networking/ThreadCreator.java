@@ -1,37 +1,66 @@
 package org.example.game_library.networking;
 
+import org.example.game_library.utils.loggers.AppLogger;
+
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
+import java.util.logging.*;
 
 public class ThreadCreator extends Thread {
-    private Socket clientSocket;
+    private final Socket clientSocket;
+
     private DataInputStream input;
+    private DataOutputStream output;
+
+    private static final Logger logger = AppLogger.getLogger();
+    private final long threadId;
 
     public ThreadCreator(Socket socket) {
         this.clientSocket = socket;
+        this.threadId = this.threadId();
+
         try {
             input = new DataInputStream(clientSocket.getInputStream());
+            output = new DataOutputStream(clientSocket.getOutputStream());
+            logger.log(Level.INFO, "Streams created for thread {0}", threadId);
         } catch (IOException e) {
-            System.out.println("Error setting up input stream: " + e.getMessage());
+            logger.log(Level.SEVERE, "Error setting up input stream: {0}",  e.getMessage());
         }
     }
 
     @Override
     public void run() {
-        String line = "";
+        logger.log(Level.INFO, "Thread {0} started successfully!", threadId);
 
         try {
-            while (!line.equals("End")) {
-                line = input.readUTF();
-                System.out.println("Client [" + clientSocket.getInetAddress() + "] says: " + line);
+            String line;
+
+            while ((line = input.readUTF()) != null) {
+                logger.log(Level.INFO, "Thread {0} received {1}", new Object[]{threadId, line});
+
+                if(line.trim().equalsIgnoreCase("end")){
+                    logger.log(Level.INFO, "Thread {0} requested to disconnect!", threadId);
+                    break;
+                }
+
+                //TODO: Trebuie sa adaugam raspunsuri ptr fiecare request de la client
+                output.writeUTF("Server a primit: " + line);
             }
-
-            System.out.println("Client [" + clientSocket.getInetAddress() + "] disconnected.");
-            clientSocket.close();
-            input.close();
-
         } catch (IOException e) {
-            System.out.println("Connection error with client: " + e.getMessage());
+            logger.log(Level.WARNING, "Thread {0} connection error: {1}", new Object[]{threadId, e.getMessage()});
+        } finally {
+            try{
+                if(output != null){
+                    output.close();
+                }
+                if(input != null){
+                    input.close();
+                }
+                clientSocket.close();
+                logger.log(Level.INFO, "Thread {0} connection closed!", threadId);
+            } catch(IOException e){
+                logger.log(Level.SEVERE, "Thread {0} error closing streams: {1}", new Object[]{threadId, e.getMessage()});
+            }
         }
     }
 }

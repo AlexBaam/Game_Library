@@ -1,6 +1,6 @@
 package org.example.game_library.networking;
 
-import utils.loggers.AppLogger;
+import org.example.game_library.utils.loggers.AppLogger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

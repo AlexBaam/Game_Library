@@ -100,3 +100,47 @@ May 31, 2025 5:49:06 PM org.example.game_library.networking.ClientMain start
 INFO: Client connected
 May 31, 2025 5:51:24 PM org.example.game_library.networking.ClientMain start
 INFO: Client connected
+May 31, 2025 6:07:57 PM org.example.game_library.networking.ClientMain start
+INFO: Client connected
+May 31, 2025 6:10:37 PM org.example.game_library.networking.ClientMain start
+INFO: Client connected
+May 31, 2025 7:37:29 PM org.example.game_library.networking.ServerMain main
+INFO: Server started! Listening on port: 5,000
+May 31, 2025 7:37:44 PM org.example.game_library.networking.ServerMain main
+INFO: Accepted new client at: 127.0.0.1:58,226 on thread 1
+May 31, 2025 7:38:01 PM org.example.game_library.networking.ServerMain main
+INFO: Accepted new client at: 127.0.0.1:58,232 on thread 1
+May 31, 2025 7:45:42 PM org.example.game_library.networking.ServerMain main
+INFO: Server started! Listening on port: 5,000
+May 31, 2025 7:45:46 PM org.example.game_library.networking.ServerMain main
+INFO: Accepted new client successfully!
+May 31, 2025 7:45:46 PM org.example.game_library.networking.ThreadCreator <init>
+INFO: Streams created for client 127.0.0.1:58297
+May 31, 2025 7:47:34 PM org.example.game_library.networking.ServerMain main
+INFO: Accepted new client successfully!
+May 31, 2025 7:47:34 PM org.example.game_library.networking.ThreadCreator <init>
+INFO: Streams created for client 127.0.0.1:58313
+May 31, 2025 7:47:54 PM org.example.game_library.networking.ServerMain main
+INFO: Accepted new client successfully!
+May 31, 2025 7:47:54 PM org.example.game_library.networking.ThreadCreator <init>
+INFO: Streams created for client 127.0.0.1:58320
+May 31, 2025 7:48:09 PM org.example.game_library.networking.ServerMain main
+INFO: Server started! Listening on port: 5,000
+May 31, 2025 7:48:13 PM org.example.game_library.networking.ServerMain main
+INFO: Accepted new client successfully!
+May 31, 2025 7:48:13 PM org.example.game_library.networking.ThreadCreator <init>
+INFO: Streams created for client 27
+May 31, 2025 7:48:26 PM org.example.game_library.networking.ServerMain main
+INFO: Server started! Listening on port: 5,000
+May 31, 2025 7:48:31 PM org.example.game_library.networking.ServerMain main
+INFO: Accepted new client successfully!
+May 31, 2025 7:48:31 PM org.example.game_library.networking.ThreadCreator <init>
+INFO: Streams created for client 27
+May 31, 2025 8:01:46 PM org.example.game_library.networking.ServerMain main
+INFO: Server started! Listening on port: 5,000
+May 31, 2025 8:01:54 PM org.example.game_library.networking.ServerMain main
+INFO: Accepted new client successfully!
+May 31, 2025 8:01:54 PM org.example.game_library.networking.ThreadCreator <init>
+INFO: Streams created for client 27
+May 31, 2025 8:01:54 PM org.example.game_library.networking.ThreadCreator run
+INFO: Thread 27 started successfully!

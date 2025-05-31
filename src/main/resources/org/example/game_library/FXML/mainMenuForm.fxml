@@ -31,7 +31,7 @@
             </LinearGradient>
          </fill>
       </Rectangle>
-      <Pane layoutX="113.0" layoutY="34.0" prefHeight="100.0" prefWidth="225.0">
+      <Pane layoutX="123.0" layoutY="44.0" prefHeight="100.0" prefWidth="225.0">
          <children>
             <Label alignment="CENTER" prefHeight="100.0" prefWidth="225.0" text="Java Game Library" textAlignment="CENTER">
                <font>
@@ -46,15 +46,18 @@
             <Button fx:id="loginButton" mnemonicParsing="false" onAction="#onLoginClick" prefHeight="26.0" prefWidth="94.0" styleClass="transparent-button" text="Login">
                <font>
                   <Font name="System Bold" size="12.0" />
-               </font></Button>
+               </font>
+            </Button>
             <Button fx:id="registerButton" mnemonicParsing="false" onAction="#onRegisterClick" prefHeight="26.0" prefWidth="93.0" styleClass="transparent-button" text="Register">
                <font>
                   <Font name="System Bold" size="12.0" />
-               </font></Button>
+               </font>
+            </Button>
             <Button fx:id="exitButton" mnemonicParsing="false" onAction="#onExitClick" prefHeight="26.0" prefWidth="90.0" styleClass="transparent-button" text="Exit">
                <font>
                   <Font name="System Bold" size="12.0" />
-               </font></Button>
+               </font>
+            </Button>
          </children>
       </HBox>
       <Label alignment="CENTER" layoutX="167.0" layoutY="179.0" text="Ready to play?" textAlignment="CENTER">
