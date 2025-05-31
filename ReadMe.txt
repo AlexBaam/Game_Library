@@ -15,3 +15,4 @@ Informatii utile:
 - Pentru partea de networking vom folosi protocolul TCP-IP, avand conexiune realizata prin socket-uri;
 - Pentru debugging folosim loggers, in \src\main\java\org\example\game_library avem folderul de utils, acolo se afla o configurare pentru loggers;
 - Acestia sunt afisati atat in terminal, cat salvati si in format fizic in folderul \Game_Library\logs ce va fi creat in calculatorul tau atunci cand rulezi prima data codul;
+- Cat timp serverul sau clientul sunt pornite, tu vei vedea in folderul de logs si fisiere .lck, acestea sunt fisiere de tip lock, ignora-le;
