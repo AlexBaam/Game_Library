@@ -10,6 +10,7 @@ public class LoggerColor extends Formatter {
     private static final String YELLOW = "\u001B[33m";
     private static final String GREEN = "\u001B[32m";
     private static final String BLUE = "\u001B[34m";
+    private static final String PURPLE = "\u001B[35m";
 
     @Override
     public String format(LogRecord record) {
@@ -19,9 +20,9 @@ public class LoggerColor extends Formatter {
             case "SEVERE": color = RED; break;
             case "WARNING": color = YELLOW; break;
             case "INFO": color = GREEN; break;
-            case "FINE":
+            case "FINE": color = BLUE; break;
             case "FINER":
-            case "FINEST": color = BLUE; break;
+            case "FINEST": color = PURPLE; break;
             default: color = RESET;
         }
 
