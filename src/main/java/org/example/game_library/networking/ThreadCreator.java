@@ -1,4 +1,4 @@
-package org.example.game_library.Server.Connection;
+package org.example.game_library.networking;
 
 import java.io.*;
 import java.net.Socket;

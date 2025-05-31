@@ -1,6 +1,5 @@
-package org.example.game_library.Server;
+package org.example.game_library.networking;
 
-import org.example.game_library.Server.Connection.ThreadCreator;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;

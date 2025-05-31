@@ -3,36 +3,45 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.paint.LinearGradient?>
 <?import javafx.scene.paint.Stop?>
-<?import javafx.scene.shape.Ellipse?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane_MainMenu" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: transparent;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.game_library.Client.UI.MainMenuForm">
+<AnchorPane fx:id="rootPane_MainMenu" prefHeight="300.0" prefWidth="450.0" style="-fx-background-color: transparent;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.game_library.views.MainMenuForm">
    <children>
-      <Ellipse layoutX="300.0" layoutY="200.0" radiusX="181.0" radiusY="110.0" stroke="BLACK" strokeType="INSIDE">
+      <Rectangle arcHeight="5.0" arcWidth="5.0" height="300.0" stroke="BLACK" strokeType="INSIDE" width="450.0">
          <fill>
-            <LinearGradient endX="1.0" endY="1.0">
+            <LinearGradient endX="0.7850378787878786" endY="0.7765151072632183" startX="0.049242422436222885" startY="0.011363643588441774">
                <stops>
                   <Stop>
                      <color>
-                        <Color red="1.0" green="0.795351505279541" blue="0.11999999731779099" />
+                        <Color red="1.0" green="0.644444465637207" blue="0.644444465637207" />
                      </color>
                   </Stop>
                   <Stop offset="1.0">
                      <color>
-                        <Color red="0.7305055260658264" green="0.16307991743087769" blue="0.9368420839309692" />
+                        <Color red="0.6629629731178284" green="0.8090123534202576" blue="1.0" />
                      </color>
                   </Stop>
                </stops>
             </LinearGradient>
          </fill>
-      </Ellipse>
-      <VBox layoutX="309.0" layoutY="150.0" prefHeight="54.0" prefWidth="91.0">
+      </Rectangle>
+      <Pane layoutX="113.0" layoutY="34.0" prefHeight="100.0" prefWidth="225.0">
+         <children>
+            <Label alignment="CENTER" prefHeight="100.0" prefWidth="225.0" text="Java Game Library" textAlignment="CENTER">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="100.0" stroke="BLACK" strokeType="INSIDE" width="225.0" />
+         </children>
+      </Pane>
+      <HBox layoutX="90.0" layoutY="222.0" prefHeight="34.0" prefWidth="270.0">
          <children>
             <Button fx:id="loginButton" mnemonicParsing="false" onAction="#onLoginClick" prefHeight="26.0" prefWidth="94.0" styleClass="transparent-button" text="Login">
                <font>
@@ -47,16 +56,11 @@
                   <Font name="System Bold" size="12.0" />
                </font></Button>
          </children>
-      </VBox>
-      <Pane layoutX="189.0" layoutY="134.0" prefHeight="132.0" prefWidth="110.0">
-         <children>
-            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9dcde" height="132.0" stroke="BLACK" strokeType="INSIDE" width="110.0" />
-            <Label layoutX="8.0" layoutY="56.0" text="Game Library" textAlignment="CENTER" wrapText="true">
-               <font>
-                  <Font name="System Bold" size="15.0" />
-               </font>
-            </Label>
-         </children>
-      </Pane>
+      </HBox>
+      <Label alignment="CENTER" layoutX="167.0" layoutY="179.0" text="Ready to play?" textAlignment="CENTER">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

@@ -1,4 +1,4 @@
-package org.example.game_library.Client.UI;
+package org.example.game_library.views;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

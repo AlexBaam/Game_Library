@@ -1,7 +1,7 @@
-package org.example.game_library.Client.UI;
+package org.example.game_library.views;
 
-import Utils.AppLogger;
-import Utils.Exceptions.NullData;
+import utils.loggers.AppLogger;
+import utils.exceptions.NullData;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

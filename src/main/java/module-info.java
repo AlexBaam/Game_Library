@@ -9,12 +9,9 @@ module org.example.game_library {
     requires java.desktop;
     requires java.logging;
 
-    exports org.example.game_library.Client;
-    opens org.example.game_library.Client to javafx.fxml;
+    exports org.example.game_library.networking;
+    opens org.example.game_library.networking to javafx.fxml;
 
-    exports org.example.game_library.Client.UI;
-    opens org.example.game_library.Client.UI to javafx.fxml;
-
-    exports org.example.game_library.Server;
-    opens org.example.game_library.Server to javafx.fxml;
+    exports org.example.game_library.views;
+    opens org.example.game_library.views to javafx.fxml;
 }

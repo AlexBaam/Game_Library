@@ -1,4 +1,4 @@
-package Utils.Exceptions;
+package utils.exceptions;
 
 public class NullData extends RuntimeException {
     public NullData(String message) {
