@@ -1,5 +1,9 @@
 package org.example.game_library.views;
 
+import javafx.scene.control.Alert;
+import org.example.game_library.database.model.User;
+import org.example.game_library.database.repository.UserRepository;
+import org.example.game_library.utils.jpa.JPAUtils;
 import org.example.game_library.utils.loggers.AppLogger;
 import org.example.game_library.utils.exceptions.NullData;
 import javafx.fxml.FXML;
@@ -52,8 +56,28 @@ public class RegisterForm {
             logger.log(Level.INFO, "Username entered: {0}", username);
             logger.log(Level.INFO, "Password entered: {0}", password);
             logger.log(Level.INFO, "Email entered: {0}", email);
+
+            UserRepository userRepository = new UserRepository(JPAUtils.getEntityManager());
+            User registeredUser = userRepository.registration(email, username, password);
+
+            if (registeredUser != null) {
+               // showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Account created successfully!");
+                logger.log(Level.INFO, "User {0} registered successfully.", username);
+               // clearFields();
+            } else {
+               // showAlert(Alert.AlertType.ERROR, "Registration Failed", "Failed to register account. Please check logs for details or try different credentials.");
+                logger.log(Level.WARNING, "User registration failed for {0}.", username);
+            }
+
         } catch (NullData e) {
             logger.log(Level.SEVERE, "Validation error: {0}", e.getMessage());
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "An unexpected error occurred during registration: {0}", e.getMessage());
+        } finally {
+            // ne asiguram ca inchidem entitatea
+            if (JPAUtils.getEntityManager().isOpen()) {
+                JPAUtils.getEntityManager().close();
+            }
         }
 
         //TODO ACTUAL SERVER COMMUNICATION
