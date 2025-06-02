@@ -1,12 +1,16 @@
 /* Apply to all buttons */
 .transparent-button {
     -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
     -fx-border-color: black;
     -fx-border-radius: 10;
     -fx-text-fill: black;
     -fx-font-size: 13px;
     -fx-cursor: hand;
     -fx-padding: 6 12;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
 
 /* Hover effect */
