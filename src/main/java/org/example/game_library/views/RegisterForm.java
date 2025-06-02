@@ -14,9 +14,11 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,8 +29,10 @@ public class RegisterForm {
     private String password;
     private String email;
     private static final Logger logger = AppLogger.getLogger();
-    ArrayList<String> parameters = new ArrayList<String>();
-    Socket clientSocket = null;
+    List<String> parameters = new ArrayList<>();
+    private final String SERVER_IP = "127.0.0.1";
+    private final int SERVER_PORT = 5000;
+    private Socket clientSocket;
 
     @FXML
     private TextField usernameField;
@@ -90,6 +94,10 @@ public class RegisterForm {
 
             if(dateVerificate==1)
             {
+                clientSocket = new Socket(SERVER_IP, SERVER_PORT);
+                ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+                ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+
                 parameters.add("register");
                 parameters.add(email);
                 parameters.add(username);
@@ -97,10 +105,34 @@ public class RegisterForm {
 
                 //String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
                 logger.log(Level.INFO, "Preparing to send registration data to server.");
+                out.writeObject(parameters);
+                out.flush();
 
+                Object response = in.readObject();
 
-                ObjectOutputStream oos = null;
-                try {
+                if (response instanceof String respMsg) {
+                    switch (respMsg) {
+                        case "SUCCESS" -> {
+                            logger.log(Level.INFO, "User registered successfully.");
+                            //showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Account created successfully!");
+                        }
+                        case "FAILURE" -> {
+                            logger.log(Level.WARNING, "Registration failed.");
+                            //showAlert(Alert.AlertType.ERROR, "Registration Failed", "Could not register account. Try different credentials.");
+                        }
+                        default -> {
+                            logger.log(Level.WARNING, "Unexpected response from server: {0}", respMsg);
+                            //showAlert(Alert.AlertType.WARNING, "Server Error", "Unexpected response: " + respMsg);
+                        }
+                    }
+                }
+
+                // Close streams & socket
+                out.close();
+                in.close();
+                clientSocket.close();
+
+                /*try {
                     // luam fluxul de iesire de la socket
                     OutputStream os = clientSocket.getOutputStream();
                     // cream un obiect peste acel flux de iesire
@@ -139,26 +171,8 @@ public class RegisterForm {
                 //     } catch (IOException e) {
                 //         logger.log(Level.SEVERE, "Error closing ObjectOutputStream: " + e.getMessage());
                 //     }
-                // }
+                // }*/
 
-            }
-
-
-
-
-
-
-
-            UserRepository userRepository = new UserRepository(JPAUtils.getEntityManager());
-            User registeredUser = userRepository.registration(email, username, password);
-
-            if (registeredUser != null) {
-               // showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Account created successfully!");
-                logger.log(Level.INFO, "User {0} registered successfully.", username);
-               // clearFields();
-            } else {
-               // showAlert(Alert.AlertType.ERROR, "Registration Failed", "Failed to register account. Please check logs for details or try different credentials.");
-                logger.log(Level.WARNING, "User registration failed for {0}.", username);
             }
 
         } catch (NullData e) {
@@ -171,8 +185,6 @@ public class RegisterForm {
                 JPAUtils.getEntityManager().close();
             }
         }
-
-        //TODO ACTUAL SERVER COMMUNICATION
     }
 
     @FXML

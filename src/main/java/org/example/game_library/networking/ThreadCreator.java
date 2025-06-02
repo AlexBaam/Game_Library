@@ -1,5 +1,8 @@
 package org.example.game_library.networking;
 
+import org.example.game_library.database.model.User;
+import org.example.game_library.database.repository.UserRepository;
+import org.example.game_library.utils.jpa.JPAUtils;
 import org.example.game_library.utils.loggers.AppLogger;
 
 import java.io.*;
@@ -71,8 +74,20 @@ public class ThreadCreator extends Thread {
                             break;
                         }
                         case REGISTER -> {
-                            // HANDLE REGISTER
-                            break;
+                            String email = request.get(1);
+                            String username = request.get(2);
+                            String password = request.get(3);
+
+                            // Call JPA/Hibernate to register user in the DB
+                            UserRepository repo = new UserRepository(JPAUtils.getEntityManager());
+                            User user = repo.registration(email, username, password);
+
+                            if (user != null) {
+                                output.writeObject("SUCCESS");
+                            } else {
+                                output.writeObject("FAILURE");
+                            }
+
                         }
                         case EXIT -> {
                             output.writeObject("User pressed exit!");
