@@ -23,6 +23,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "logged_in")
+    private boolean loggedIn;
+
     public User() {}
 
     public User(String username, String email, String password) {

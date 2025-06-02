@@ -4,14 +4,15 @@ DROP VIEW IF EXISTS top10_minesweeper;
 DROP TABLE IF EXISTS saved_games;
 DROP TABLE IF EXISTS tictactoe_scores;
 DROP TABLE IF EXISTS minesweeper_scores;
-DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS user_deletion_log;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
                        user_id SERIAL PRIMARY KEY,
                        username VARCHAR(50) UNIQUE NOT NULL,
                        email VARCHAR(100) UNIQUE NOT NULL,
-                       password TEXT NOT NULL
+                       password TEXT NOT NULL,
+                       logged_in BOOLEAN NOT NULL
 );
 
 CREATE TABLE tictactoe_scores (
@@ -133,7 +134,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Hardcoded user for testing
-INSERT INTO users (username, email, password)
-VALUES ('Nicu', 'testEmail@example.com', '0307');
-INSERT INTO users (username, email, password)
-VALUES ('geo', 'geo@example.com', 'geo');
+INSERT INTO users (username, email, password, logged_in)
+VALUES ('Nicu', 'testEmail@example.com', '0307', FALSE);
+INSERT INTO users (username, email, password, logged_in)
+VALUES ('geo', 'geo@example.com', 'geo', FALSE);
