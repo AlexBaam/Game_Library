@@ -1,11 +1,7 @@
 package org.example.game_library.views;
 
 import javafx.scene.control.Alert;
-import org.example.game_library.database.model.User;
-import org.example.game_library.database.repository.UserRepository;
-import org.example.game_library.networking.ClientMain;
 import org.example.game_library.networking.ClientToServerProxy;
-import org.example.game_library.utils.jpa.JPAUtils;
 import org.example.game_library.utils.loggers.AppLogger;
 import org.example.game_library.utils.exceptions.NullData;
 import javafx.fxml.FXML;
@@ -16,21 +12,11 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.util.ArrayList;
-
 public class RegisterForm {
-
-    private String username;
-    private String password;
-    private String email;
 
     private static final Logger logger = AppLogger.getLogger();
 
@@ -45,9 +31,9 @@ public class RegisterForm {
 
     @FXML
     private void onRegisterClick() {
-        this.username = usernameField.getText();
-        this.password = passwordField.getText();
-        this.email = emailField.getText();
+        String username = usernameField.getText();
+        String password = passwordField.getText();
+        String email = emailField.getText();
 
         logger.log(Level.INFO, "User pressed register");
 
@@ -76,7 +62,8 @@ public class RegisterForm {
                 dateVerificate = 0;
                 logger.log(Level.WARNING, "Password must have at least 4 characters");
             } else {
-                int numberARond=0, numberDot = 0;
+                int numberARond=0;
+                int numberDot = 0;
                 for (int i = 0; i < email.length(); i++) {
                     if(email.charAt(i)=='.')
                         numberDot++;
@@ -90,13 +77,7 @@ public class RegisterForm {
             }
 
             if(dateVerificate==1) {
-                List<String> parameters = new ArrayList<>();
-                parameters.clear();
-
-                parameters.add("register");
-                parameters.add(email);
-                parameters.add(username);
-                parameters.add(password);
+                List<String> parameters = List.of("register", email, username, password);
 
                 //String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
                 logger.log(Level.INFO, "Preparing to send registration data to server.");
@@ -118,14 +99,7 @@ public class RegisterForm {
             logger.log(Level.SEVERE, "Validation error: {0}", e.getMessage());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "An unexpected error occurred during registration: {0}", e.getMessage());
-        } finally {
-            // ne asiguram ca inchidem entitatea
-            if (JPAUtils.getEntityManager().isOpen()) {
-                JPAUtils.getEntityManager().close();
-            }
         }
-
-        //TODO ACTUAL SERVER COMMUNICATION
     }
 
     @FXML
