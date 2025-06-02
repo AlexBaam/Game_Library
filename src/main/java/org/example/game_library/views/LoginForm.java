@@ -1,5 +1,9 @@
 package org.example.game_library.views;
 
+import jakarta.persistence.EntityManager;
+import org.example.game_library.database.model.User;
+import org.example.game_library.database.repository.UserRepository;
+import org.example.game_library.utils.jpa.JPAUtils;
 import org.example.game_library.utils.loggers.AppLogger;
 import org.example.game_library.utils.exceptions.NullData;
 import javafx.fxml.FXML;
@@ -40,14 +44,29 @@ public class LoginForm {
                 throw new NullData("Password cannot be blank");
             }
 
-            logger.log(Level.INFO, "Username entered: {0}", username);
-            logger.log(Level.INFO, "Password entered: {0}", password);
+            logger.log(Level.INFO, "Attempting login for user: {0}", username);
+
+            EntityManager em = JPAUtils.getEntityManager();
+            UserRepository userRepo = new UserRepository(em);
+            User user = userRepo.authenticate(username, password);
+
+            if(user != null){
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass()
+                        .getResource("/org/example/game_library/FXML/userDashboardForm.fxml"));
+                Parent root = fxmlLoader.load();
+                Stage stage = (Stage) usernameField.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                logger.log(Level.INFO, "Login successful! Switched to dashboard!");
+            } else {
+                logger.log(Level.WARNING, "Login failed for user: {0}", username);
+            }
 
         } catch (NullData e){
             logger.log(Level.SEVERE, "Validation error: {0}", e.getMessage());
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error loading user dashboard: {0}", e.getMessage());
+            throw new RuntimeException(e);
         }
-
-        // TODO: Implement real login logic (server call, validation, etc.)
     }
 
     @FXML

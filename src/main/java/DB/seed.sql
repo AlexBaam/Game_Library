@@ -1,10 +1,10 @@
 DROP VIEW IF EXISTS top10_tictactoe;
 DROP VIEW IF EXISTS top10_minesweeper;
 
+DROP TABLE IF EXISTS saved_games;
 DROP TABLE IF EXISTS tictactoe_scores;
 DROP TABLE IF EXISTS minesweeper_scores;
 DROP TABLE IF EXISTS users;
-
 
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
@@ -12,7 +12,6 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password TEXT NOT NULL
 );
-
 
 CREATE TABLE tictactoe_scores (
     user_id INTEGER PRIMARY KEY,
@@ -27,6 +26,14 @@ CREATE TABLE minesweeper_scores (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
+CREATE TABLE saved_games (
+    save_id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    game_type VARCHAR(20),
+    game_state TEXT NOT NULL,
+    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
 
 CREATE VIEW top10_minesweeper AS
 SELECT u.username, ms.best_score
@@ -72,5 +79,6 @@ CREATE TRIGGER validate_user_insert
     FOR EACH ROW
     EXECUTE FUNCTION check_email_and_username_uniqueness();
 
-
-
+-- Hardcoded user for testing
+INSERT INTO users (username, email, password)
+VALUES ('Nicu', 'testEmail@example.com', '0307');
