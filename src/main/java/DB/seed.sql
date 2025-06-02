@@ -5,34 +5,35 @@ DROP TABLE IF EXISTS saved_games;
 DROP TABLE IF EXISTS tictactoe_scores;
 DROP TABLE IF EXISTS minesweeper_scores;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS user_deletion_log;
 
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password TEXT NOT NULL
+                       user_id SERIAL PRIMARY KEY,
+                       username VARCHAR(50) UNIQUE NOT NULL,
+                       email VARCHAR(100) UNIQUE NOT NULL,
+                       password TEXT NOT NULL
 );
 
 CREATE TABLE tictactoe_scores (
-    user_id INTEGER PRIMARY KEY,
-    total_wins INTEGER DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+                                  user_id INTEGER PRIMARY KEY,
+                                  total_wins INTEGER DEFAULT 0,
+                                  FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE minesweeper_scores (
-    user_id INTEGER PRIMARY KEY,
-    total_wins INTEGER DEFAULT 0,
-    best_score INTEGER DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+                                    user_id INTEGER PRIMARY KEY,
+                                    total_wins INTEGER DEFAULT 0,
+                                    best_score INTEGER DEFAULT 0,
+                                    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE saved_games (
-    save_id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    game_type VARCHAR(20),
-    game_state TEXT NOT NULL,
-    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+                             save_id SERIAL PRIMARY KEY,
+                             user_id INTEGER NOT NULL,
+                             game_type VARCHAR(20),
+                             game_state TEXT NOT NULL,
+                             saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 CREATE VIEW top10_minesweeper AS
@@ -79,6 +80,60 @@ CREATE TRIGGER validate_user_insert
     FOR EACH ROW
     EXECUTE FUNCTION check_email_and_username_uniqueness();
 
+-- Trigger pentru a loga stergerea unui user
+CREATE TABLE user_deletion_log (
+                                   log_id SERIAL PRIMARY KEY,
+                                   user_id INTEGER,
+                                   username VARCHAR(50),
+                                   deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE FUNCTION log_user_deletion()
+RETURNS TRIGGER AS $$
+BEGIN
+INSERT INTO user_deletion_log (user_id, username)
+VALUES (OLD.user_id, OLD.username);
+RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_log_user_deletion
+    BEFORE DELETE ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION log_user_deletion();
+
+
+CREATE OR REPLACE FUNCTION get_user_tictactoe_rank_manual(p_user_id INTEGER)
+RETURNS INTEGER AS $$
+DECLARE
+v_user_wins INTEGER;
+    v_rank INTEGER;
+BEGIN
+    -- 1. Obținem numărul de victorii al utilizatorului specificat
+SELECT total_wins INTO v_user_wins
+FROM tictactoe_scores
+WHERE user_id = p_user_id;
+
+-- Dacă utilizatorul nu are victorii sau nu există, îi dăm un rang "nedefinit" (sau 0, în funcție de logica ta)
+-- sau putem arunca o excepție, dacă e cazul.
+IF v_user_wins IS NULL THEN
+        RETURN NULL; -- Sau o altă valoare care indică faptul că nu a fost găsit
+END IF;
+
+    -- 2. Calculăm rangul: numărăm câți utilizatori au mai multe victorii
+    -- și adăugăm 1 la rezultat.
+    -- (Acest lucru simulează comportamentul RANK() unde egalitățile primesc același loc,
+    -- dar locul următor este sărit - ex: 1, 2, 2, 4)
+SELECT COUNT(DISTINCT total_wins) + 1 INTO v_rank
+FROM tictactoe_scores
+WHERE total_wins > v_user_wins;
+
+RETURN v_rank;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Hardcoded user for testing
 INSERT INTO users (username, email, password)
 VALUES ('Nicu', 'testEmail@example.com', '0307');
+INSERT INTO users (username, email, password)
+VALUES ('geo', 'geo@example.com', 'geo');
