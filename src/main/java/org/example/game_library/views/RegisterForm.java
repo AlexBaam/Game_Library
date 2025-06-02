@@ -3,6 +3,8 @@ package org.example.game_library.views;
 import javafx.scene.control.Alert;
 import org.example.game_library.database.model.User;
 import org.example.game_library.database.repository.UserRepository;
+import org.example.game_library.networking.ClientMain;
+import org.example.game_library.networking.ClientToServerProxy;
 import org.example.game_library.utils.jpa.JPAUtils;
 import org.example.game_library.utils.loggers.AppLogger;
 import org.example.game_library.utils.exceptions.NullData;
@@ -14,21 +16,23 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import java.util.ArrayList;
 
 public class RegisterForm {
+
     private String username;
     private String password;
     private String email;
+
     private static final Logger logger = AppLogger.getLogger();
-    ArrayList<String> parameters = new ArrayList<String>();
-    Socket clientSocket = null;
 
     @FXML
     private TextField usernameField;
@@ -71,8 +75,7 @@ public class RegisterForm {
             } else if (password.length() < 4) {
                 dateVerificate = 0;
                 logger.log(Level.WARNING, "Password must have at least 4 characters");
-            } else
-            {
+            } else {
                 int numberARond=0, numberDot = 0;
                 for (int i = 0; i < email.length(); i++) {
                     if(email.charAt(i)=='.')
@@ -80,16 +83,16 @@ public class RegisterForm {
                     else if(email.charAt(i)=='@')
                         numberARond++;
                 }
-                if(numberARond!=1 && numberDot<1)
-                {
+                if(numberARond!=1 && numberDot<1) {
                     dateVerificate = 0;
                     logger.log(Level.WARNING, "User must have at least one dot and at one @");
                 }
             }
 
+            if(dateVerificate==1) {
+                List<String> parameters = new ArrayList<>();
+                parameters.clear();
 
-            if(dateVerificate==1)
-            {
                 parameters.add("register");
                 parameters.add(email);
                 parameters.add(username);
@@ -98,68 +101,17 @@ public class RegisterForm {
                 //String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
                 logger.log(Level.INFO, "Preparing to send registration data to server.");
 
+                ClientToServerProxy.send(parameters);
 
-                ObjectOutputStream oos = null;
-                try {
-                    clientSocket = new Socket("localhost", 5000);
-                    // luam fluxul de iesire de la socket
-                    OutputStream os = clientSocket.getOutputStream();
-                    // cream un obiect peste acel flux de iesire
-                    oos = new ObjectOutputStream(os);
+                String response = ClientToServerProxy.receive();
 
-                    // serializarea
-                    oos.writeObject(parameters);
-                    oos.flush();
+                logger.log(Level.INFO, "Received response: {0}", response);
 
-                    logger.log(Level.INFO, "Registration data sent to server: {0}", parameters);
-
-                    // Aici poți adăuga logica pentru a aștepta un răspuns de la server
-                    // de ex: un ObjectInputStream pentru a citi un mesaj de succes/eșec.
-                    // Căci, serverul va trebui să-ți răspundă dacă înregistrarea a avut succes sau nu.
-                    // De exemplu:
-                    // ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-                    // String serverResponse = (String) ois.readObject();
-                    // logger.log(Level.INFO, "Server response: " + serverResponse);
-                    // if ("SUCCESS".equals(serverResponse)) {
-                    //     showAlert(AlertType.INFORMATION, "Registration Successful", "Account created successfully!");
-                    //     clearFields();
-                    // } else {
-                    //     showAlert(AlertType.ERROR, "Registration Failed", serverResponse); // Serverul ar trebui să trimită mesajul de eroare
-                    // }
-
-                } catch (IOException e) {
-                    logger.log(Level.SEVERE, "Error sending data through socket: {0}", e.getMessage());
-                    //showAlert(AlertType.ERROR, "Network Error", "Could not communicate with the server. Please check your connection.");
+                if ("SUCCESS".equals(response)) {
+                    showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Cont created.");
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Registration Failed", response);
                 }
-                // Nu închide socket-ul aici dacă vrei să-l refolosești pentru alte comunicații.
-                // Închiderea socket-ului ar trebui să se facă atunci când clientul se deconectează complet.
-                // If you need to close the OOS if it's new for this operation, do it here:
-                // finally {
-                //     try {
-                //         if (oos != null) oos.close();
-                //     } catch (IOException e) {
-                //         logger.log(Level.SEVERE, "Error closing ObjectOutputStream: " + e.getMessage());
-                //     }
-                // }
-
-            }
-
-
-
-
-
-
-
-            UserRepository userRepository = new UserRepository(JPAUtils.getEntityManager());
-            User registeredUser = userRepository.registration(email, username, password);
-
-            if (registeredUser != null) {
-                // showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Account created successfully!");
-                logger.log(Level.INFO, "User {0} registered successfully.", username);
-                // clearFields();
-            } else {
-                // showAlert(Alert.AlertType.ERROR, "Registration Failed", "Failed to register account. Please check logs for details or try different credentials.");
-                logger.log(Level.WARNING, "User registration failed for {0}.", username);
             }
 
         } catch (NullData e) {
@@ -192,5 +144,13 @@ public class RegisterForm {
     private void onExitClick() {
         Stage stage = (Stage) usernameField.getScene().getWindow();
         stage.close();
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

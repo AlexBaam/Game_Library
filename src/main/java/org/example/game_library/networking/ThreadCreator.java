@@ -24,9 +24,9 @@ public class ThreadCreator extends Thread {
         this.threadId = this.threadId();
 
         try {
+            input = new ObjectInputStream(clientSocket.getInputStream());
             output = new ObjectOutputStream(clientSocket.getOutputStream());
             output.flush();
-            input = new ObjectInputStream(clientSocket.getInputStream());
             logger.log(Level.INFO, "Streams created for thread {0}", threadId);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error setting up input stream: {0}",  e.getMessage());
@@ -36,7 +36,6 @@ public class ThreadCreator extends Thread {
     @Override
     public void run() {
         boolean logged = false;
-        String currentUsername = null;
 
         logger.log(Level.INFO, "Thread {0} started successfully!", threadId);
 
@@ -95,6 +94,7 @@ public class ThreadCreator extends Thread {
                         }
                         default -> {
                             output.writeObject("Command not yet implemented!");
+                            return;
                         }
                     }
                 } else {

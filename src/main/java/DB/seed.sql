@@ -132,9 +132,3 @@ WHERE total_wins > v_user_wins;
 RETURN v_rank;
 END;
 $$ LANGUAGE plpgsql;
-
--- Hardcoded user for testing
-INSERT INTO users (username, email, password, logged_in)
-VALUES ('Nicu', 'testEmail@example.com', '0307', FALSE);
-INSERT INTO users (username, email, password, logged_in)
-VALUES ('geo', 'geo@example.com', 'geo', FALSE);

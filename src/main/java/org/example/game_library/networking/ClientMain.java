@@ -8,24 +8,19 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ClientMain extends Application {
 
-    public static Socket socket;
-    public static DataOutputStream out;
     private static final Logger logger = AppLogger.getLogger();
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         try {
             // Attempt to connect to the server
-            socket = new Socket("127.0.0.1", 5000);
-            out = new DataOutputStream(socket.getOutputStream());
+            ClientToServerProxy.init();
             logger.log(Level.INFO, "Client connected");
 
         } catch (IOException e) {
