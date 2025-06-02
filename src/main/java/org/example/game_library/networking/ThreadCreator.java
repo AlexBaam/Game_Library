@@ -4,13 +4,14 @@ import org.example.game_library.utils.loggers.AppLogger;
 
 import java.io.*;
 import java.net.*;
+import java.util.List;
 import java.util.logging.*;
 
 public class ThreadCreator extends Thread {
     private final Socket clientSocket;
 
-    private DataInputStream input;
-    private DataOutputStream output;
+    private ObjectInputStream input;
+    private ObjectOutputStream output;
 
     private static final Logger logger = AppLogger.getLogger();
     private final long threadId;
@@ -20,8 +21,9 @@ public class ThreadCreator extends Thread {
         this.threadId = this.threadId();
 
         try {
-            input = new DataInputStream(clientSocket.getInputStream());
-            output = new DataOutputStream(clientSocket.getOutputStream());
+            output = new ObjectOutputStream(clientSocket.getOutputStream());
+            output.flush();
+            input = new ObjectInputStream(clientSocket.getInputStream());
             logger.log(Level.INFO, "Streams created for thread {0}", threadId);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error setting up input stream: {0}",  e.getMessage());
@@ -30,24 +32,87 @@ public class ThreadCreator extends Thread {
 
     @Override
     public void run() {
+        boolean logged = false;
+        String currentUsername = null;
+
         logger.log(Level.INFO, "Thread {0} started successfully!", threadId);
 
         try {
-            String line;
+            Object obj;
 
-            while ((line = input.readUTF()) != null) {
-                logger.log(Level.INFO, "Thread {0} received {1}", new Object[]{threadId, line});
-
-                if(line.trim().equalsIgnoreCase("end")){
-                    logger.log(Level.INFO, "Thread {0} requested to disconnect!", threadId);
-                    break;
+            while ((obj = input.readObject()) != null) {
+                if(!(obj instanceof List<?> list)){
+                    output.writeObject("Invalid message format!");
+                    continue;
                 }
 
-                //TODO: Trebuie sa adaugam raspunsuri ptr fiecare request de la client
-                output.writeUTF("Server a primit: " + line);
+                //Safe cast
+                @SuppressWarnings("unchecked")
+                List<String> request = (List<String>) list;
+
+                logger.log(Level.INFO, "Thread {0} received {1}", new Object[]{threadId, request});
+
+                if(request.isEmpty()){
+                    output.writeObject("Empty request!");
+                    continue;
+                }
+
+                String command = request.get(0).toLowerCase();
+                Command commandEnum = Command.fromString(command);
+                if(commandEnum == null){
+                    output.writeObject("Invalid command!");
+                    continue;
+                }
+
+                if(!logged){
+                    switch(commandEnum){
+                        case LOGIN -> {
+                            // HANDLE LOGIN
+                            break;
+                        }
+                        case REGISTER -> {
+                            // HANDLE REGISTER
+                            break;
+                        }
+                        case EXIT -> {
+                            output.writeObject("User pressed exit!");
+                            return;
+                        }
+                        default -> {
+                            output.writeObject("Command not yet implemented!");
+                        }
+                    }
+                } else {
+                    switch(commandEnum){
+                        case LOGOUT -> {
+                            //HANDLE LOGOUT
+                            break;
+                        }
+                        case DELETE -> {
+                            // HANDLE DELETE
+                            break;
+                        }
+                        case EXIT -> {
+                            output.writeObject("User pressed exit!");
+                            return;
+                        }
+                        case TICTACTOE -> {
+                            break;
+                        }
+                        case MINESWEEPER -> {
+                            break;
+                        }
+                        default -> {
+                            output.writeObject("Command not yet implemented!");
+                        }
+                    }
+                }
+
             }
         } catch (IOException e) {
             logger.log(Level.WARNING, "Thread {0} connection error: {1}", new Object[]{threadId, e.getMessage()});
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         } finally {
             try{
                 if(output != null){
