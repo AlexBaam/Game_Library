@@ -19,14 +19,17 @@ public class ThreadCreator extends Thread {
     private static final Logger logger = AppLogger.getLogger();
     private final long threadId;
 
+    private boolean logged = false;
+    private int currentUserId = -1; // Ptr utilizator mai tarziu
+
     public ThreadCreator(Socket socket) {
         this.clientSocket = socket;
         this.threadId = this.threadId();
 
         try {
-            input = new ObjectInputStream(clientSocket.getInputStream());
             output = new ObjectOutputStream(clientSocket.getOutputStream());
             output.flush();
+            input = new ObjectInputStream(clientSocket.getInputStream());
             logger.log(Level.INFO, "Streams created for thread {0}", threadId);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error setting up input stream: {0}",  e.getMessage());
@@ -35,14 +38,20 @@ public class ThreadCreator extends Thread {
 
     @Override
     public void run() {
-        boolean logged = false;
-
         logger.log(Level.INFO, "Thread {0} started successfully!", threadId);
 
         try {
-            Object obj;
 
-            while ((obj = input.readObject()) != null) {
+            while (true) {
+
+                Object obj;
+                try{
+                    obj = input.readObject();
+                } catch (EOFException e) {
+                    logger.log(Level.INFO, "Thread {0} received EOF – closing connection.", threadId);
+                    break;
+                }
+
                 if(!(obj instanceof List<?> list)){
                     output.writeObject("Invalid message format!");
                     continue;
@@ -61,73 +70,21 @@ public class ThreadCreator extends Thread {
 
                 String command = request.get(0).toLowerCase();
                 Command commandEnum = Command.fromString(command);
-                if(commandEnum == null){
+
+                if (commandEnum == null) {
                     output.writeObject("Invalid command!");
                     continue;
                 }
 
                 if(!logged){
-                    switch(commandEnum){
-                        case LOGIN -> {
-                            // HANDLE LOGIN
-                            break;
-                        }
-                        case REGISTER -> {
-                            String email = request.get(1);
-                            String username = request.get(2);
-                            String password = request.get(3);
-
-                            // Call JPA/Hibernate to register user in the DB
-                            UserRepository repo = new UserRepository(JPAUtils.getEntityManager());
-                            User user = repo.registration(email, username, password);
-
-                            if (user != null) {
-                                output.writeObject("SUCCESS");
-                            } else {
-                                output.writeObject("FAILURE");
-                            }
-
-                        }
-                        case EXIT -> {
-                            output.writeObject("User pressed exit!");
-                            return;
-                        }
-                        default -> {
-                            output.writeObject("Command not yet implemented!");
-                            return;
-                        }
-                    }
+                   handleUnauthenticatedCommand(commandEnum, request);
                 } else {
-                    switch(commandEnum){
-                        case LOGOUT -> {
-                            //HANDLE LOGOUT
-                            break;
-                        }
-                        case DELETE -> {
-                            // HANDLE DELETE
-                            break;
-                        }
-                        case EXIT -> {
-                            output.writeObject("User pressed exit!");
-                            return;
-                        }
-                        case TICTACTOE -> {
-                            break;
-                        }
-                        case MINESWEEPER -> {
-                            break;
-                        }
-                        default -> {
-                            output.writeObject("Command not yet implemented!");
-                        }
-                    }
+                    handleAuthenticatedCommand(commandEnum, request);
                 }
 
             }
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e){
             logger.log(Level.WARNING, "Thread {0} connection error: {1}", new Object[]{threadId, e.getMessage()});
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } finally {
             try{
                 if(output != null){
@@ -143,4 +100,72 @@ public class ThreadCreator extends Thread {
             }
         }
     }
+
+    private void handleUnauthenticatedCommand(Command commandEnum, List<String> request) throws IOException {
+        switch(commandEnum){
+            case LOGIN -> handleLogin(request);
+            case REGISTER -> handleRegister(request);
+            case EXIT -> handleExit(request);
+            default -> output.writeObject("Command " + request.get(0) + " not yet implemented!");
+        }
+    }
+
+    private void handleAuthenticatedCommand(Command commandEnum, List<String> request) throws IOException {
+        switch(commandEnum){
+            case LOGOUT -> handleLogout(request);
+            case DELETE -> handleDelete(request);
+            case EXIT -> handleExit(request);
+            case TICTACTOE -> handleTicTacToe(request);
+            case MINESWEEPER -> handleMinesweeper(request);
+            default -> output.writeObject("Command " + request.get(0) + " not yet implemented!");
+        }
+    }
+
+    private void handleRegister(List<String> request) throws IOException {
+        if (request.size() < 4) {
+            output.writeObject("Not enough arguments for REGISTER");
+            return;
+        }
+
+        String email = request.get(1);
+        String username = request.get(2);
+        String password = request.get(3);
+
+        UserRepository repo = new UserRepository(JPAUtils.getEntityManager());
+        User user = repo.registration(email, username, password);
+
+        if (user != null) {
+            output.writeObject("SUCCESS");
+        } else {
+            output.writeObject("FAILURE");
+        }
+    }
+
+    private void handleLogin(List<String> request) throws IOException {
+        //TODO
+    }
+
+    private void handleDelete(List<String> request) throws IOException {
+        //TODO
+    }
+
+    private void handleLogout(List<String> request) throws IOException {
+        //TODO
+    }
+
+    private void handleExit(List<String> request) throws IOException {
+        output.writeObject("User pressed exit!");
+        throw new EOFException();
+    }
+
+    private void handleMinesweeper(List<String> request) throws IOException {
+        //TODO
+    }
+
+    private void handleTicTacToe(List<String> request) throws IOException {
+        //TODO
+    }
+
+
+
 }
