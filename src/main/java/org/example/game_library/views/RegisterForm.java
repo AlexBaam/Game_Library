@@ -79,7 +79,6 @@ public class RegisterForm {
             if(dateVerificate==1) {
                 List<String> parameters = List.of("register", email, username, password);
 
-                //String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
                 logger.log(Level.INFO, "Preparing to send registration data to server.");
 
                 ClientToServerProxy.send(parameters);
