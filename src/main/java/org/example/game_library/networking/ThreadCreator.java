@@ -207,6 +207,7 @@ public class ThreadCreator extends Thread {
 
 
     private void handleExit(List<String> request) throws IOException {
+        handleLogout(request);
         output.writeObject("User pressed exit!");
         throw new EOFException();
     }

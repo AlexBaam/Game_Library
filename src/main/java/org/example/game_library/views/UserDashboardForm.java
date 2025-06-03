@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import javafx.event.ActionEvent;
@@ -104,5 +105,11 @@ public class UserDashboardForm {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    public void onMinesweeperClick(MouseEvent mouseEvent) {
+    }
+
+    public void onTicTacToeClick(MouseEvent mouseEvent) {
     }
 }
