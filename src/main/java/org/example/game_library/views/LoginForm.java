@@ -1,8 +1,10 @@
 package org.example.game_library.views;
 
 import jakarta.persistence.EntityManager;
+import javafx.scene.control.Alert;
 import org.example.game_library.database.model.User;
 import org.example.game_library.database.repository.UserRepository;
+import org.example.game_library.networking.ClientToServerProxy;
 import org.example.game_library.utils.jpa.JPAUtils;
 import org.example.game_library.utils.loggers.AppLogger;
 import org.example.game_library.utils.exceptions.NullData;
@@ -14,6 +16,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,11 +49,18 @@ public class LoginForm {
 
             logger.log(Level.INFO, "Attempting login for user: {0}", username);
 
-            EntityManager em = JPAUtils.getEntityManager();
-            UserRepository userRepo = new UserRepository(em);
-            User user = userRepo.authenticate(username, password);
+            List<String> parameters = List.of( "login",username, password);
 
-            if(user != null){
+            logger.log(Level.INFO, "Preparing to send login data to server.");
+
+            ClientToServerProxy.send(parameters);
+
+            String response = ClientToServerProxy.receive();
+
+            logger.log(Level.INFO, "Received response: {0}", response);
+
+            if ("SUCCESS".equals(response)) {
+                showAlert(Alert.AlertType.INFORMATION, "Login successful", "User successfully logged in.");
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass()
                         .getResource("/org/example/game_library/FXML/userDashboardForm.fxml"));
                 Parent root = fxmlLoader.load();
@@ -58,6 +68,7 @@ public class LoginForm {
                 stage.setScene(new Scene(root));
                 logger.log(Level.INFO, "Login successful! Switched to dashboard!");
             } else {
+                showAlert(Alert.AlertType.ERROR, "Registration Failed", response);
                 logger.log(Level.WARNING, "Login failed for user: {0}", username);
             }
 
@@ -65,6 +76,9 @@ public class LoginForm {
             logger.log(Level.SEVERE, "Validation error: {0}", e.getMessage());
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error loading user dashboard: {0}", e.getMessage());
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            logger.log(Level.SEVERE, "Error receiving data from server: {0}", e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -85,5 +99,13 @@ public class LoginForm {
     private void onExitClick() {
         Stage stage = (Stage) usernameField.getScene().getWindow();
         stage.close();
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

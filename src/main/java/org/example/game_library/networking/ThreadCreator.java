@@ -1,5 +1,6 @@
 package org.example.game_library.networking;
 
+import jakarta.persistence.EntityManager;
 import org.example.game_library.database.model.User;
 import org.example.game_library.database.repository.UserRepository;
 import org.example.game_library.utils.jpa.JPAUtils;
@@ -142,7 +143,22 @@ public class ThreadCreator extends Thread {
     }
 
     private void handleLogin(List<String> request) throws IOException {
-        //TODO
+        if(request.size() < 3){
+            output.writeObject("Not enough arguments for LOGIN");
+            return;
+        }
+
+        String username = request.get(1);
+        String password = request.get(2);
+
+        UserRepository userRepo = new UserRepository(JPAUtils.getEntityManager());
+        User user = userRepo.authenticate(username, password);
+
+        if (user != null) {
+            output.writeObject("SUCCESS");
+        } else {
+            output.writeObject("FAILURE");
+        }
     }
 
     private void handleDelete(List<String> request) throws IOException {
