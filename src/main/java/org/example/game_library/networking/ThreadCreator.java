@@ -25,6 +25,7 @@ public class ThreadCreator extends Thread {
 
     private boolean logged = false;
     private int currentUserId = -1; // Ptr utilizator mai tarziu
+    private String currentUserName;
 
     public ThreadCreator(Socket socket) {
         this.clientSocket = socket;
@@ -159,6 +160,7 @@ public class ThreadCreator extends Thread {
             User user = userRepo.authenticate(username, password);
             logged = true; // Marchează sesiunea ca autentificată
             currentUserId = user.getUser_id(); // Stochează ID-ul utilizatorului
+            currentUserName = user.getUsername();
             output.writeObject("SUCCESS");
         } catch (org.example.game_library.utils.exceptions.LoginException e) {
             // Prindem excepția specifică de login (inclusiv "deja conectat")
@@ -176,8 +178,33 @@ public class ThreadCreator extends Thread {
     }
 
     private void handleLogout(List<String> request) throws IOException {
-        //TODO
+
+        if (!logged || currentUserName == null) {
+            output.writeObject("Nu sunteți autentificat pentru a vă deconecta.");
+            logger.log(Level.WARNING, "Attempted logout by unauthenticated thread {0}.", threadId);
+            return;
+        }
+
+        UserRepository userRepo = new UserRepository(JPAUtils.getEntityManager());
+        try {
+            boolean success = userRepo.updateUserLoggedInStatus(currentUserName, false); // Setează logged_in la FALSE
+            if (success) {
+                logged = false; // Marchează sesiunea ca deconectată
+                currentUserId = -1; // Resetează ID-ul utilizatorului
+                currentUserName = null; // Resetează username-ul
+                output.writeObject("SUCCESS");
+                logger.log(Level.INFO, "User {0} successfully logged out.", currentUserName);
+            } else {
+                output.writeObject("Eroare la deconectare. Vă rugăm să încercați din nou.");
+                logger.log(Level.WARNING, "Failed to update logged_in status to FALSE for user {0}.", currentUserName);
+            }
+        } catch (PersistenceException e) {
+            logger.log(Level.SEVERE, "Database error during logout for user {0}: {1}", new Object[]{currentUserName, e.getMessage()});
+            // Trigger-ul de logout nu ar trebui să arunce excepții, dar prindem orice eroare de DB
+            output.writeObject("Eroare de bază de date la deconectare: " + e.getMessage());
+        }
     }
+
 
     private void handleExit(List<String> request) throws IOException {
         output.writeObject("User pressed exit!");
