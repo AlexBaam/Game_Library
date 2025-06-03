@@ -3,10 +3,6 @@ package org.example.game_library.database.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceException;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import org.example.game_library.database.model.User;
 import org.example.game_library.utils.loggers.AppLogger;
 
