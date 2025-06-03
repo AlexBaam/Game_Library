@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 public class LoginForm {
     private static final Logger logger = AppLogger.getLogger();
     private String username;
@@ -55,7 +56,7 @@ public class LoginForm {
 
             ClientToServerProxy.send(parameters);
 
-            String response = ClientToServerProxy.receive();
+            String response = ClientToServerProxy.receive(); // Aici primesc SUCCESS sau mesajul de eroare
 
             logger.log(Level.INFO, "Received response: {0}", response);
 
@@ -68,16 +69,21 @@ public class LoginForm {
                 stage.setScene(new Scene(root));
                 logger.log(Level.INFO, "Login successful! Switched to dashboard!");
             } else {
-                showAlert(Alert.AlertType.ERROR, "Registration Failed", response);
-                logger.log(Level.WARNING, "Login failed for user: {0}", username);
+                // Acum, 'response' va conține mesajul de eroare de la server,
+                // inclusiv cel de la trigger, dacă e cazul.
+                showAlert(Alert.AlertType.ERROR, "Login Failed", response);
+                logger.log(Level.WARNING, "Login failed for user: {0}. Response: {1}", new Object[]{username, response});
             }
 
         } catch (NullData e){
-            logger.log(Level.SEVERE, "Validation error: {0}", e.getMessage());
+            showAlert(Alert.AlertType.WARNING, "Validation Error", e.getMessage());
+            logger.log(Level.WARNING, "Validation error: {0}", e.getMessage());
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error loading user dashboard: {0}", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Connection Error", "Could not connect to server or load dashboard.");
+            logger.log(Level.SEVERE, "Error loading user dashboard or connection error: {0}", e.getMessage());
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
+            showAlert(Alert.AlertType.ERROR, "Communication Error", "Error receiving data from server.");
             logger.log(Level.SEVERE, "Error receiving data from server: {0}", e.getMessage());
             throw new RuntimeException(e);
         }
