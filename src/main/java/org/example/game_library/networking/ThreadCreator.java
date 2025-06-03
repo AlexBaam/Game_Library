@@ -1,6 +1,5 @@
 package org.example.game_library.networking;
 
-import jakarta.persistence.EntityManager;
 import org.example.game_library.database.model.User;
 import org.example.game_library.database.repository.UserRepository;
 import org.example.game_library.utils.jpa.JPAUtils;
@@ -10,6 +9,10 @@ import java.io.*;
 import java.net.*;
 import java.util.List;
 import java.util.logging.*;
+
+
+import jakarta.persistence.PersistenceException;
+import javax.security.auth.login.LoginException;
 
 public class ThreadCreator extends Thread {
     private final Socket clientSocket;
@@ -78,7 +81,7 @@ public class ThreadCreator extends Thread {
                 }
 
                 if(!logged){
-                   handleUnauthenticatedCommand(commandEnum, request);
+                    handleUnauthenticatedCommand(commandEnum, request);
                 } else {
                     handleAuthenticatedCommand(commandEnum, request);
                 }
@@ -152,12 +155,19 @@ public class ThreadCreator extends Thread {
         String password = request.get(2);
 
         UserRepository userRepo = new UserRepository(JPAUtils.getEntityManager());
-        User user = userRepo.authenticate(username, password);
-
-        if (user != null) {
+        try {
+            User user = userRepo.authenticate(username, password);
+            logged = true; // Marchează sesiunea ca autentificată
+            currentUserId = user.getUser_id(); // Stochează ID-ul utilizatorului
             output.writeObject("SUCCESS");
-        } else {
-            output.writeObject("FAILURE");
+        } catch (org.example.game_library.utils.exceptions.LoginException e) {
+            // Prindem excepția specifică de login (inclusiv "deja conectat")
+            logger.log(Level.INFO, "Login failed for user {0}: {1}", new Object[]{username, e.getMessage()});
+            output.writeObject(e.getMessage()); // Trimite mesajul de eroare clientului
+        } catch (PersistenceException e) {
+            // Prindem alte erori de persistență care nu sunt direct legate de login logică (e.g., probleme cu DB)
+            logger.log(Level.SEVERE, "Database error during login for user {0}: {1}", new Object[]{username, e.getMessage()});
+            output.writeObject("Eroare de bază de date la autentificare.");
         }
     }
 
@@ -181,7 +191,4 @@ public class ThreadCreator extends Thread {
     private void handleTicTacToe(List<String> request) throws IOException {
         //TODO
     }
-
-
-
 }

@@ -132,3 +132,29 @@ WHERE total_wins > v_user_wins;
 RETURN v_rank;
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION manage_user_login_and_sessions()
+RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+
+    IF NEW.logged_in = TRUE AND OLD.logged_in = FALSE THEN
+        RAISE NOTICE 'Utilizatorul "%" încearcă să se conecteze.', NEW.username;
+
+    ELSIF NEW.logged_in = FALSE AND OLD.logged_in = TRUE THEN
+        RAISE NOTICE 'Utilizatorul "%" încearcă să se deconecteze.', OLD.username;
+        RAISE NOTICE 'Utilizatorul "%" s-a deconectat cu succes.', OLD.username;
+
+    ELSIF OLD.logged_in = TRUE AND NEW.logged_in = TRUE THEN
+        RAISE EXCEPTION 'Utilizatorul "%" este deja conectat!', OLD.username
+        USING HINT = 'Nu poți seta logged_in la TRUE dacă este deja TRUE. Folosește o deconectare explicită (setând logged_in la FALSE) înainte de a te reconecta.';
+END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_manage_user_login_and_sessions
+BEFORE UPDATE OF logged_in ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION manage_user_login_and_sessions();
