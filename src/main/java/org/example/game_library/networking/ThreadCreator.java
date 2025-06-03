@@ -174,7 +174,29 @@ public class ThreadCreator extends Thread {
     }
 
     private void handleDelete(List<String> request) throws IOException {
-        //TODO
+        if (!logged || currentUserName == null) {
+            output.writeObject("Nu sunteți autentificat pentru a șterge contul.");
+            logger.log(Level.WARNING, "Attempted delete by unauthenticated thread {0}.", threadId);
+            return;
+        }
+
+        UserRepository userRepo = new UserRepository(JPAUtils.getEntityManager());
+        try {
+            boolean success = userRepo.deleteUserByUsername(currentUserName);
+            if (success) {
+                logged = false;
+                currentUserId = -1;
+                currentUserName = null;
+                output.writeObject("SUCCESS");
+                logger.log(Level.INFO, "User {0} successfully deleted account.", currentUserName);
+            } else {
+                output.writeObject("Eroare la ștergerea contului. Utilizatorul nu a putut fi găsit sau șters.");
+                logger.log(Level.WARNING, "Failed to delete user {0}.", currentUserName);
+            }
+        } catch (PersistenceException e) {
+            logger.log(Level.SEVERE, "Database error during user deletion for {0}: {1}", new Object[]{currentUserName, e.getMessage()});
+            output.writeObject("Eroare de bază de date la ștergerea contului: " + e.getMessage());
+        }
     }
 
     private void handleLogout(List<String> request) throws IOException {

@@ -180,4 +180,34 @@ public class UserRepository {
             return null;
         }
     }
+
+    public boolean deleteUserByUsername(String username) throws PersistenceException {
+        em.getTransaction().begin();
+        try {
+            User user = findByUsername(username);
+            if (user == null) {
+                logger.log(Level.WARNING, "User {0} not found for deletion.", username);
+                em.getTransaction().rollback();
+                return false;
+            }
+
+            em.remove(user); // Aceasta va declanșa trigger-ul log_user_deletion
+            em.getTransaction().commit();
+            logger.log(Level.INFO, "User {0} successfully deleted from the database.", username);
+            return true;
+        } catch (PersistenceException e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            logger.log(Level.SEVERE, "Error deleting user {0}: {1}", new Object[]{username, e.getMessage()});
+            // Propagăm excepția pentru gestionare ulterioară (e.g., afișare mesaj de eroare clientului)
+            throw e;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            logger.log(Level.SEVERE, "An unexpected error occurred during user deletion for {0}: {1}", new Object[]{username, e.getMessage()});
+            throw new PersistenceException("An unexpected error occurred during user deletion.", e);
+        }
+    }
 }

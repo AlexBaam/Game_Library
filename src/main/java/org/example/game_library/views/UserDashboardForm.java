@@ -94,8 +94,43 @@ public class UserDashboardForm {
 
     public void onDeleteAccClick(ActionEvent actionEvent) {
         logger.log(Level.INFO, "User pressed delete account button");
-        // Aici ar trebui să implementezi logica pentru ștergerea contului
-        // care ar implica, de asemenea, trimiterea unei comenzi către server.
+        try {
+            // Trimite comanda de ștergere către server
+            List<String> parameters = List.of("delete");
+            ClientToServerProxy.send(parameters);
+
+            // Așteaptă răspunsul de la server
+            String response = ClientToServerProxy.receive();
+
+            logger.log(Level.INFO, "Received delete account response from server: {0}", response);
+
+            if ("SUCCESS".equals(response)) {
+                showAlert(Alert.AlertType.INFORMATION, "Ștergere cont reușită", "Contul a fost șters cu succes.");
+                logger.log(Level.INFO, "Account deletion successful! Navigating to login form.");
+
+                // După ștergerea contului, navighează înapoi la ecranul de login
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/loginForm.fxml"));
+                Parent root = loader.load();
+
+                Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Game Library - Login");
+                stage.show();
+            } else {
+                // Dacă serverul a trimis un mesaj de eroare
+                showAlert(Alert.AlertType.ERROR, "Eroare la ștergerea contului", response);
+                logger.log(Level.WARNING, "Account deletion failed. Server response: {0}", response);
+            }
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Eroare de comunicare", "Nu s-a putut comunica cu serverul la ștergerea contului.");
+            logger.log(Level.SEVERE, "IO Error during account deletion: {0}", e.getMessage());
+        } catch (ClassNotFoundException e) {
+            showAlert(Alert.AlertType.ERROR, "Eroare de protocol", "Eroare la citirea răspunsului de la server.");
+            logger.log(Level.SEVERE, "ClassNotFoundException during account deletion: {0}", e.getMessage());
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Eroare necunoscută", "A apărut o eroare neașteptată la ștergerea contului.");
+            logger.log(Level.SEVERE, "Unexpected error during account deletion: {0}", e.getMessage());
+        }
     }
 
     // Metodă helper pentru afișarea alertelor
