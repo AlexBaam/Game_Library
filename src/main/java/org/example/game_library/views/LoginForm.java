@@ -1,11 +1,7 @@
 package org.example.game_library.views;
 
-import jakarta.persistence.EntityManager;
 import javafx.scene.control.Alert;
-import org.example.game_library.database.model.User;
-import org.example.game_library.database.repository.UserRepository;
 import org.example.game_library.networking.ClientToServerProxy;
-import org.example.game_library.utils.jpa.JPAUtils;
 import org.example.game_library.utils.loggers.AppLogger;
 import org.example.game_library.utils.exceptions.NullData;
 import javafx.fxml.FXML;

@@ -58,7 +58,7 @@
          <children>
             <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="112.5">
                <children>
-                  <ImageView fitHeight="100.0" fitWidth="112.5" pickOnBounds="true">
+                  <ImageView fx:id="minesweeperButton" fitHeight="100.0" fitWidth="112.5" onMouseClicked="#onMinesweeperClick" pickOnBounds="true" styleClass="image-button">
                      <image>
                         <Image url="@../images/minesweeper.png" />
                      </image>
@@ -70,7 +70,7 @@
             </VBox>
             <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="112.5">
                <children>
-                  <ImageView fitHeight="100.0" fitWidth="112.5" pickOnBounds="true">
+                  <ImageView fx:id="tictactoeButton" fitHeight="100.0" fitWidth="112.5" onMouseClicked="#onTicTacToeClick" pickOnBounds="true" styleClass="image-button">
                      <image>
                         <Image url="@../images/tictactoe.png" />
                      </image>
