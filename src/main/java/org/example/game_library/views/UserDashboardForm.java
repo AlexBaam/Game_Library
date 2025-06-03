@@ -28,7 +28,7 @@ public class UserDashboardForm {
     private Button exitButton;
 
     @FXML
-    public void handleLogout(ActionEvent event) {
+    public void onLogoutClick(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/loginForm.fxml"));
             Parent root = loader.load();
@@ -43,12 +43,12 @@ public class UserDashboardForm {
     }
 
     @FXML
-    public void handleExit(ActionEvent event) {
+    public void onExitClick(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.close();
     }
 
-    public void handleDeleteAcc(ActionEvent actionEvent) {
+    public void onDeleteAccClick(ActionEvent actionEvent) {
         logger.log(Level.INFO, "User pressed delete button");
     }
 }
