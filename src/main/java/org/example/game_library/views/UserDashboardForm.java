@@ -15,6 +15,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.scene.control.Alert;
+
+import org.example.game_library.networking.ClientToServerProxy;
+import java.util.List;
+
 public class UserDashboardForm {
     private static final Logger logger = AppLogger.getLogger();
 
@@ -29,26 +34,75 @@ public class UserDashboardForm {
 
     @FXML
     public void onLogoutClick(ActionEvent event) {
+        logger.log(Level.INFO, "User pressed logout button.");
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/loginForm.fxml"));
-            Parent root = loader.load();
+            // 1. Trimite comanda de logout către server
+            List<String> parameters = List.of("logout");
+            ClientToServerProxy.send(parameters);
 
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Game Library - Login");
-            stage.show();
+            // 2. Așteaptă răspunsul de la server
+            String response = ClientToServerProxy.receive();
+
+            logger.log(Level.INFO, "Received logout response from server: {0}", response);
+
+            // 3. Gestionează răspunsul
+            if ("SUCCESS".equals(response)) {
+                showAlert(Alert.AlertType.INFORMATION, "Deconectare reușită", "V-ați deconectat cu succes.");
+                logger.log(Level.INFO, "Logout successful! Navigating to login form.");
+
+                // 4. Navighează înapoi la ecranul de login
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/loginForm.fxml"));
+                Parent root = loader.load();
+
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Game Library - Login");
+                stage.show();
+            } else {
+                // Dacă serverul a trimis un mesaj de eroare
+                showAlert(Alert.AlertType.ERROR, "Eroare la deconectare", response);
+                logger.log(Level.WARNING, "Logout failed. Server response: {0}", response);
+            }
         } catch (IOException e) {
-            e.printStackTrace(); // Replace with logger if needed
+            showAlert(Alert.AlertType.ERROR, "Eroare de comunicare", "Nu s-a putut comunica cu serverul la deconectare.");
+            logger.log(Level.SEVERE, "IO Error during logout: {0}", e.getMessage());
+        } catch (ClassNotFoundException e) {
+            showAlert(Alert.AlertType.ERROR, "Eroare de protocol", "Eroare la citirea răspunsului de la server.");
+            logger.log(Level.SEVERE, "ClassNotFoundException during logout: {0}", e.getMessage());
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Eroare necunoscută", "A apărut o eroare neașteptată la deconectare.");
+            logger.log(Level.SEVERE, "Unexpected error during logout: {0}", e.getMessage());
         }
     }
 
     @FXML
     public void onExitClick(ActionEvent event) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.close();
+        // La închiderea aplicației, ar trebui să trimiți și o comandă de EXIT către server
+        // pentru a închide thread-ul corespunzător și a deconecta utilizatorul.
+        logger.log(Level.INFO, "User pressed exit button.");
+        try {
+            ClientToServerProxy.send(List.of("exit"));
+            // Nu așteptăm un răspuns aici, deoarece aplicația se închide.
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not send exit command to server: {0}", e.getMessage());
+        } finally {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.close();
+        }
     }
 
     public void onDeleteAccClick(ActionEvent actionEvent) {
-        logger.log(Level.INFO, "User pressed delete button");
+        logger.log(Level.INFO, "User pressed delete account button");
+        // Aici ar trebui să implementezi logica pentru ștergerea contului
+        // care ar implica, de asemenea, trimiterea unei comenzi către server.
+    }
+
+    // Metodă helper pentru afișarea alertelor
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
