@@ -118,7 +118,7 @@ public class ThreadCreator extends Thread {
     private void handleAuthenticatedCommand(Command commandEnum, List<String> request) throws IOException {
         switch(commandEnum){
             case LOGOUT -> handleLogout(request);
-            case DELETE -> handleDelete(request);
+            case DELETE -> handleDelete();
             case EXIT -> handleExit(request);
             case TICTACTOE -> handleTicTacToe(request);
             case MINESWEEPER -> handleMinesweeper(request);
@@ -173,7 +173,7 @@ public class ThreadCreator extends Thread {
         }
     }
 
-    private void handleDelete(List<String> request) throws IOException {
+    private void handleDelete() throws IOException {
         if (!logged || currentUserName == null) {
             output.writeObject("Nu sunteți autentificat pentru a șterge contul.");
             logger.log(Level.WARNING, "Attempted delete by unauthenticated thread {0}.", threadId);
