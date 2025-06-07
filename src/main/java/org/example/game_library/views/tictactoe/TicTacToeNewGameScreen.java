@@ -72,27 +72,16 @@ public class TicTacToeNewGameScreen {
 
     @FXML
     public void OnPlayerClick(ActionEvent event) {
-        logger.log(Level.INFO, "User pressed vs Player button. (TicTacToe - New Game)");
+        logger.log(Level.INFO, "User pressed 'vs Player' button. (TicTacToe - New Game)");
         try {
-            List<String> request = List.of("tictactoe", "newgame", "player");
-            ClientToServerProxy.send(request);
-            String response = (String) ClientToServerProxy.receive();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeConnectionScreen.fxml"));
+            Parent root = loader.load();
 
-            if ("SUCCESS".equalsIgnoreCase(response)) {
-                logger.log(Level.INFO, "New local game initialized successfully.");
-
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeBoard.fxml"));
-                Parent root = loader.load();
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.setTitle("TicTacToe - Local Game");
-                stage.show();
-            } else {
-                logger.log(Level.WARNING, "Server response: {0}", response);
-            }
-
-        } catch (IOException | ClassNotFoundException e) {
-            logger.log(Level.SEVERE, "Error during local game initialization: {0}", e.getMessage());
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            logger.log(Level.INFO, "Navigated to Connection Screen.");
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to load back screen: " + e.getMessage());
         }
     }
 
