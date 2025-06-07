@@ -30,6 +30,17 @@ public class TicTacToeConnectionScreen {
     }
 
     public void OnJoinClick(ActionEvent event) {
+        logger.log(Level.INFO, "User pressed Join Room button. (TicTacToe - Connection Screen)");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeJoinScreen.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            logger.log(Level.INFO, "Navigated to Join Room Screen.");
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to load back screen: " + e.getMessage());
+        }
     }
 
     public void OnHostClick(ActionEvent event) {
