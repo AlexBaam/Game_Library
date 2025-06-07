@@ -125,34 +125,22 @@ public class TicTacToeForm {
             }
 
             if (obj instanceof TicTacToeGame loadedGame) {
-                loadGameToUI(loadedGame);
-                showAlert(Alert.AlertType.INFORMATION, "Loaded", "Game loaded successfully.");
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeBoard.fxml"));
+                Parent root = loader.load();
+
+                TicTacToeBoard controller = loader.getController();
+                controller.loadGameToUI(loadedGame);
+
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("TicTacToe - Loaded Game");
+                stage.show();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Unexpected", "Unknown response from server.");
             }
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Could not load game: " + e.getMessage());
         }
-    }
-
-    private void loadGameToUI(TicTacToeGame game) {
-        String[][] board = game.getBoard();
-
-        for (Node node : boardGrid.getChildren()) {
-            if (node instanceof Button button) {
-                Integer row = GridPane.getRowIndex(button);
-                Integer col = GridPane.getColumnIndex(button);
-
-                if (row == null) row = 0;
-                if (col == null) col = 0;
-
-                String cellValue = board[row][col];
-                button.setText(cellValue);
-                button.setDisable(!cellValue.equals(" "));
-            }
-        }
-
-        this.currentSymbol = game.getCurrentSymbol();
     }
 }
 

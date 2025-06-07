@@ -30,14 +30,18 @@ public class SavedGameRepository {
 
             String gameStateJson = mapper.writeValueAsString(game);
 
-            SavedGame savedGame = new SavedGame();
-            savedGame.setUser(user);
-            savedGame.setGameType(gameType);
-            savedGame.setGameStateJSON(game);
-            savedGame.setSavedAt(LocalDateTime.now());
-
             em.getTransaction().begin();
-            em.persist(savedGame);
+
+            em.createNativeQuery("""
+                INSERT INTO saved_games (user_id, game_type_id, game_state, saved_at)
+                VALUES (?1, ?2, CAST(?3 AS jsonb), ?4)
+            """)
+                    .setParameter(1, user.getUser_id())
+                    .setParameter(2, gameType.getGameTypeId())
+                    .setParameter(3, gameStateJson)
+                    .setParameter(4, LocalDateTime.now())
+                    .executeUpdate();
+
             em.getTransaction().commit();
         } finally {
             em.close();
@@ -61,7 +65,7 @@ public class SavedGameRepository {
             List<TicTacToeGame> games = new ArrayList<>();
 
             for (SavedGame savedGame : savedGames) {
-                TicTacToeGame game = savedGame.getGameStateJSON();
+                TicTacToeGame game = mapper.readValue(savedGame.getGameStateJSON(), TicTacToeGame.class);
                 games.add(game);
             }
 

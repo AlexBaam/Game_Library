@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeGame;
-import org.example.game_library.utils.jpa.JsonbConverter;
 
 import java.time.LocalDateTime;
 
@@ -27,16 +26,15 @@ public class SavedGame {
     @JoinColumn(name = "game_type_id", nullable = false)
     private GameType gameType;
 
-    @Convert(converter = JsonbConverter.class)
     @Column(name = "game_state", columnDefinition = "jsonb", nullable = false)
-    private TicTacToeGame gameStateJSON;
+    private String gameStateJSON;
 
     @Column(name = "saved_at", columnDefinition = "timestamp", nullable = false, updatable = false)
     private LocalDateTime savedAt;
 
     public SavedGame() {}
 
-    public SavedGame(User user, GameType gameType, TicTacToeGame gameStateJSON) {
+    public SavedGame(User user, GameType gameType, String gameStateJSON) {
         this.user = user;
         this.gameType = gameType;
         this.gameStateJSON = gameStateJSON;

@@ -12,6 +12,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.example.game_library.networking.client.ClientToServerProxy;
+import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeGame;
 import org.example.game_library.utils.loggers.AppLogger;
 
 import java.io.IOException;
@@ -158,5 +159,25 @@ public class TicTacToeBoard {
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Navigation Error", "Couldn't go back to new game screen.");
         }
+    }
+
+    public void loadGameToUI(TicTacToeGame loadedGame) {
+        String[][] board = loadedGame.getBoard();
+
+        for (Node node : boardGrid.getChildren()) {
+            if (node instanceof Button button) {
+                Integer row = GridPane.getRowIndex(button);
+                Integer col = GridPane.getColumnIndex(button);
+
+                if (row == null) row = 0;
+                if (col == null) col = 0;
+
+                String cellValue = board[row][col];
+                button.setText(cellValue);
+                button.setDisable(!cellValue.equals(" "));
+            }
+        }
+
+        this.currentSymbol = loadedGame.getCurrentSymbol();
     }
 }
