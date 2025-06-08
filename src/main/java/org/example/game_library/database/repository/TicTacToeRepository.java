@@ -4,7 +4,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import org.example.game_library.database.model.TicTacToe;
 import org.example.game_library.database.model.User;
+import org.example.game_library.networking.server.tictactoe_game_logic.ScoreEntry;
 import org.example.game_library.utils.jpa.JPAUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TicTacToeRepository {
 
@@ -32,6 +36,32 @@ public class TicTacToeRepository {
         } catch (Exception e) {
             if (tx.isActive()) tx.rollback();
             throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<ScoreEntry> getTicTacToeTopRankedPlayers(int topRanks, String scoreType) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            if (!scoreType.equals("network_wins") && !scoreType.equals("ai_wins")) {
+                throw new IllegalArgumentException("Invalid score type provided for ranking: " + scoreType);
+            }
+
+            List<Object[]> resultList = em.createNativeQuery(
+                            "SELECT rank_nr, username, wins FROM get_tictactoe_top_ranked_players(?, ?)")
+                    .setParameter(1, topRanks)
+                    .setParameter(2, scoreType)
+                    .getResultList();
+
+            List<ScoreEntry> topPlayers = new ArrayList<>();
+            for (Object[] row : resultList) {
+                int rank = ((Number) row[0]).intValue();
+                String username = (String) row[1];
+                int wins = ((Number) row[2]).intValue();
+                topPlayers.add(new ScoreEntry(rank, username, wins));
+            }
+            return topPlayers;
         } finally {
             em.close();
         }

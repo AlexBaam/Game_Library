@@ -4,6 +4,7 @@
     import org.example.game_library.database.repository.UserRepository;
     import org.example.game_library.networking.enums.Command;
     import org.example.game_library.networking.enums.CommandTicTacToe;
+    import org.example.game_library.networking.server.tictactoe_game_logic.ScoreEntry;
     import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeGame;
     import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeRequests;
     import org.example.game_library.utils.loggers.AppLogger;
@@ -14,6 +15,9 @@
     import java.util.logging.*;
 
     import jakarta.persistence.PersistenceException;
+
+    import static org.example.game_library.networking.enums.CommandMinesweeper.*;
+    import static org.example.game_library.networking.enums.CommandTicTacToe.FORFEIT;
 
     public class ThreadCreator extends Thread {
         private final Socket clientSocket;
@@ -29,9 +33,13 @@
 
         private TicTacToeGame ticTacToeGame;
 
+        private UserRepository userRepository;
+
         public ThreadCreator(Socket socket) {
             this.clientSocket = socket;
             this.threadId = this.threadId();
+
+            this.userRepository = new UserRepository();
 
             try {
                 output = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -137,8 +145,7 @@
             String username = request.get(2);
             String password = request.get(3);
 
-            UserRepository userRepo = new UserRepository();
-            User user = userRepo.registration(email, username, password);
+            User user = userRepository.registration(email, username, password);
 
             if (user != null) {
                 output.writeObject("SUCCESS");
@@ -156,9 +163,8 @@
             String username = request.get(1);
             String password = request.get(2);
 
-            UserRepository userRepo = new UserRepository();
             try {
-                User user = userRepo.authenticate(username, password);
+                User user = userRepository.authenticate(username, password);
                 logged = true;
                 currentUser = user;
                 output.writeObject("SUCCESS");
@@ -176,9 +182,8 @@
                 return;
             }
 
-            UserRepository userRepo = new UserRepository();
             try {
-                boolean success = userRepo.deleteUserByUsername(currentUser.getUsername());
+                boolean success = userRepository.deleteUserByUsername(currentUser.getUsername());
                 if (success) {
                     output.writeObject("SUCCESS");
                     logger.log(Level.INFO, "User {0} successfully deleted account.", currentUser.getUsername());
@@ -202,9 +207,8 @@
                 return;
             }
 
-            UserRepository userRepo = new UserRepository();
             try {
-                boolean success = userRepo.updateUserLoggedInStatus(currentUser.getUsername(), false);
+                boolean success = userRepository.updateUserLoggedInStatus(currentUser.getUsername(), false);
                 if (success) {
                     output.writeObject("SUCCESS");
                     logger.log(Level.INFO, "User {0} successfully logged out.", currentUser.getUsername());
@@ -227,18 +231,47 @@
         }
 
         private void handleMinesweeper(List<String> request) throws IOException {
-            //TODO
+            if (request.size() == 1) {
+                output.writeObject("SUCCESS");
+//            } else if (request.size() >= 2) {
+//                String commandMinesweeper = request.get(1);
+//                CommandMinesweeper cTTT = CommandMinesweeper.fromString(commandMinesweeper);
+//
+//                if (cTTT == null) {
+//                    output.writeObject("Comanda Minesweeper este nulă! Comandă: " + commandMinesweeper);
+//                    return;
+//                }
+//
+//                switch (cTTT) {
+//                    case NEWGAME -> MinesweeperRequests.handleNewGame(request, this, output, input);
+//                    case LOADGAME -> MinesweeperRequests.handleLoadGame(request, this, output, input);
+//                    case SAVEGAME -> MinesweeperRequests.handleSaveGame(request, this, output, input);
+//                    case EXIT -> handleExit(request);
+//                    case SCORE -> {
+//                        if (request.size() >= 3) {
+//                            String scoreType = request.get(2);
+//                            MinesweeperRequests.handleScore(request, this, output, input, userRepository);
+//                        } else {
+//                            output.writeObject("Eroare: Tipul de scor nu a fost furnizat pentru comanda SCORE.");
+//                            logger.log(Level.WARNING, "Cererea de scor Minesweeper nu are parametrul de tip de scor.");
+//                        }
+//                    }
+//                    default -> output.writeObject("Comanda " + request.get(1) + " nu este implementată încă!");
+//              }
+            } else {
+                output.writeObject("Eșec la procesarea comenzii TicTacToe.");
+            }
         }
 
         private void handleTicTacToe(List<String> request) throws IOException {
-            if(request.size() == 1) {
+            if (request.size() == 1) {
                 output.writeObject("SUCCESS");
-            } else if(request.size() >= 2) {
+            } else if (request.size() >= 2) {
                 String commandTicTacToe = request.get(1);
                 CommandTicTacToe cTTT = CommandTicTacToe.fromString(commandTicTacToe);
 
-                if(cTTT == null) {
-                    output.writeObject("TicTacToe command is null! Command: " + commandTicTacToe);
+                if (cTTT == null) {
+                    output.writeObject("Comanda TicTacToe este nulă! Comandă: " + commandTicTacToe);
                     return;
                 }
 
@@ -246,14 +279,22 @@
                     case NEWGAME -> TicTacToeRequests.handleNewGame(request, this, output, input);
                     case LOADGAME -> TicTacToeRequests.handleLoadGame(request, this, output, input);
                     case SAVEGAME -> TicTacToeRequests.handleSaveGame(request, this, output, input);
-                    case SCORE -> TicTacToeRequests.handleScore(request,this, output, input);
-                    case FORFEIT -> TicTacToeRequests.handleForfeit(request,this, output, input);
+                    case FORFEIT -> TicTacToeRequests.handleForfeit(request, this, output, input);
                     case MOVE -> TicTacToeRequests.handleMove(request, this, output, input);
                     case EXIT -> handleExit(request);
-                    default -> output.writeObject("Command " + request.get(1) + " not yet implemented!");
+                    case SCORE -> {
+                        if (request.size() >= 3) {
+                            String scoreType = request.get(2);
+                            TicTacToeRequests.handleScore(request, this, output, input, scoreType, userRepository);
+                        } else {
+                            output.writeObject("Eroare: Tipul de scor nu a fost furnizat pentru comanda SCORE.");
+                            logger.log(Level.WARNING, "Cererea de scor TicTacToe nu are parametrul de tip de scor.");
+                        }
+                    }
+                    default -> output.writeObject("Comanda " + request.get(1) + " nu este implementată încă!");
                 }
             } else {
-                output.writeObject("FAILURE");
+                output.writeObject("Eșec la procesarea comenzii TicTacToe.");
             }
         }
 

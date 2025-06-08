@@ -1,4 +1,4 @@
-package org.example.game_library.networking.server.tictactoe_game_logic;
+package org.example.game_library.networking.server.minesweeper_game_logic;
 
 import java.io.Serializable;
 

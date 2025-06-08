@@ -124,6 +124,28 @@ public class UserDashboardForm {
 
     public void onMinesweeperClick(MouseEvent mouseEvent) {
         logger.log(Level.INFO, "User pressed Minesweeper button!");
+        try{
+            List<String> parameters = List.of("minesweeper");
+            ClientToServerProxy.send(parameters);
+
+            String response = (String) ClientToServerProxy.receive();
+
+            logger.log(Level.INFO, "Received delete account response from server: {0}", response);
+
+            if("SUCCESS".equals(response)) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/minesweeper/minesweeperForm.fxml"));
+                Parent root = loader.load();
+                Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+            } else {
+                logger.log(Level.WARNING, "Login failed for user: {0}. Response: {1}", response);
+            }
+
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void onTicTacToeClick(MouseEvent mouseEvent) {

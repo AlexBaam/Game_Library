@@ -102,20 +102,25 @@ public class UserRepository {
         }
     }
 
-    public List<ScoreEntry> getTicTacToeTopRankedPlayers(int topRanks) {
+    public List<ScoreEntry> getTicTacToeTopRankedPlayers(int topRanks, String scoreType) {
         EntityManager em = JPAUtils.getEntityManager();
         try {
+            if (!scoreType.equals("network_wins") && !scoreType.equals("ai_wins")) {
+                throw new IllegalArgumentException("Tip de scor invalid furnizat pentru clasament: " + scoreType);
+            }
+
             List<Object[]> resultList = em.createNativeQuery(
-                            "SELECT rank_nr, username, games_played FROM get_tictactoe_top_ranked_players(?)")
+                            "SELECT rank_nr, username, wins FROM get_tictactoe_top_ranked_players(?, ?)")
                     .setParameter(1, topRanks)
+                    .setParameter(2, scoreType)
                     .getResultList();
 
             List<ScoreEntry> topPlayers = new ArrayList<>();
             for (Object[] row : resultList) {
                 int rank = ((Number) row[0]).intValue();
                 String username = (String) row[1];
-                int gamesPlayed = ((Number) row[2]).intValue();
-                topPlayers.add(new ScoreEntry(rank, username, gamesPlayed));
+                int wins = ((Number) row[2]).intValue();
+                topPlayers.add(new ScoreEntry(rank, username, wins));
             }
             return topPlayers;
         } finally {

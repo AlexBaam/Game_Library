@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.HBox?>
 
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.game_library.views.tictactoe.ScoreForm">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.game_library.views.minesweeper.ScoreForm">
     <children>
         <Rectangle arcHeight="5.0" arcWidth="5.0" height="720.0" smooth="false" stroke="BLACK" strokeType="OUTSIDE" strokeWidth="0.0" width="800.0">
             <fill>
@@ -36,26 +36,24 @@
         </Rectangle>
         <HBox alignment="CENTER" layoutX="196.0" layoutY="99.0" prefHeight="60.0" prefWidth="408.0" spacing="10">
             <children>
-                <Button fx:id="prevRankButton" mnemonicParsing="false" onAction="#onPrevRankClick" text="&lt;" />
-                <Label fx:id="rankTitleLabel" alignment="CENTER" text="Top 3 Rank - Multiplayer">
+                <Label fx:id="rankTitleLabel" alignment="CENTER" text="Top Minesweeper Scores">
                     <font>
                         <Font name="System Bold" size="24.0" />
                     </font>
                 </Label>
-                <Button fx:id="nextRankButton" mnemonicParsing="false" onAction="#onNextRankClick" text="&gt;" />
             </children>
         </HBox>
         <TableView fx:id="scoreTable" layoutX="150.0" layoutY="180.0" prefHeight="400.0" prefWidth="500.0">
             <columns>
                 <TableColumn fx:id="rankColumn" prefWidth="75.0" text="Rank" />
-                <TableColumn fx:id="usernameColumn" prefWidth="225.0" text="Username" />
-                <TableColumn fx:id="winsColumn" prefWidth="200.0" text="Wins" />
+                <TableColumn fx:id="usernameColumn" prefWidth="175.0" text="Username" />
+                <TableColumn fx:id="totalWinsColumn" prefWidth="125.0" text="Total Wins" />
+                <TableColumn fx:id="bestScoreColumn" prefWidth="125.0" text="Best Score" />
             </columns>
         </TableView>
-        <Button fx:id="backButton" layoutX="30.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onBackClick" prefHeight="30.0" prefWidth="90.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Back">
-            <font>
-                <Font name="System Bold" size="12.0" />
-            </font>
+        <Button fx:id="backButton" layoutX="30.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#onBackClick" prefHeight="30.0" prefWidth="90.0" styleClass="transparent-button" stylesheets="@/styles.css" text="Back"> <font>
+            <Font name="System Bold" size="12.0" />
+        </font>
         </Button>
     </children>
 </AnchorPane>
