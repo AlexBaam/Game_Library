@@ -1,5 +1,6 @@
 package org.example.game_library.views.minesweeper;
 
+import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntryM;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
