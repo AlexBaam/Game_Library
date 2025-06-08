@@ -1,5 +1,6 @@
 package org.example.game_library.views.tictactoe;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -49,14 +50,19 @@ public class TicTacToeBoard {
             clicked.setText(currentSymbol);
             clicked.setDisable(true);
 
-            boolean done = false;
+            if ("network".equalsIgnoreCase(mode)) {
+                return;
+            }
 
+            boolean done = false;
             while (!done) {
                 Object raw = ClientToServerProxy.receive();
                 if (!(raw instanceof String)) continue;
+
                 String response = (String) raw;
 
                 if (response.startsWith("AI_MOVE:")) {
+                    logger.log(Level.INFO, response);
                     String[] coords = response.substring(8).split(",");
                     int aiRow = Integer.parseInt(coords[0]);
                     int aiCol = Integer.parseInt(coords[1]);
@@ -64,27 +70,30 @@ public class TicTacToeBoard {
                     aiCell.setText("O");
                     aiCell.setDisable(true);
                 } else if (response.startsWith("WIN:")) {
+                    logger.log(Level.INFO, response);
                     showAlert(Alert.AlertType.INFORMATION, "Game Over", "Player " + currentSymbol + " wins!");
                     returnToNewGameScreen(event);
                     done = true;
                 } else if (response.startsWith("LOSE:")) {
+                    logger.log(Level.INFO, response);
                     showAlert(Alert.AlertType.INFORMATION, "Game Over", "You lost!");
                     returnToNewGameScreen(event);
                     done = true;
                 } else if (response.equalsIgnoreCase("DRAW!")) {
+                    logger.log(Level.INFO, response);
                     showAlert(Alert.AlertType.INFORMATION, "Game Over", "It's a draw!");
                     returnToNewGameScreen(event);
                     done = true;
                 } else if (response.equalsIgnoreCase("SUCCESS")) {
-                    if ("local".equalsIgnoreCase(mode)) {
-                        togglePlayer();
-                    }
+                    logger.log(Level.INFO, response);
+                    if ("local".equalsIgnoreCase(mode)) togglePlayer();
                     done = true;
                 } else if (response.startsWith("FAILURE")) {
+                    logger.log(Level.INFO, response);
                     showAlert(Alert.AlertType.WARNING, "Invalid move", response);
                     done = true;
                 } else {
-                    System.out.println("Unhandled response: " + response);
+                    logger.log(Level.WARNING, "Unhandled: {0}", response);
                 }
             }
 
@@ -230,4 +239,44 @@ public class TicTacToeBoard {
     public void setMode(String mode) {
         this.mode = mode;
     }
+
+    public void startListeningForUpdates() {
+        if (!"network".equalsIgnoreCase(mode)) return;
+
+        Thread listenerThread = new Thread(() -> {
+            try {
+                while (true) {
+                    Object raw = ClientToServerProxy.receive();
+                    if (!(raw instanceof String message)) continue;
+
+                    if (message.startsWith("OPPONENT_MOVED:")) {
+                        String[] coords = message.substring("OPPONENT_MOVED:".length()).split(",");
+                        int row = Integer.parseInt(coords[0]);
+                        int col = Integer.parseInt(coords[1]);
+
+                        Platform.runLater(() -> {
+                            Button cell = getButtonAt(row, col);
+                            if (cell != null) {
+                                cell.setText(currentSymbol.equals("X") ? "O" : "X");
+                                cell.setDisable(true);
+                            }
+                        });
+
+                    } else if (message.startsWith("WIN:") || message.startsWith("LOSE:") || message.equals("DRAW!")) {
+                        Platform.runLater(() -> {
+                            showAlert(Alert.AlertType.INFORMATION, "Game Over", message);
+                            returnToNewGameScreen(null);
+                        });
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        listenerThread.setDaemon(true);
+        listenerThread.start();
+    }
+
 }

@@ -67,7 +67,8 @@ public class TicTacToeRequests {
                     game.setMode("network");
                     threadCreator.setTicTacToeGame(game);
 
-                    output.writeObject("SUCCESS:mode=network;symbol=" + room.getPlayerSymbol(threadCreator));
+                    String symbol = room.getPlayerSymbol(threadCreator);
+                    output.writeObject("SUCCESS:mode=network;symbol=" + symbol);
                 }
                 default -> {
                     output.writeObject("FAILURE: Game mode not supported.");

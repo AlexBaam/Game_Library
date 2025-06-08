@@ -53,12 +53,20 @@ public class TicTacToeConnectionScreen {
     public void onHostClick(ActionEvent event) {
         logger.log(Level.INFO, "User pressed host button. (TicTacToe - Connection Screen)");
         try {
-            List<String> request = List.of("tictactoe", "newgame", "host");
-            ClientToServerProxy.send(request);
+            ClientToServerProxy.send(List.of("tictactoe", "newgame", "host"));
             String response = (String) ClientToServerProxy.receive();
 
-            if (response.startsWith("ROOM_ID:")) {
-                String roomId = response.substring("ROOM_ID:".length());
+            if (response.toLowerCase().startsWith("success")) {
+                String roomId = "";
+                String mode = "network";
+
+                for (String part : response.split(":|;")) {
+                    if (part.startsWith("mode=")) {
+                        mode = part.split("=")[1];
+                    } else if (part.startsWith("room=")) {
+                        roomId = part.split("=")[1];
+                    }
+                }
 
                 logger.log(Level.INFO, "Room hosted successfully with ID: {0}", roomId);
 
@@ -72,8 +80,9 @@ public class TicTacToeConnectionScreen {
                 Parent root = loader.load();
 
                 TicTacToeBoard controller = loader.getController();
+                controller.setMode(mode);
                 controller.setCurrentSymbol("X");
-                controller.setMode("network");
+                controller.startListeningForUpdates();
 
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
@@ -85,7 +94,7 @@ public class TicTacToeConnectionScreen {
             }
 
         } catch (IOException | ClassNotFoundException e) {
-            logger.log(Level.SEVERE, "Error during local game initialization: {0}", e.getMessage());
+            logger.log(Level.SEVERE, "Error during host initialization: {0}", e.getMessage());
         }
     }
 }
