@@ -148,6 +148,13 @@ public class UserRepository {
                 int totalScore = ((Number) row[2]).intValue();
                 topPlayers.add(new ScoreEntryM(rank, username, totalScore));
             }
+
+            for (ScoreEntryM entry : topPlayers) {
+                System.out.println("Rank: " + entry.getRank() +
+                        ", Username: " + entry.getUsername() +
+                        ", TotalScore: " + entry.getTotalScore());
+            }
+
             return topPlayers;
         } catch (Exception e) {
             throw new PersistenceException("Error retrieving Minesweeper scores: " + e.getMessage(), e);

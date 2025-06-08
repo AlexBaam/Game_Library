@@ -284,9 +284,9 @@
                 }
 
                 switch (subCommand) {
-                    case NEWGAME -> TicTacToeRequests.handleNewGame(request, this, output, input);
-                    case LOADGAME -> TicTacToeRequests.handleLoadGame(request, this, output, input);
-                    case SAVEGAME -> TicTacToeRequests.handleSaveGame(request, this, output, input);
+                   // case NEWGAME -> MinesweeperRequests.handleNewGame(request, this, output, input);
+                    //case LOADGAME -> MinesweeperRequests.handleLoadGame(request, this, output, input);
+                    //case SAVEGAME -> MinesweeperRequests.handleSaveGame(request, this, output, input);
                     case EXIT -> handleExit(request);
                     case SCORE -> MinesweeperRequests.handleScore(request, this, output, input, userRepository);
                     default -> output.writeObject("Comanda Minesweeper " + subCommandStr + " nu este implementată.");

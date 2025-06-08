@@ -19,7 +19,6 @@ import org.example.game_library.networking.client.ClientToServerProxy;
 // Nu mai e nevoie de CommandMinesweeper aici dacă nu îl folosești explicit
 // import org.example.game_library.networking.enums.CommandMinesweeper;
 //import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntry;
-import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntryM;
 import org.example.game_library.utils.loggers.AppLogger;
 
 import java.io.IOException;
@@ -28,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class ScoreForm {
+public class ScoreFormMinesweeper {
     private static final Logger logger = AppLogger.getLogger();
 
     @FXML
@@ -77,7 +76,13 @@ public class ScoreForm {
                         return;
                     }
                 }
+
+//                for (ScoreEntryM entry : data) {
+//                    System.out.println("Rank: " + entry.getRank() + ", Username: " + entry.getUsername() + ", TotalScore: " + entry.getTotalScore());
+//                }
+
                 scoreTable.setItems(data);
+               // System.out.println("Numar iteme in tabela: " + scoreTable.getItems().size());
                 logger.log(Level.INFO, "Scorurile Minesweeper au fost încărcate cu succes. Număr de înregistrări: " + data.size());
             } else if (response instanceof String errorMessage) {
                 showAlert(Alert.AlertType.ERROR, "Eroare Server", "Server error for Minesweeper scores: " + errorMessage);

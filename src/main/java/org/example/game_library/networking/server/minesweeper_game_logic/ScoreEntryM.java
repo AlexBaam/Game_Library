@@ -16,7 +16,7 @@ public class ScoreEntryM implements Serializable {
 
     public int getRank() { return rank; }
     public String getUsername() { return username; }
-    public int getTotalScore() { return totalScore; } // Metoda get pentru "totalScore"
+    public int getTotalScore() { return totalScore; }
 
     public void setRank(int rank) { this.rank = rank; }
     public void setUsername(String username) { this.username = username; }
