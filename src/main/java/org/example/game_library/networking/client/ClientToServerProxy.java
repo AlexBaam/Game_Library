@@ -35,7 +35,6 @@ public class ClientToServerProxy {
         return in.readObject();
     }
 
-
     public static void close() throws IOException {
         if (out != null) out.close();
         if (in != null) in.close();

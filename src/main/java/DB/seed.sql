@@ -32,6 +32,7 @@ CREATE TABLE minesweeper_scores (
     user_id INTEGER PRIMARY KEY,
     total_wins INTEGER DEFAULT 0,
     best_score INTEGER DEFAULT 0,
+    total_score INTEGER DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
@@ -59,7 +60,6 @@ FROM minesweeper_scores ms
 WHERE ms.best_score > 0
 ORDER BY ms.best_score ASC
     LIMIT 10;
-
 
 
 CREATE OR REPLACE FUNCTION check_email_and_username_uniqueness()
@@ -213,7 +213,38 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-
+CREATE OR REPLACE FUNCTION get_minesweeper_top_ranked_players(p_top_ranks INTEGER)
+RETURNS TABLE (
+    rank_nr BIGINT,
+    username VARCHAR(50),
+    total_score INTEGER
+) AS $$
+BEGIN
+RETURN QUERY
+    WITH RankedScores AS (
+        SELECT
+            u.username,
+            ms.total_score,
+            DENSE_RANK() OVER (ORDER BY ms.total_score DESC, u.username ASC) as current_rank
+        FROM
+            minesweeper_scores ms
+        JOIN
+            users u ON u.user_id = ms.user_id
+        WHERE
+            ms.total_score > 0
+    )
+SELECT
+    rs.current_rank,
+    rs.username,
+    rs.total_score
+FROM
+    RankedScores rs
+WHERE
+    rs.current_rank <= p_top_ranks
+ORDER BY
+    rs.current_rank ASC, rs.total_score DESC, rs.username ASC;
+END;
+$$ LANGUAGE plpgsql;
 
 INSERT INTO game_types (name) VALUES ('tictactoe');
 INSERT INTO game_types (name) VALUES ('minesweeper');
