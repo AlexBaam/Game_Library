@@ -16,6 +16,9 @@
 
     import jakarta.persistence.PersistenceException;
 
+    import static org.example.game_library.networking.enums.CommandMinesweeper.*;
+    import static org.example.game_library.networking.enums.CommandTicTacToe.FORFEIT;
+
     public class ThreadCreator extends Thread {
         private final Socket clientSocket;
 
@@ -228,7 +231,36 @@
         }
 
         private void handleMinesweeper(List<String> request) throws IOException {
-            //TODO
+            if (request.size() == 1) {
+                output.writeObject("SUCCESS");
+//            } else if (request.size() >= 2) {
+//                String commandMinesweeper = request.get(1);
+//                CommandMinesweeper cTTT = CommandMinesweeper.fromString(commandMinesweeper);
+//
+//                if (cTTT == null) {
+//                    output.writeObject("Comanda Minesweeper este nulă! Comandă: " + commandMinesweeper);
+//                    return;
+//                }
+//
+//                switch (cTTT) {
+//                    case NEWGAME -> MinesweeperRequests.handleNewGame(request, this, output, input);
+//                    case LOADGAME -> MinesweeperRequests.handleLoadGame(request, this, output, input);
+//                    case SAVEGAME -> MinesweeperRequests.handleSaveGame(request, this, output, input);
+//                    case EXIT -> handleExit(request);
+//                    case SCORE -> {
+//                        if (request.size() >= 3) {
+//                            String scoreType = request.get(2);
+//                            MinesweeperRequests.handleScore(request, this, output, input, userRepository);
+//                        } else {
+//                            output.writeObject("Eroare: Tipul de scor nu a fost furnizat pentru comanda SCORE.");
+//                            logger.log(Level.WARNING, "Cererea de scor Minesweeper nu are parametrul de tip de scor.");
+//                        }
+//                    }
+//                    default -> output.writeObject("Comanda " + request.get(1) + " nu este implementată încă!");
+//              }
+            } else {
+                output.writeObject("Eșec la procesarea comenzii TicTacToe.");
+            }
         }
 
         private void handleTicTacToe(List<String> request) throws IOException {
