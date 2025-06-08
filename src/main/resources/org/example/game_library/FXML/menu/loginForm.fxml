@@ -15,7 +15,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane_Login" prefHeight="720.0" prefWidth="800.0" style="-fx-background-color: transparent;"
+<AnchorPane fx:id="rootPaneLogin" prefHeight="720.0" prefWidth="800.0" style="-fx-background-color: transparent;"
             stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.game_library.views.menu.LoginForm">
    <Rectangle arcHeight="5.0" arcWidth="5.0" height="720.0" stroke="BLACK" strokeType="INSIDE" width="800.0">

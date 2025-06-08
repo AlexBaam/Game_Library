@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.example.game_library.utils.ui.ShowAlert;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,11 +20,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RegisterForm {
-
     private static final Logger logger = AppLogger.getLogger();
 
     @FXML
-    public AnchorPane rootPane_Register;
+    public AnchorPane rootPaneRegister;
 
     @FXML
     public Button registerButton;
@@ -52,62 +52,35 @@ public class RegisterForm {
         logger.log(Level.INFO, "User pressed register");
 
         try {
-            if (username.isBlank()) {
-                throw new NullData("Username cannot be blank");
+            validateNotBlank(username, "Username");
+            validateNotBlank(email, "Email");
+            validateNotBlank(password, "Password");
+
+            logger.log(Level.INFO,
+                    "Username entered: {0} \n Password entered: {1} \n Email entered: {2}",
+                    new Object[]{username, password, email}
+            );
+
+            if (!isValidInput(username, password, email)) {
+                return;
             }
 
-            if (email.isBlank()) {
-                throw new NullData("Email cannot be blank");
-            }
+            List<String> parameters = List.of("register", email, username, password);
 
-            if (password.isBlank()) {
-                throw new NullData("Password cannot be blank");
-            }
+            logger.log(Level.INFO, "Preparing to send registration data to server.");
 
-            logger.log(Level.INFO, "Username entered: {0}", username);
-            logger.log(Level.INFO, "Password entered: {0}", password);
-            logger.log(Level.INFO, "Email entered: {0}", email);
+            ClientToServerProxy.send(parameters);
+            String response = (String) ClientToServerProxy.receive();
 
-            int dateVerificate = 1;
-            if (username.length() < 4) {
-                dateVerificate = 0;
-                logger.log(Level.WARNING, "User must have at least 4 characters");
-            } else if (password.length() < 4) {
-                dateVerificate = 0;
-                logger.log(Level.WARNING, "Password must have at least 4 characters");
+            logger.log(Level.INFO, "Received response: {0}", response);
+
+            if ("SUCCESS".equals(response)) {
+                logger.log(Level.INFO, "Account successfully registered into the database!");
+                ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Account created!");
             } else {
-                int numberARond=0;
-                int numberDot = 0;
-                for (int i = 0; i < email.length(); i++) {
-                    if(email.charAt(i)=='.')
-                        numberDot++;
-                    else if(email.charAt(i)=='@')
-                        numberARond++;
-                }
-                if(numberARond!=1 && numberDot<1) {
-                    dateVerificate = 0;
-                    logger.log(Level.WARNING, "User must have at least one dot and at one @");
-                }
+                logger.log(Level.WARNING, "Registration failed! Reason: {0}", response);
+                ShowAlert.showAlert(Alert.AlertType.ERROR, "Registration Failed", response);
             }
-
-            if(dateVerificate==1) {
-                List<String> parameters = List.of("register", email, username, password);
-
-                logger.log(Level.INFO, "Preparing to send registration data to server.");
-
-                ClientToServerProxy.send(parameters);
-
-                String response = (String) ClientToServerProxy.receive();
-
-                logger.log(Level.INFO, "Received response: {0}", response);
-
-                if ("SUCCESS".equals(response)) {
-                    showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Cont created.");
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Registration Failed", response);
-                }
-            }
-
         } catch (NullData e) {
             logger.log(Level.SEVERE, "Validation error: {0}", e.getMessage());
         } catch (Exception e) {
@@ -133,11 +106,40 @@ public class RegisterForm {
         stage.close();
     }
 
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+    private void validateNotBlank(String field, String fieldName) throws NullData {
+        logger.log(Level.INFO, "Validating field: {0}", fieldName);
+        if (field == null || field.isBlank()) {
+            throw new NullData(fieldName + " cannot be blank");
+        }
+    }
+
+    private boolean isValidInput(String username, String password, String email) {
+        if (username.length() < 4) {
+            logger.log(Level.WARNING, "User must have at least 4 characters");
+            return false;
+        }
+
+        if (password.length() < 4) {
+            logger.log(Level.WARNING, "Password must have at least 4 characters");
+            return false;
+        }
+
+        int atCount = 0;
+        int dotCount = 0;
+        for (char ch : email.toCharArray()) {
+            if (ch == '@'){
+                atCount++;
+            }
+            if (ch == '.'){
+                dotCount++;
+            }
+        }
+
+        if (atCount != 1 || dotCount < 1) {
+            logger.log(Level.WARNING, "User must have at least one dot and one @");
+            return false;
+        }
+
+        return true;
     }
 }

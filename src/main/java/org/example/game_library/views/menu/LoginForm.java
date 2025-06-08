@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import org.example.game_library.utils.ui.ShowAlert;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,11 +32,8 @@ public class LoginForm {
     @FXML
     public Button exitButton;
 
-    private String username;
-    private String password;
-
     @FXML
-    public AnchorPane rootPane_Login;
+    public AnchorPane rootPaneLogin;
 
     @FXML
     private TextField usernameField;
@@ -45,8 +43,8 @@ public class LoginForm {
 
     @FXML
     private void onLoginClick() {
-        this.username = usernameField.getText();
-        this.password = passwordField.getText();
+        String username = usernameField.getText();
+        String password = passwordField.getText();
 
         logger.log(Level.INFO, "User pressed login");
 
@@ -61,7 +59,7 @@ public class LoginForm {
 
             logger.log(Level.INFO, "Attempting login for user: {0}", username);
 
-            List<String> parameters = List.of( "login",username, password);
+            List<String> parameters = List.of( "login", username, password);
 
             logger.log(Level.INFO, "Preparing to send login data to server.");
 
@@ -72,7 +70,7 @@ public class LoginForm {
             logger.log(Level.INFO, "Received response: {0}", response);
 
             if ("SUCCESS".equals(response)) {
-                showAlert(Alert.AlertType.INFORMATION, "Login successful", "User successfully logged in.");
+                ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Login successful", "User successfully logged in.");
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass()
                         .getResource("/org/example/game_library/FXML/menu/userDashboardForm.fxml"));
                 Parent root = fxmlLoader.load();
@@ -80,21 +78,19 @@ public class LoginForm {
                 stage.setScene(new Scene(root));
                 logger.log(Level.INFO, "Login successful! Switched to dashboard!");
             } else {
-                showAlert(Alert.AlertType.ERROR, "Login Failed", response);
+                ShowAlert.showAlert(Alert.AlertType.ERROR, "Login Failed", response);
                 logger.log(Level.WARNING, "Login failed for user: {0}. Response: {1}", new Object[]{username, response});
             }
 
         } catch (NullData e){
-            showAlert(Alert.AlertType.WARNING, "Validation Error", e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.WARNING, "Validation Error", e.getMessage());
             logger.log(Level.WARNING, "Validation error: {0}", e.getMessage());
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Connection Error", "Could not connect to server or load dashboard.");
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Connection Error", e.getMessage());
             logger.log(Level.SEVERE, "Error loading user dashboard or connection error: {0}", e.getMessage());
-            throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Communication Error", "Error receiving data from server.");
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Communication Error", e.getMessage());
             logger.log(Level.SEVERE, "Error receiving data from server: {0}", e.getMessage());
-            throw new RuntimeException(e);
         }
     }
 
@@ -114,13 +110,5 @@ public class LoginForm {
     private void onExitClick() {
         Stage stage = (Stage) usernameField.getScene().getWindow();
         stage.close();
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

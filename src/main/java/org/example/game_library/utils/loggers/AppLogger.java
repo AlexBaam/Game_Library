@@ -1,9 +1,16 @@
 package org.example.game_library.utils.loggers;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.*;
 
+@Getter
+@Setter
 public class AppLogger {
+
+    private AppLogger() {}
 
     private static final Logger logger = Logger.getLogger("GameLibraryLogger");
 
@@ -17,7 +24,6 @@ public class AppLogger {
                 logDir.mkdirs();
             }
 
-            // Use colored console output
             ConsoleHandler consoleHandler = new ConsoleHandler();
             consoleHandler.setLevel(Level.ALL);
             consoleHandler.setFormatter(new LoggerColor());

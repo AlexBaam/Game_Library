@@ -20,13 +20,20 @@ import java.util.logging.Logger;
 import javafx.scene.control.Alert;
 
 import org.example.game_library.networking.client.ClientToServerProxy;
+import org.example.game_library.utils.ui.ShowAlert;
+
 import java.util.List;
 
 public class UserDashboardForm {
     private static final Logger logger = AppLogger.getLogger();
 
-    @FXML
-    public Button deleteAccButton;
+    private static final String COMM_ERR_HEADER = "Communication Error";
+    private static final String COMM_ERR_BODY = "Error writing to the server!";
+
+    private static final String PROT_ERR_HEADER = "Protocol Error";
+    private static final String PROT_ERR_BODY = "Error reading from the server!";
+
+    private static final String SUCCES = "SUCCESS";
 
     @FXML
     public ImageView minesweeperButton;
@@ -35,7 +42,7 @@ public class UserDashboardForm {
     public ImageView tictactoeButton;
 
     @FXML
-    private Button deleteButton;
+    public Button deleteAccButton;
 
     @FXML
     private Button logoutButton;
@@ -54,8 +61,8 @@ public class UserDashboardForm {
 
             logger.log(Level.INFO, "Received logout response from server: {0}", response);
 
-            if ("SUCCESS".equals(response)) {
-                showAlert(Alert.AlertType.INFORMATION, "Deconectare reusita", "V-ati deconectat cu succes.");
+            if (SUCCES.equals(response)) {
+                ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Logout", "Logout successful! Navigating to login form.");
                 logger.log(Level.INFO, "Logout successful! Navigating to login form.");
 
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/menu/loginForm.fxml"));
@@ -66,19 +73,18 @@ public class UserDashboardForm {
                 stage.setTitle("Game Library - Login");
                 stage.show();
             } else {
-
-                showAlert(Alert.AlertType.ERROR, "Eroare la deconectare", response);
+                ShowAlert.showAlert(Alert.AlertType.ERROR, "Logout", response);
                 logger.log(Level.WARNING, "Logout failed. Server response: {0}", response);
             }
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare de comunicare", "Nu s-a putut comunica cu serverul la deconectare.");
-            logger.log(Level.SEVERE, "IO Error during logout: {0}", e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, COMM_ERR_HEADER, COMM_ERR_BODY);
+            logger.log(Level.SEVERE, "IO Exception during logout: {0}", e.getMessage());
         } catch (ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare de protocol", "Eroare la citirea raspunsului de la server.");
-            logger.log(Level.SEVERE, "ClassNotFoundException during logout: {0}", e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, PROT_ERR_HEADER, PROT_ERR_BODY);
+            logger.log(Level.SEVERE, "ClassNotFound Exception during logout: {0}", e.getMessage());
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare necunoscuta", "A aparut o eroare neasteptata la deconectare.");
-            logger.log(Level.SEVERE, "Unexpected error during logout: {0}", e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Unknown Error", "An error occurred while logging out!");
+            logger.log(Level.SEVERE, "Unexpected Exception during logout: {0}", e.getMessage());
         }
     }
 
@@ -105,11 +111,11 @@ public class UserDashboardForm {
 
             logger.log(Level.INFO, "Received delete account response from server: {0}", response);
 
-            if ("SUCCESS".equals(response)) {
-                showAlert(Alert.AlertType.INFORMATION, "Stergere cont reusita", "Contul a fost sters cu succes.");
-                logger.log(Level.INFO, "Account deletion successful! Navigating to login form.");
+            if (SUCCES.equals(response)) {
+                ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Delete", "Account deleted successfully!");
+                logger.log(Level.INFO, "Account deletion successful! Navigating to register form.");
 
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/menu/loginForm.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/menu/registerForm.fxml"));
                 Parent root = loader.load();
 
                 Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
@@ -117,17 +123,17 @@ public class UserDashboardForm {
                 stage.setTitle("Game Library - Login");
                 stage.show();
             } else {
-                showAlert(Alert.AlertType.ERROR, "Eroare la stergerea contului", response);
+                ShowAlert.showAlert(Alert.AlertType.ERROR, "Delete", response);
                 logger.log(Level.WARNING, "Account deletion failed. Server response: {0}", response);
             }
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare de comunicare", "Nu s-a putut comunica cu serverul la stergerea contului.");
-            logger.log(Level.SEVERE, "IO Error during account deletion: {0}", e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, COMM_ERR_HEADER, COMM_ERR_BODY);
+            logger.log(Level.SEVERE, "IO Exception during account deletion: {0}", e.getMessage());
         } catch (ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare de protocol", "Eroare la citirea raspunsului de la server.");
+            ShowAlert.showAlert(Alert.AlertType.ERROR, PROT_ERR_HEADER, PROT_ERR_BODY);
             logger.log(Level.SEVERE, "ClassNotFoundException during account deletion: {0}", e.getMessage());
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare necunoscuta", "A aparut o eroare neasteptata la stergerea contului.");
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Unknown Error", "Unknown error occurred while deleting account!");
             logger.log(Level.SEVERE, "Unexpected error during account deletion: {0}", e.getMessage());
         }
     }
@@ -140,21 +146,22 @@ public class UserDashboardForm {
 
             String response = (String) ClientToServerProxy.receive();
 
-            logger.log(Level.INFO, "Received delete account response from server: {0}", response);
+            logger.log(Level.INFO, "Received minesweeper response from server: {0}", response);
 
-            if("SUCCESS".equals(response)) {
+            if(SUCCES.equals(response)) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/minesweeper/minesweeperForm.fxml"));
                 Parent root = loader.load();
                 Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
             } else {
-                logger.log(Level.WARNING, "Login failed for user: {0}. Response: {1}", response);
+                logger.log(Level.WARNING, "Minesweeper loading failed! Reason: {0}", response);
             }
-
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            ShowAlert.showAlert(Alert.AlertType.ERROR, PROT_ERR_HEADER, PROT_ERR_BODY);
+            logger.log(Level.SEVERE, "ClassNotFoundException during minesweeper loading: {0}", e.getMessage());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            ShowAlert.showAlert(Alert.AlertType.ERROR, COMM_ERR_HEADER, COMM_ERR_BODY);
+            logger.log(Level.SEVERE, "IO Exception during minesweeper loading: {0}", e.getMessage());
         }
     }
 
@@ -168,28 +175,21 @@ public class UserDashboardForm {
 
             logger.log(Level.INFO, "Received delete account response from server: {0}", response);
 
-            if("SUCCESS".equals(response)) {
+            if(SUCCES.equals(response)) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeForm.fxml"));
                 Parent root = loader.load();
                 Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
             } else {
-                logger.log(Level.WARNING, "Login failed for user: {0}. Response: {1}", response);
+                logger.log(Level.WARNING, "TicTacToe loading failed! Reason: {0}", response);
             }
-
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            ShowAlert.showAlert(Alert.AlertType.ERROR, PROT_ERR_HEADER, PROT_ERR_BODY);
+            logger.log(Level.SEVERE, "ClassNotFoundException during tictactoe loading: {0}", e.getMessage());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            ShowAlert.showAlert(Alert.AlertType.ERROR, COMM_ERR_HEADER, COMM_ERR_BODY);
+            logger.log(Level.SEVERE, "IO Exception during tictactoe loading: {0}", e.getMessage());
         }
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }
 
