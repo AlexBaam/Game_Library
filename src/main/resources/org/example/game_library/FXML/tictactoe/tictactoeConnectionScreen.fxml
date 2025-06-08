@@ -49,12 +49,12 @@
         </Label>
         <VBox layoutX="300.0" layoutY="432.0" prefHeight="150.0" prefWidth="200.0">
             <children>
-                <Button fx:id="HostButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#OnHostClick" prefHeight="50.0" prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Host Room">
+                <Button fx:id="HostButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onHostClick" prefHeight="50.0" prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Host Room">
                     <font>
                         <Font name="System Bold" size="14.0" />
                     </font>
                 </Button>
-                <Button fx:id="joinButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#OnJoinClick" prefHeight="50.0" prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Join Room">
+                <Button fx:id="joinButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onJoinClick" prefHeight="50.0" prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Join Room">
                     <font>
                         <Font name="System Bold" size="14.0" />
                     </font>

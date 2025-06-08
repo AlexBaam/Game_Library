@@ -1,6 +1,7 @@
 package org.example.game_library.views.tictactoe;
 
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -18,6 +19,7 @@ import java.util.logging.Logger;
 public class TicTacToeConnectionScreen {
     private static final Logger logger = AppLogger.getLogger();
 
+    @FXML
     public void onBackClick(ActionEvent event) {
         logger.log(Level.INFO, "User pressed back button. (TicTacToe - Connection Screen)");
         try {
@@ -28,11 +30,12 @@ public class TicTacToeConnectionScreen {
             stage.setScene(new Scene(root));
             logger.log(Level.INFO, "Navigated back to New Game Screen.");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to load back screen: " + e.getMessage());
+            logger.log(Level.SEVERE, "Failed to load back screen: {0}", e.getMessage());
         }
     }
 
-    public void OnJoinClick(ActionEvent event) {
+    @FXML
+    public void onJoinClick(ActionEvent event) {
         logger.log(Level.INFO, "User pressed Join Room button. (TicTacToe - Connection Screen)");
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeJoinScreen.fxml"));
@@ -42,11 +45,12 @@ public class TicTacToeConnectionScreen {
             stage.setScene(new Scene(root));
             logger.log(Level.INFO, "Navigated to Join Room Screen.");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to load back screen: " + e.getMessage());
+            logger.log(Level.SEVERE, "Failed to load back screen: {0}", e.getMessage());
         }
     }
 
-    public void OnHostClick(ActionEvent event) {
+    @FXML
+    public void onHostClick(ActionEvent event) {
         logger.log(Level.INFO, "User pressed host button. (TicTacToe - Connection Screen)");
         try {
             List<String> request = List.of("tictactoe", "newgame", "host");
@@ -66,6 +70,11 @@ public class TicTacToeConnectionScreen {
 
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeBoard.fxml"));
                 Parent root = loader.load();
+
+                TicTacToeBoard controller = loader.getController();
+                controller.setCurrentSymbol("X");
+                controller.setMode("network");
+
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.setTitle("TicTacToe - Online Game");
