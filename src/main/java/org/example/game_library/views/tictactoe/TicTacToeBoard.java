@@ -28,6 +28,13 @@ public class TicTacToeBoard {
 
     private String currentSymbol = "X";
 
+    private String mode;
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+
     private void togglePlayer() {
         currentSymbol = currentSymbol.equals("X") ? "O" : "X";
     }
@@ -56,22 +63,57 @@ public class TicTacToeBoard {
             clicked.setDisable(true);
             showAlert(Alert.AlertType.INFORMATION, "Game Over", "Player " + currentSymbol + " wins!");
             returnToNewGameScreen(event);
+
         } else if ("DRAW!".equalsIgnoreCase(response)) {
             clicked.setText(currentSymbol);
             clicked.setDisable(true);
             showAlert(Alert.AlertType.INFORMATION, "Game Over", "It's a draw!");
             returnToNewGameScreen(event);
+
         } else if ("SUCCESS".equalsIgnoreCase(response)) {
             clicked.setText(currentSymbol);
             clicked.setDisable(true);
+            if (!"network".equalsIgnoreCase(mode)) {
+                togglePlayer();
+            }
+        } else if (response.startsWith("OPPONENT_MOVED:")) {
+            String[] parts = response.split(":")[1].split(",");
+            int oppRow = Integer.parseInt(parts[0]);
+            int oppCol = Integer.parseInt(parts[1]);
+
+            Button opponentCell = getButtonAt(oppRow, oppCol);
+            String opponentSymbol = currentSymbol.equals("X") ? "O" : "X";
+            opponentCell.setText(opponentSymbol);
+            opponentCell.setDisable(true);
+
             togglePlayer();
+
+        } else if (response.startsWith("LOSE:")) {
+            showAlert(Alert.AlertType.INFORMATION, "Game Over", "You lost!");
+            returnToNewGameScreen(event);
+
         } else {
-            showAlert(Alert.AlertType.WARNING, "Invalid move", "Cell already occupied!");
+            showAlert(Alert.AlertType.WARNING, "Invalid move", response);
         }
     }
 
+    private Button getButtonAt(int oppRow, int oppCol) {
+        for (Node node : boardGrid.getChildren()) {
+            Integer row = GridPane.getRowIndex(node);
+            Integer col = GridPane.getColumnIndex(node);
+
+            if (row == null) row = 0;
+            if (col == null) col = 0;
+
+            if (row == oppRow && col == oppCol && node instanceof Button button) {
+                return button;
+            }
+        }
+        return null;
+    }
+
     @FXML
-    public void onSaveClick(ActionEvent event) {
+    public void onSaveClick() {
         try {
             ClientToServerProxy.send(List.of("tictactoe", "save"));
             String response = (String) ClientToServerProxy.receive();
@@ -179,5 +221,9 @@ public class TicTacToeBoard {
         }
 
         this.currentSymbol = loadedGame.getCurrentSymbol();
+    }
+
+    public void setCurrentSymbol(String symbol) {
+        this.currentSymbol = symbol;
     }
 }

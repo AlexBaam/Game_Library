@@ -60,5 +60,7 @@ public class MainMenuForm {
         Parent root = loader.load();
         Stage stage = (Stage) rootPane_MainMenu.getScene().getWindow();
         stage.setScene(new Scene(root));
+        stage.setWidth(800);
+        stage.setHeight(720);
     }
 }
