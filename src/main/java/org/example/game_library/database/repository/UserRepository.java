@@ -3,11 +3,11 @@ package org.example.game_library.database.repository;
 import jakarta.persistence.*;
 import org.example.game_library.database.model.User;
 import org.example.game_library.networking.server.tictactoe_game_logic.ScoreEntry;
+import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntryM;
 import org.example.game_library.utils.exceptions.LoginException;
 import org.example.game_library.utils.jpa.JPAUtils;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,7 +129,7 @@ public class UserRepository {
         }
     }
 
-    public List<ScoreEntry> getMinesweeperTopRankedPlayers(int topRanks) throws PersistenceException {
+    public List<ScoreEntryM> getMinesweeperTopRankedPlayers(int topRanks) throws PersistenceException {
         // Pentru Minesweeper, ai specificat că folosești DOAR total_score,
         // deci nu mai este nevoie de parametrul scoreType în semnătura metodei.
         // Totuși, putem adăuga o validare internă dacă dorești, deși nu e strict necesară
@@ -144,12 +144,12 @@ public class UserRepository {
                     .setParameter(1, topRanks) // Setează parametrul pentru numărul de rank-uri
                     .getResultList();
 
-            List<ScoreEntry> topPlayers = new ArrayList<>();
+            List<ScoreEntryM> topPlayers = new ArrayList<>();
             for (Object[] row : resultList) {
                 int rank = ((Number) row[0]).intValue();
                 String username = (String) row[1];
                 int totalScore = ((Number) row[2]).intValue(); // Asigură-te că extragi total_score
-                topPlayers.add(new ScoreEntry(rank, username, totalScore));
+                topPlayers.add(new ScoreEntryM(rank, username, totalScore));
             }
             return topPlayers;
         } catch (Exception e) {

@@ -3,7 +3,7 @@ package org.example.game_library.networking.server.minesweeper_game_logic;
 import jakarta.persistence.PersistenceException;
 import org.example.game_library.database.repository.UserRepository;
 import org.example.game_library.networking.server.ThreadCreator;
-import org.example.game_library.networking.server.tictactoe_game_logic.ScoreEntry;
+import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntryM;
 import org.example.game_library.utils.loggers.AppLogger;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class MinesweeperRequests {
             // Nu mai e nevoie de validarea scoreType aici, deoarece nu mai vine din client
             // și UserRepository.getMinesweeperTopRankedPlayers nu mai primește acest parametru.
 
-            List<ScoreEntry> topPlayers = userRepository.getMinesweeperTopRankedPlayers(3); // Obținem top 3 jucători
+            List<ScoreEntryM> topPlayers = userRepository.getMinesweeperTopRankedPlayers(3); // Obținem top 3 jucători
 
             output.writeObject(topPlayers);
             logger.log(Level.INFO, "Sent Minesweeper top ranked players to client for thread {0}.", threadCreator.getId());

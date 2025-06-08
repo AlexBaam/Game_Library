@@ -17,7 +17,8 @@ import javafx.stage.Stage;
 import org.example.game_library.networking.client.ClientToServerProxy;
 // Nu mai e nevoie de CommandMinesweeper aici dacă nu îl folosești explicit
 // import org.example.game_library.networking.enums.CommandMinesweeper;
-import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntry;
+//import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntry;
+import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntryM;
 import org.example.game_library.utils.loggers.AppLogger;
 
 import java.io.IOException;
@@ -30,16 +31,16 @@ public class ScoreForm {
     private static final Logger logger = AppLogger.getLogger();
 
     @FXML
-    private TableView<ScoreEntry> scoreTable;
+    private TableView<ScoreEntryM> scoreTable;
 
     @FXML
-    private TableColumn<ScoreEntry, Integer> rankColumn;
+    private TableColumn<ScoreEntryM, Integer> rankColumn;
 
     @FXML
-    private TableColumn<ScoreEntry, String> usernameColumn;
+    private TableColumn<ScoreEntryM, String> usernameColumn;
 
     @FXML
-    private TableColumn<ScoreEntry, Integer> totalScoreColumn;
+    private TableColumn<ScoreEntryM, Integer> totalScoreColumn;
 
     @FXML
     private Label rankTitleLabel;
@@ -66,10 +67,10 @@ public class ScoreForm {
             Object response = ClientToServerProxy.receive();
 
             if (response instanceof List<?> scoreList) {
-                ObservableList<ScoreEntry> data = FXCollections.observableArrayList();
+                ObservableList<ScoreEntryM> data = FXCollections.observableArrayList();
                 for (Object item : scoreList) {
-                    if (item instanceof ScoreEntry) {
-                        data.add((ScoreEntry) item);
+                    if (item instanceof ScoreEntryM) {
+                        data.add((ScoreEntryM) item);
                     } else {
                         logger.log(Level.WARNING, "Received unexpected object type in Minesweeper score list: " + item.getClass().getName());
                         showAlert(Alert.AlertType.ERROR, "Eroare de date", "A apărut o eroare la interpretarea datelor de scor Minesweeper.");
@@ -98,7 +99,7 @@ public class ScoreForm {
     @FXML
     public void onBackClick(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/menu/userDashboardForm.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/minesweeper/minesweeperForm.fxml"));
             Parent root = loader.load();
 
             Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
