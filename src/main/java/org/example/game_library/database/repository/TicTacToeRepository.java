@@ -12,6 +12,7 @@ import java.util.List;
 
 public class TicTacToeRepository {
 
+
     public static void incrementWins(User user, String mode) {
         EntityManager em = JPAUtils.getEntityManager();
         EntityTransaction tx = em.getTransaction();

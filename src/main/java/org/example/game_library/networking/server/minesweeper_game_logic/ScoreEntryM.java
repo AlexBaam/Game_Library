@@ -1,4 +1,3 @@
-// src/main/java/org/example/game_library/networking/server/minesweeper_game_logic/ScoreEntryM.java
 package org.example.game_library.networking.server.minesweeper_game_logic;
 
 import java.io.Serializable;
@@ -7,7 +6,7 @@ public class ScoreEntryM implements Serializable {
     private static final long serialVersionUID = 1L;
     private int rank;
     private String username;
-    private int totalScore; // Va fi afișat ca "Wins" în FXML-ul Minesweeper
+    private int totalScore;
 
     public ScoreEntryM(int rank, String username, int totalScore) {
         this.rank = rank;

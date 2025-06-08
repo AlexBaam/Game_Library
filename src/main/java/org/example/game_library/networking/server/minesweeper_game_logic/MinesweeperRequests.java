@@ -16,17 +16,9 @@ import java.util.logging.Logger;
 public class MinesweeperRequests {
     private static final Logger logger = AppLogger.getLogger();
 
-    /**
-     * Handles requests for Minesweeper scoreboard data.
-     * Uses the total_score from the database implicitly.
-     */
-    // Semnătura metodei s-a schimbat: am eliminat 'String scoreType'
     public static void handleScore(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input, UserRepository userRepository) {
         try {
-            // Nu mai e nevoie de validarea scoreType aici, deoarece nu mai vine din client
-            // și UserRepository.getMinesweeperTopRankedPlayers nu mai primește acest parametru.
-
-            List<ScoreEntryM> topPlayers = userRepository.getMinesweeperTopRankedPlayers(3); // Obținem top 3 jucători
+            List<ScoreEntryM> topPlayers = userRepository.getMinesweeperTopRankedPlayers(3);
 
             output.writeObject(topPlayers);
             logger.log(Level.INFO, "Sent Minesweeper top ranked players to client for thread {0}.", threadCreator.getId());

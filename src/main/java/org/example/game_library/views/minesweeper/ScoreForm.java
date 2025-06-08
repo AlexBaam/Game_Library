@@ -52,17 +52,16 @@ public class ScoreForm {
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         totalScoreColumn.setCellValueFactory(new PropertyValueFactory<>("totalScore"));
 
+        loadScores();
         rankTitleLabel.setText("Top Minesweeper Scores");
 
         // Aici este modificarea esențială:
         // Trimite comanda exact cum ai sugerat tu.
-        loadScores(); // Apelăm fără parametru scoreType, deoarece este implicit
+        // Apelăm fără parametru scoreType, deoarece este implicit
     }
 
-    // Modifică semnătura metodei loadScores pentru a nu mai primi scoreType
     private void loadScores() {
         try {
-            // Trimite comanda explicit ca o listă de String-uri, cum ai cerut.
             ClientToServerProxy.send(List.of("minesweeper", "score"));
 
             Object response = ClientToServerProxy.receive();

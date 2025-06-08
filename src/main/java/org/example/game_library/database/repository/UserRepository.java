@@ -124,31 +124,28 @@ public class UserRepository {
                 topPlayers.add(new ScoreEntry(rank, username, wins));
             }
             return topPlayers;
+        } catch (Exception e) {
+            throw new PersistenceException("Error retrieving Minesweeper scores: " + e.getMessage(), e);
         } finally {
-            em.close();
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
 
     public List<ScoreEntryM> getMinesweeperTopRankedPlayers(int topRanks) throws PersistenceException {
-        // Pentru Minesweeper, ai specificat că folosești DOAR total_score,
-        // deci nu mai este nevoie de parametrul scoreType în semnătura metodei.
-        // Totuși, putem adăuga o validare internă dacă dorești, deși nu e strict necesară
-        // dacă metoda apelează direct funcția SQL specifică.
-
-        EntityManager em = JPAUtils.getEntityManager(); // Obține EntityManager
+        EntityManager em = JPAUtils.getEntityManager();
         try {
-            // Aici, apelăm direct funcția SQL get_minesweeper_top_ranked_players
-            // care acceptă doar un singur parametru (numărul de top rank-uri).
             List<Object[]> resultList = em.createNativeQuery(
                             "SELECT rank_nr, username, total_score FROM get_minesweeper_top_ranked_players(?)")
-                    .setParameter(1, topRanks) // Setează parametrul pentru numărul de rank-uri
+                    .setParameter(1, topRanks)
                     .getResultList();
 
             List<ScoreEntryM> topPlayers = new ArrayList<>();
             for (Object[] row : resultList) {
                 int rank = ((Number) row[0]).intValue();
                 String username = (String) row[1];
-                int totalScore = ((Number) row[2]).intValue(); // Asigură-te că extragi total_score
+                int totalScore = ((Number) row[2]).intValue();
                 topPlayers.add(new ScoreEntryM(rank, username, totalScore));
             }
             return topPlayers;
