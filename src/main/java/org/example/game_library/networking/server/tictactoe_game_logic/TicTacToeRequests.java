@@ -32,14 +32,14 @@ public class TicTacToeRequests {
                     TicTacToeGame game = new TicTacToeGame();
                     game.setMode("local");
                     threadCreator.setTicTacToeGame(game);
-                    output.writeObject("SUCCESS");
+                    output.writeObject("SUCCESS:mode=local");
                     logger.log(Level.INFO, "New LOCAL game started for thread {0}", threadCreator.getId());
                 }
                 case "ai" -> {
                     TicTacToeGame game = new TicTacToeGame();
                     game.setMode("ai");
                     threadCreator.setTicTacToeGame(game);
-                    output.writeObject("SUCCESS");
+                    output.writeObject("SUCCESS:mode=ai");
                     logger.log(Level.INFO, "New AI game started for thread {0}", threadCreator.getId());
                 }
                 case "host" -> {
@@ -47,7 +47,7 @@ public class TicTacToeRequests {
                     TicTacToeGame game = RoomManager.getRoom(roomId).getGame();
                     game.setMode("network");
                     threadCreator.setTicTacToeGame(game);
-                    output.writeObject("ROOM_ID:" + roomId);
+                    output.writeObject("SUCCESS:mode=network;room=" + roomId);
                 }
                 case "join" -> {
                     if (request.size() < 4) {
@@ -67,7 +67,7 @@ public class TicTacToeRequests {
                     game.setMode("network");
                     threadCreator.setTicTacToeGame(game);
 
-                    output.writeObject("SUCCESS:" + room.getPlayerSymbol(threadCreator));
+                    output.writeObject("SUCCESS:mode=network;symbol=" + room.getPlayerSymbol(threadCreator));
                 }
                 default -> {
                     output.writeObject("FAILURE: Game mode not supported.");

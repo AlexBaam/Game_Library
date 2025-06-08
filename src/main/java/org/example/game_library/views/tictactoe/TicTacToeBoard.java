@@ -30,11 +30,6 @@ public class TicTacToeBoard {
 
     private String mode;
 
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-
-
     private void togglePlayer() {
         currentSymbol = currentSymbol.equals("X") ? "O" : "X";
     }
@@ -81,7 +76,7 @@ public class TicTacToeBoard {
                     returnToNewGameScreen(event);
                     done = true;
                 } else if (response.equalsIgnoreCase("SUCCESS")) {
-                    if (!"network".equalsIgnoreCase(mode)) {
+                    if ("local".equalsIgnoreCase(mode)) {
                         togglePlayer();
                     }
                     done = true;
@@ -230,5 +225,9 @@ public class TicTacToeBoard {
 
     public void setCurrentSymbol(String symbol) {
         this.currentSymbol = symbol;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 }
