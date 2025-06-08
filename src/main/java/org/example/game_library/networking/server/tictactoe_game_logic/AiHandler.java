@@ -13,6 +13,7 @@ public class AiHandler implements MoveHandler {
         int row = Integer.parseInt(request.get(2));
         int col = Integer.parseInt(request.get(3));
         String symbol = "X";
+        String aiSymbol = "O";
 
         TicTacToeGame game = threadCreator.getTicTacToeGame();
 
@@ -39,6 +40,44 @@ public class AiHandler implements MoveHandler {
         }
 
         game.togglePlayer();
+
+        boolean aiMoved = false;
+        int aiRow = -1, aiCol = -1;
+        outerLoop:
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (game.getBoard()[i][j].equals(" ")) {
+                    game.makeMove(i, j, aiSymbol);
+                    aiRow = i;
+                    aiCol = j;
+                    aiMoved = true;
+                    break outerLoop;
+                }
+            }
+        }
+
+        if (!aiMoved) {
+            output.writeObject("DRAW!");
+            game.resetGame();
+            return;
+        }
+
+        output.writeObject("AI_MOVE:" + aiRow + "," + aiCol);
+
+        if (game.checkWin()) {
+            output.writeObject("LOSE: " + aiSymbol);
+            game.resetGame();
+            return;
+        }
+
+        if (game.isBoardFull()) {
+            output.writeObject("DRAW!");
+            game.resetGame();
+            return;
+        }
+
+        game.setCurrentSymbol("X");
         output.writeObject("SUCCESS");
     }
+
 }

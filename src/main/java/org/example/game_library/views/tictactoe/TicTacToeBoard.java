@@ -40,60 +40,65 @@ public class TicTacToeBoard {
     }
 
     @FXML
-    public void handleCellClick(ActionEvent event) throws IOException, ClassNotFoundException {
+    public void handleCellClick(ActionEvent event) {
         Button clicked = (Button) event.getSource();
 
         Integer row = GridPane.getRowIndex(clicked);
         Integer col = GridPane.getColumnIndex(clicked);
+        if (row == null) row = 0;
+        if (col == null) col = 0;
 
-        if (row == null) {
-            row = 0;
-        }
+        try {
+            ClientToServerProxy.send(List.of("tictactoe", "move", row.toString(), col.toString(), currentSymbol));
 
-        if (col == null) {
-            col = 0;
-        }
-
-        ClientToServerProxy.send(List.of("tictactoe", "move", row.toString(), col.toString(), currentSymbol));
-
-        String response = (String) ClientToServerProxy.receive();
-
-        if (response.startsWith("WIN:")) {
             clicked.setText(currentSymbol);
             clicked.setDisable(true);
-            showAlert(Alert.AlertType.INFORMATION, "Game Over", "Player " + currentSymbol + " wins!");
-            returnToNewGameScreen(event);
 
-        } else if ("DRAW!".equalsIgnoreCase(response)) {
-            clicked.setText(currentSymbol);
-            clicked.setDisable(true);
-            showAlert(Alert.AlertType.INFORMATION, "Game Over", "It's a draw!");
-            returnToNewGameScreen(event);
+            boolean done = false;
 
-        } else if ("SUCCESS".equalsIgnoreCase(response)) {
-            clicked.setText(currentSymbol);
-            clicked.setDisable(true);
-            if (!"network".equalsIgnoreCase(mode)) {
-                togglePlayer();
+            while (!done) {
+                Object raw = ClientToServerProxy.receive();
+                if (!(raw instanceof String)) continue;
+                String response = (String) raw;
+
+                if (response.startsWith("AI_MOVE:")) {
+                    String[] coords = response.substring(8).split(",");
+                    int aiRow = Integer.parseInt(coords[0]);
+                    int aiCol = Integer.parseInt(coords[1]);
+                    Button aiCell = getButtonAt(aiRow, aiCol);
+                    aiCell.setText("O");
+                    aiCell.setDisable(true);
+                } else if (response.startsWith("WIN:")) {
+                    showAlert(Alert.AlertType.INFORMATION, "Game Over", "Player " + currentSymbol + " wins!");
+                    returnToNewGameScreen(event);
+                    done = true;
+                } else if (response.startsWith("LOSE:")) {
+                    showAlert(Alert.AlertType.INFORMATION, "Game Over", "You lost!");
+                    returnToNewGameScreen(event);
+                    done = true;
+                } else if (response.equalsIgnoreCase("DRAW!")) {
+                    showAlert(Alert.AlertType.INFORMATION, "Game Over", "It's a draw!");
+                    returnToNewGameScreen(event);
+                    done = true;
+                } else if (response.equalsIgnoreCase("SUCCESS")) {
+                    if (!"network".equalsIgnoreCase(mode)) {
+                        togglePlayer();
+                    }
+                    done = true;
+                } else if (response.startsWith("FAILURE")) {
+                    showAlert(Alert.AlertType.WARNING, "Invalid move", response);
+                    done = true;
+                } else {
+                    System.out.println("Unhandled response: " + response);
+                }
             }
-        } else if (response.startsWith("OPPONENT_MOVED:")) {
-            String[] parts = response.split(":")[1].split(",");
-            int oppRow = Integer.parseInt(parts[0]);
-            int oppCol = Integer.parseInt(parts[1]);
 
-            Button opponentCell = getButtonAt(oppRow, oppCol);
-            String opponentSymbol = currentSymbol.equals("X") ? "O" : "X";
-            opponentCell.setText(opponentSymbol);
-            opponentCell.setDisable(true);
-
-            togglePlayer();
-
-        } else if (response.startsWith("LOSE:")) {
-            showAlert(Alert.AlertType.INFORMATION, "Game Over", "You lost!");
-            returnToNewGameScreen(event);
-
-        } else {
-            showAlert(Alert.AlertType.WARNING, "Invalid move", response);
+        } catch (IOException | ClassNotFoundException e) {
+            showAlert(Alert.AlertType.ERROR, "Connection Error", "Lost connection to server: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Unexpected Error", e.getMessage());
+            e.printStackTrace();
         }
     }
 
