@@ -6,19 +6,19 @@ public class ScoreEntry implements Serializable {
     private static final long serialVersionUID = 1L;
     private int rank;
     private String username;
-    private int wins;
+    private int totalScore;
 
-    public ScoreEntry(int rank, String username, int wins) {
+    public ScoreEntry(int rank, String username, int totalScore) {
         this.rank = rank;
         this.username = username;
-        this.wins = wins;
+        this.totalScore = totalScore;
     }
 
     public int getRank() { return rank; }
     public String getUsername() { return username; }
-    public int getWins() { return wins; }
+    public int getTotalScore() { return totalScore; }
 
     public void setRank(int rank) { this.rank = rank; }
     public void setUsername(String username) { this.username = username; }
-    public void setWins(int wins) { this.wins = wins; }
+    public void setTotalScore(int totalScore) { this.totalScore = totalScore; }
 }

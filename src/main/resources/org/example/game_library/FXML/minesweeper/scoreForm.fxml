@@ -47,12 +47,9 @@
             <columns>
                 <TableColumn fx:id="rankColumn" prefWidth="75.0" text="Rank" />
                 <TableColumn fx:id="usernameColumn" prefWidth="175.0" text="Username" />
-                <TableColumn fx:id="totalWinsColumn" prefWidth="125.0" text="Total Wins" />
-                <TableColumn fx:id="bestScoreColumn" prefWidth="125.0" text="Best Score" />
-            </columns>
+                <TableColumn fx:id="totalScoreColumn" prefWidth="125.0" text="Total Score" /> </columns>
         </TableView>
-        <Button fx:id="backButton" layoutX="30.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#onBackClick" prefHeight="30.0" prefWidth="90.0" styleClass="transparent-button" stylesheets="@/styles.css" text="Back"> <font>
-            <Font name="System Bold" size="12.0" />
+        <Button fx:id="backButton" layoutX="30.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#onBackClick" prefHeight="30.0" prefWidth="90.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Back"> <font> <Font name="System Bold" size="12.0" />
         </font>
         </Button>
     </children>
