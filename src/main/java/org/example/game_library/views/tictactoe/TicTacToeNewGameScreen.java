@@ -46,7 +46,7 @@ public class TicTacToeNewGameScreen {
 
     @FXML
     public void OnLocalClick(ActionEvent event) {
-        logger.log(Level.INFO, "User pressed vs Local button. (TicTacToe - New Game)");
+        logger.log(Level.INFO, "User pressed 'vs Local' button. (TicTacToe - New Game)");
         try {
             List<String> request = List.of("tictactoe", "newgame", "local");
             ClientToServerProxy.send(request);

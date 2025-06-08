@@ -62,7 +62,7 @@
                 </Button>
             </children>
         </VBox>
-      <TextField layoutX="300.0" layoutY="431.0" prefHeight="50.0" prefWidth="200.0" promptText="Enter ID">
+      <TextField fx:id="roomIDButton" layoutX="300.0" layoutY="431.0" prefHeight="50.0" prefWidth="200.0" promptText="Enter ID">
          <font>
             <Font size="18.0" />
          </font>

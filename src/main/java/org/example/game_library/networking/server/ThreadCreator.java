@@ -272,5 +272,9 @@
         public User getCurrentUser() {
             return currentUser;
         }
+
+        public ObjectOutputStream getOutputStream() {
+            return output;
+        }
     }
 

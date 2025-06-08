@@ -36,20 +36,46 @@ public class TicTacToeRequests {
                     output.writeObject("SUCCESS");
                     logger.log(Level.INFO, "New LOCAL game started for thread {0}", threadCreator.getId());
                 }
-                case "player" -> {
-                    // Poți inițializa jocul aici dacă ai logica pentru multiplayer TCP
-                    TicTacToeGame game = new TicTacToeGame();
-                    game.setMode("network");
-                    threadCreator.setTicTacToeGame(game);
-                    output.writeObject("SUCCESS");
-                    logger.log(Level.INFO, "New NETWORK game started for thread {0}", threadCreator.getId());
-                }
                 case "ai" -> {
                     TicTacToeGame game = new TicTacToeGame();
                     game.setMode("ai");
                     threadCreator.setTicTacToeGame(game);
                     output.writeObject("SUCCESS");
                     logger.log(Level.INFO, "New AI game started for thread {0}", threadCreator.getId());
+                }
+                case "host" -> {
+                    String roomId = RoomManager.createRoom(threadCreator);
+                    TicTacToeGame game = RoomManager.getRoom(roomId).getGame();
+                    threadCreator.setTicTacToeGame(game);
+                    output.writeObject("ROOM_ID:" + roomId);
+                    logger.log(Level.INFO, "HOST created room {0} on thread {1}", new Object[]{roomId, threadCreator.getId()});
+                }
+                case "join" -> {
+                    if (request.size() < 4) {
+                        output.writeObject("FAILURE: Room ID not specified.");
+                        logger.log(Level.WARNING, "JOIN failed: No room ID (thread {0})", threadCreator.getId());
+                        return;
+                    }
+
+                    String roomId = request.get(3).toUpperCase();
+                    Room room = RoomManager.getRoom(roomId);
+
+                    if (room == null) {
+                        output.writeObject("FAILURE: Room not found.");
+                        logger.log(Level.WARNING, "JOIN failed: Room {0} not found (thread {1})", new Object[]{roomId, threadCreator.getId()});
+                        return;
+                    }
+
+                    if (room.isFull()) {
+                        output.writeObject("FAILURE: Room is full.");
+                        logger.log(Level.WARNING, "JOIN failed: Room {0} already full (thread {1})", new Object[]{roomId, threadCreator.getId()});
+                        return;
+                    }
+
+                    room.setGuest(threadCreator);
+                    threadCreator.setTicTacToeGame(room.getGame());
+                    output.writeObject("SUCCESS:" + room.getPlayerSymbol(threadCreator));
+                    logger.log(Level.INFO, "JOIN successful: Guest joined room {0} (thread {1})", new Object[]{roomId, threadCreator.getId()});
                 }
                 default -> {
                     output.writeObject("FAILURE: Game mode not supported.");
@@ -118,23 +144,109 @@ public class TicTacToeRequests {
 
     public static void handleMove(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
         try {
-            if(request.size() < 5) {
+            if(request.size() < 4) {
                 output.writeObject("FAILURE: Invalid move request format!");
                 return;
             }
 
-            int row = Integer.parseInt(request.get(2));;
-            int col = Integer.parseInt(request.get(3));;
-            String symbol = request.get(4).toUpperCase();
+            int row = Integer.parseInt(request.get(2));
+            int col = Integer.parseInt(request.get(3));
 
             TicTacToeGame game = threadCreator.getTicTacToeGame();
-
             if(game == null) {
                 output.writeObject("FAILURE: No active game session!");
                 return;
             }
 
-            if(!symbol.equals("X") && !symbol.equals("O")) {
+            String mode = game.getMode();
+            String symbol;
+
+            switch(mode) {
+                case "local" -> {
+                    if (request.size() < 5) {
+                        output.writeObject("FAILURE: Missing symbol for local mode!");
+                        return;
+                    }
+
+                    symbol = request.get(4).toUpperCase();
+                    if (!symbol.equals("X") && !symbol.equals("O")) {
+                        output.writeObject("FAILURE: Invalid symbol! Must be X or O!");
+                        return;
+                    }
+
+                    if (!symbol.equals(game.getCurrentSymbol())) {
+                        output.writeObject("FAILURE: Not your turn!");
+                        return;
+                    }
+                }
+
+                case "ai" -> {
+                    symbol = "X";
+
+                    if (!symbol.equals(game.getCurrentSymbol())) {
+                        output.writeObject("FAILURE: Not your turn!");
+                        return;
+                    }
+                }
+
+                case "network" -> {
+                    Room room = RoomManager.getRoomByPlayer(threadCreator);
+                    if (room == null || !room.containsPlayer(threadCreator)) {
+                        output.writeObject("FAILURE: Not in a multiplayer room.");
+                        return;
+                    }
+
+                    if (!room.isPlayerTurn(threadCreator)) {
+                        output.writeObject("FAILURE: Not your turn!");
+                        return;
+                    }
+
+                    symbol = room.getPlayerSymbol(threadCreator);
+                    ObjectOutputStream opponentOut = room.getOtherPlayerOutput(threadCreator);
+
+                    boolean moveResult = game.makeMove(row, col, symbol);
+                    if (!moveResult) {
+                        output.writeObject("FAILURE: Cell already occupied!");
+                        return;
+                    }
+
+                    if (game.checkWin()) {
+                        try {
+                            User currentUser = threadCreator.getCurrentUser();
+                            TicTacToeRepository.incrementWins(currentUser, mode);
+                        } catch (PersistenceException e) {
+                            logger.log(Level.SEVERE, "SQL exception while saving win: {0}", e.getMessage());
+                        }
+
+                        output.writeObject("WIN: " + symbol);
+                        if (opponentOut != null)
+                            opponentOut.writeObject("LOSE: " + symbol);
+                        game.resetGame();
+                        return;
+                    }
+
+                    if (game.isBoardFull()) {
+                        output.writeObject("DRAW!");
+                        if (opponentOut != null)
+                            opponentOut.writeObject("DRAW!");
+                        game.resetGame();
+                        return;
+                    }
+
+                    game.togglePlayer();
+                    output.writeObject("SUCCESS");
+                    if (opponentOut != null)
+                        opponentOut.writeObject("OPPONENT_MOVED:" + row + "," + col);
+                    return;
+                }
+
+                default -> {
+                    output.writeObject("FAILURE: Unsupported game mode.");
+                    return;
+                }
+            }
+
+            if(!isValidSymbol(symbol)) {
                 output.writeObject("FAILURE: Invalid symbol! Must be X or O!");
                 return;
             }
@@ -145,22 +257,22 @@ public class TicTacToeRequests {
             }
 
             boolean moveResult = game.makeMove(row, col, symbol);
-
             if(!moveResult) {
                 output.writeObject("FAILURE: Move failed! Cell already occupied!");
                 return;
             }
 
             if(game.checkWin()){
-                try{
+                try {
                     User currentUser = threadCreator.getCurrentUser();
-                    TicTacToeRepository.incrementWins(currentUser, game.getMode());
-                    output.writeObject("WIN: " + symbol);
-                    game.resetGame();
-                    return;
+                    TicTacToeRepository.incrementWins(currentUser, mode);
                 } catch (PersistenceException e) {
-                    logger.log(Level.SEVERE, "SQL exception met: {0}", e.getMessage());
+                    logger.log(Level.SEVERE, "SQL exception while saving win: {0}", e.getMessage());
                 }
+
+                output.writeObject("WIN: " + symbol);
+                game.resetGame();
+                return;
             }
 
             if(game.isBoardFull()){
@@ -170,6 +282,11 @@ public class TicTacToeRequests {
             }
 
             game.togglePlayer();
+
+            if (mode.equals("ai")) {
+                performAIMove(game);
+            }
+
             output.writeObject("SUCCESS");
         } catch (IOException | NumberFormatException e) {
             try {
@@ -178,6 +295,11 @@ public class TicTacToeRequests {
                 ex.printStackTrace();
             }
         }
+    }
+
+    private static void performAIMove(TicTacToeGame game) {
+        logger.log(Level.FINE, "AI move not implemented yet!");
+        game.togglePlayer();
     }
 
     public static void handleSaveGame(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
@@ -200,5 +322,9 @@ public class TicTacToeRequests {
                 ex.printStackTrace();
             }
         }
+    }
+
+    private static boolean isValidSymbol(String symbol) {
+        return "X".equals(symbol) || "O".equals(symbol);
     }
 }
