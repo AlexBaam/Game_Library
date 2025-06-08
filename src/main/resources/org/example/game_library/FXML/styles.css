@@ -1,4 +1,3 @@
-/* Apply to all buttons */
 .transparent-button {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
@@ -13,29 +12,27 @@
     -fx-faint-focus-color: transparent;
 }
 
-/* Hover effect */
 .transparent-button:hover {
     -fx-background-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Pressed effect */
 .transparent-button:pressed {
     -fx-background-color: rgba(0, 0, 0, 0.2);
     -fx-translate-y: 1;
 }
 
 .image-button {
-    -fx-cursor: hand;              /* schimbă cursorul la pointer */
-    -fx-opacity: 1.0;              /* opacitate normală */
-    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.3), 5, 0.0, 0, 2); /* un mic shadow */
-    -fx-transition: all 0.3s ease; /* tranziție lină */
+    -fx-cursor: hand;
+    -fx-opacity: 1.0;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.3), 5, 0.0, 0, 2);
+    -fx-transition: all 0.3s ease;
 }
 
 .image-button:hover {
-    -fx-opacity: 0.8;              /* ușor transparent la hover */
-    -fx-scale-x: 1.05;             /* mic zoom */
+    -fx-opacity: 0.8;
+    -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
-    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.5), 8, 0.0, 0, 4); /* shadow mai accentuat */
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.5), 8, 0.0, 0, 4);
 }
 
 .tictactoe-cell {
@@ -53,12 +50,10 @@
     -fx-border-radius: 0;
 }
 
-/* Hover effect (opțional) */
 .tictactoe-cell:hover {
     -fx-background-color: #f0f0f0;
 }
 
-/* Pressed effect */
 .tictactoe-cell:pressed {
     -fx-background-color: #d0d0d0;
 }

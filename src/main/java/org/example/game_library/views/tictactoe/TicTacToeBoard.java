@@ -25,6 +25,39 @@ public class TicTacToeBoard {
     private static final Logger logger = AppLogger.getLogger();
 
     @FXML
+    public Button cell1;
+
+    @FXML
+    public Button cell2;
+
+    @FXML
+    public Button cell3;
+
+    @FXML
+    public Button cell4;
+
+    @FXML
+    public Button cell5;
+
+    @FXML
+    public Button cell6;
+
+    @FXML
+    public Button cell7;
+
+    @FXML
+    public Button cell8;
+
+    @FXML
+    public Button cell9;
+
+    @FXML
+    public Button saveButton;
+
+    @FXML
+    public Button forfeitButton;
+
+    @FXML
     private GridPane boardGrid;
 
     private String currentSymbol = "X";

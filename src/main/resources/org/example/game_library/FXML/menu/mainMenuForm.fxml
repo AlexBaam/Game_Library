@@ -11,59 +11,61 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane_MainMenu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="800.0" style="-fx-background-color: transparent;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.game_library.views.menu.MainMenuForm">
-   <children>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" height="720.0" stroke="BLACK" strokeType="INSIDE" width="800.0">
-         <fill>
-            <LinearGradient endX="0.7850378787878786" endY="0.7765151072632183" startX="0.049242422436222885" startY="0.011363643588441774">
-               <stops>
-                  <Stop>
-                     <color>
-                        <Color red="1.0" green="0.644444465637207" blue="0.644444465637207" />
-                     </color>
-                  </Stop>
-                  <Stop offset="1.0">
-                     <color>
-                        <Color red="0.6629629731178284" green="0.8090123534202576" blue="1.0" />
-                     </color>
-                  </Stop>
-               </stops>
-            </LinearGradient>
-         </fill>
-      </Rectangle>
-      <Pane layoutX="199.0" layoutY="215.0" prefHeight="200.0" prefWidth="400.0">
-         <children>
-            <Label alignment="CENTER" prefHeight="200.0" prefWidth="400.0" text="Java Game Library" textAlignment="CENTER">
-               <font>
-                  <Font name="System Bold" size="24.0" />
-               </font>
-            </Label>
-            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="200.0" stroke="BLACK" strokeType="INSIDE" width="400.0" />
-         </children>
-      </Pane>
-      <HBox layoutX="219.0" layoutY="521.0" prefHeight="45.0" prefWidth="360.0">
-         <children>
-            <Button fx:id="loginButton" mnemonicParsing="false" onAction="#onLoginClick" prefHeight="45.0" prefWidth="120.0" styleClass="transparent-button" text="Login">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-            </Button>
-            <Button fx:id="registerButton" mnemonicParsing="false" onAction="#onRegisterClick" prefHeight="45.0" prefWidth="120.0" styleClass="transparent-button" text="Register">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-            </Button>
-            <Button fx:id="exitButton" mnemonicParsing="false" onAction="#onExitClick" prefHeight="45.0" prefWidth="120.0" styleClass="transparent-button" text="Exit">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-            </Button>
-         </children>
-      </HBox>
-      <Label alignment="CENTER" layoutX="341.0" layoutY="455.0" text="Ready to play?" textAlignment="CENTER">
+<AnchorPane fx:id="rootPane_MainMenu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity" prefHeight="720.0" prefWidth="800.0" style="-fx-background-color: transparent;"
+            stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.game_library.views.menu.MainMenuForm">
+   <Rectangle arcHeight="5.0" arcWidth="5.0" height="720.0" stroke="BLACK" strokeType="INSIDE" width="800.0">
+      <fill>
+         <LinearGradient endX="0.7850378787878786" endY="0.7765151072632183" startX="0.049242422436222885"
+                         startY="0.011363643588441774">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="1.0" green="0.644444465637207" blue="0.644444465637207"/>
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="0.6629629731178284" green="0.8090123534202576" blue="1.0"/>
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Rectangle>
+   <Pane layoutX="199.0" layoutY="215.0" prefHeight="200.0" prefWidth="400.0">
+      <Label alignment="CENTER" prefHeight="200.0" prefWidth="400.0" text="Java Game Library" textAlignment="CENTER">
          <font>
-            <Font size="18.0" />
+            <Font name="System Bold" size="24.0"/>
          </font>
       </Label>
-   </children>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="200.0" stroke="BLACK" strokeType="INSIDE"
+                 width="400.0"/>
+   </Pane>
+   <HBox layoutX="219.0" layoutY="521.0" prefHeight="45.0" prefWidth="360.0">
+      <Button fx:id="loginButton" mnemonicParsing="false" onAction="#onLoginClick" prefHeight="45.0"
+              prefWidth="120.0" styleClass="transparent-button" text="Login">
+         <font>
+            <Font name="System Bold" size="12.0"/>
+         </font>
+      </Button>
+      <Button fx:id="registerButton" mnemonicParsing="false" onAction="#onRegisterClick" prefHeight="45.0"
+              prefWidth="120.0" styleClass="transparent-button" text="Register">
+         <font>
+            <Font name="System Bold" size="12.0"/>
+         </font>
+      </Button>
+      <Button fx:id="exitButton" mnemonicParsing="false" onAction="#onExitClick" prefHeight="45.0" prefWidth="120.0"
+              styleClass="transparent-button" text="Exit">
+         <font>
+            <Font name="System Bold" size="12.0"/>
+         </font>
+      </Button>
+   </HBox>
+   <Label alignment="CENTER" layoutX="341.0" layoutY="455.0" text="Ready to play?" textAlignment="CENTER">
+      <font>
+         <Font size="18.0"/>
+      </font>
+   </Label>
 </AnchorPane>

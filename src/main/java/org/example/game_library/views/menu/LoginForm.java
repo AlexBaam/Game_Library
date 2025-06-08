@@ -1,6 +1,8 @@
 package org.example.game_library.views.menu;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.layout.AnchorPane;
 import org.example.game_library.networking.client.ClientToServerProxy;
 import org.example.game_library.utils.loggers.AppLogger;
 import org.example.game_library.utils.exceptions.NullData;
@@ -19,8 +21,21 @@ import java.util.logging.Logger;
 
 public class LoginForm {
     private static final Logger logger = AppLogger.getLogger();
+
+    @FXML
+    public Button loginButton;
+
+    @FXML
+    public Button backButton;
+
+    @FXML
+    public Button exitButton;
+
     private String username;
     private String password;
+
+    @FXML
+    public AnchorPane rootPane_Login;
 
     @FXML
     private TextField usernameField;

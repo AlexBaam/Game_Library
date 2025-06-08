@@ -24,6 +24,15 @@ public class TicTacToeForm {
     private static final Logger logger = AppLogger.getLogger();
 
     @FXML
+    public Button newGameButton;
+
+    @FXML
+    public Button loadGameButton;
+
+    @FXML
+    public Button scoreboardButton;
+
+    @FXML
     private GridPane boardGrid;
 
     @FXML

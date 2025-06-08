@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import org.example.game_library.networking.client.ClientToServerProxy;
 import org.example.game_library.utils.loggers.AppLogger;
@@ -18,6 +19,15 @@ import java.util.logging.Logger;
 
 public class TicTacToeConnectionScreen {
     private static final Logger logger = AppLogger.getLogger();
+
+    @FXML
+    public Button hostButton;
+
+    @FXML
+    public Button joinButton;
+
+    @FXML
+    public Button backButton;
 
     @FXML
     public void onBackClick(ActionEvent event) {
