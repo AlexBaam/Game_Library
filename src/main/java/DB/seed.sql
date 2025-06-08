@@ -60,59 +60,6 @@ WHERE ms.best_score > 0
 ORDER BY ms.best_score ASC
     LIMIT 10;
 
-CREATE OR REPLACE FUNCTION get_user_tictactoe_rank_manual(p_user_id INTEGER)
-RETURNS INTEGER AS $$
-DECLARE
-v_user_wins INTEGER;
-    v_rank INTEGER;
-BEGIN
-SELECT total_wins INTO v_user_wins
-FROM tictactoe_scores
-WHERE user_id = p_user_id;
-
-IF v_user_wins IS NULL THEN
-        RETURN NULL;
-END IF;
-
-SELECT COUNT(DISTINCT total_wins) + 1 INTO v_rank
-FROM tictactoe_scores
-WHERE total_wins > v_user_wins;
-
-RETURN v_rank;
-END;
-$$ LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE FUNCTION get_tictactoe_top_ranked_players(p_top_ranks INTEGER)
-RETURNS TABLE (
-    rank_nr BIGINT,
-    username VARCHAR(50),
-    games_played INTEGER
-) AS $$
-BEGIN
-RETURN QUERY
-    WITH RankedScores AS (
-        SELECT
-            u.username,
-            tts.total_wins AS games_played,
-            DENSE_RANK() OVER (ORDER BY tts.total_wins DESC) as current_rank
-        FROM
-            tictactoe_scores tts
-        JOIN
-            users u ON u.user_id = tts.user_id
-    )
-SELECT
-    rs.current_rank,
-    rs.username,
-    rs.games_played
-FROM
-    RankedScores rs
-WHERE
-    rs.current_rank <= p_top_ranks
-ORDER BY
-    rs.current_rank ASC, rs.games_played DESC, rs.username ASC;
-END;
-$$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION check_email_and_username_uniqueness()
@@ -193,6 +140,80 @@ CREATE TRIGGER trg_create_scores_after_user_insert
     AFTER INSERT ON users
     FOR EACH ROW
     EXECUTE FUNCTION create_score_entries_after_user_insert();
+
+
+
+CREATE OR REPLACE FUNCTION get_user_tictactoe_rank_manual(p_user_id INTEGER, p_score_type VARCHAR)
+RETURNS INTEGER AS $$
+DECLARE
+v_user_wins INTEGER;
+    v_rank INTEGER;
+    v_sql TEXT;
+BEGIN
+    -- Validează p_score_type pentru a preveni injecția SQL
+    IF p_score_type NOT IN ('local_wins', 'network_wins', 'ai_wins') THEN
+        RAISE EXCEPTION 'Tip de scor invalid: %', p_score_type;
+END IF;
+
+    -- Obține victoriile specificate pentru utilizator
+EXECUTE 'SELECT ' || p_score_type || ' FROM tictactoe_scores WHERE user_id = $1'
+    INTO v_user_wins USING p_user_id;
+
+IF v_user_wins IS NULL THEN
+        RETURN NULL;
+END IF;
+
+    -- Calculează rangul pe baza victoriilor specificate
+EXECUTE 'SELECT COUNT(DISTINCT ' || p_score_type || ') + 1 FROM tictactoe_scores WHERE ' || p_score_type || ' > $1'
+    INTO v_rank USING v_user_wins;
+
+RETURN v_rank;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_tictactoe_top_ranked_players(p_top_ranks INTEGER, p_score_type VARCHAR)
+RETURNS TABLE (
+    rank_nr BIGINT,
+    username VARCHAR(50),
+    wins INTEGER -- Asigură-te că este "wins" aici
+) AS $$
+DECLARE
+v_sql TEXT;
+BEGIN
+    -- Validează p_score_type pentru a preveni injecția SQL
+    IF p_score_type NOT IN ('network_wins', 'ai_wins') THEN
+        RAISE EXCEPTION 'Tip de scor invalid: %', p_score_type;
+END IF;
+
+    v_sql := '
+        WITH RankedScores AS (
+            SELECT
+                u.username,
+                tts.' || p_score_type || ' AS wins, -- Selectează dinamic coloana de victorii
+                DENSE_RANK() OVER (ORDER BY tts.' || p_score_type || ' DESC) as current_rank
+            FROM
+                tictactoe_scores tts
+            JOIN
+                users u ON u.user_id = tts.user_id
+        )
+        SELECT
+            rs.current_rank,
+            rs.username,
+            rs.wins
+        FROM
+            RankedScores rs
+        WHERE
+            rs.current_rank <= $1
+        ORDER BY
+            rs.current_rank ASC, rs.wins DESC, rs.username ASC;
+    ';
+
+RETURN QUERY EXECUTE v_sql USING p_top_ranks;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
 
 INSERT INTO game_types (name) VALUES ('tictactoe');
 INSERT INTO game_types (name) VALUES ('minesweeper');

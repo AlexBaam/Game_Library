@@ -37,7 +37,6 @@ public class TicTacToeRequests {
                     logger.log(Level.INFO, "New LOCAL game started for thread {0}", threadCreator.getId());
                 }
                 case "player" -> {
-                    // Poți inițializa jocul aici dacă ai logica pentru multiplayer TCP
                     TicTacToeGame game = new TicTacToeGame();
                     game.setMode("network");
                     threadCreator.setTicTacToeGame(game);
@@ -84,12 +83,18 @@ public class TicTacToeRequests {
         }
     }
 
-    public static void handleScore(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
-        UserRepository userDAO = new UserRepository();
+    public static void handleScore(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input, String scoreType, UserRepository userRepository) {
         try {
-            List<ScoreEntry> topPlayers = userDAO.getTicTacToeTopRankedPlayers(3);
+            List<ScoreEntry> topPlayers = userRepository.getTicTacToeTopRankedPlayers(3, scoreType);
             output.writeObject(topPlayers);
-            logger.log(Level.INFO, "Sent TicTacToe top ranked players to client.");
+            logger.log(Level.INFO, "Sent TicTacToe top ranked players (type: {0}) to client for thread {1}.", new Object[]{scoreType, threadCreator.getId()});
+        } catch (IllegalArgumentException e) {
+            logger.log(Level.WARNING, "Invalid score type requested: {0} - {1}", new Object[]{scoreType, e.getMessage()});
+            try {
+                output.writeObject("ERROR: " + e.getMessage());
+            } catch (IOException ioException) {
+                logger.log(Level.SEVERE, "Error sending error to client: " + ioException.getMessage());
+            }
         } catch (PersistenceException e) {
             logger.log(Level.SEVERE, "Database error retrieving TicTacToe scores: " + e.getMessage());
             try {

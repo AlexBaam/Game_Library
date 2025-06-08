@@ -10,6 +10,9 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.HBox?>
+
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.game_library.views.tictactoe.ScoreForm">
     <children>
@@ -31,16 +34,22 @@
                 </LinearGradient>
             </fill>
         </Rectangle>
-        <Label alignment="CENTER" layoutX="196.0" layoutY="99.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="408.0" text="Rank: 3 Top Tic Tac Toe Scores" textAlignment="CENTER">
-            <font>
-                <Font name="System Bold" size="24.0" />
-            </font>
-        </Label>
+        <HBox alignment="CENTER" layoutX="196.0" layoutY="99.0" prefHeight="60.0" prefWidth="408.0" spacing="10">
+            <children>
+                <Button fx:id="prevRankButton" mnemonicParsing="false" onAction="#onPrevRankClick" text="&lt;" />
+                <Label fx:id="rankTitleLabel" alignment="CENTER" text="Top 3 Rank - Multiplayer">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Label>
+                <Button fx:id="nextRankButton" mnemonicParsing="false" onAction="#onNextRankClick" text="&gt;" />
+            </children>
+        </HBox>
         <TableView fx:id="scoreTable" layoutX="150.0" layoutY="180.0" prefHeight="400.0" prefWidth="500.0">
             <columns>
                 <TableColumn fx:id="rankColumn" prefWidth="75.0" text="Rank" />
                 <TableColumn fx:id="usernameColumn" prefWidth="225.0" text="Username" />
-                <TableColumn fx:id="gamesPlayedColumn" prefWidth="200.0" text="Games Played" />
+                <TableColumn fx:id="winsColumn" prefWidth="200.0" text="Wins" />
             </columns>
         </TableView>
         <Button fx:id="backButton" layoutX="30.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onBackClick" prefHeight="30.0" prefWidth="90.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Back">
