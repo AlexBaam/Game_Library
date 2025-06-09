@@ -1,11 +1,18 @@
 package org.example.game_library.networking.server.minesweeper_game_logic;
 
+import javafx.fxml.FXML;
+import javafx.scene.layout.GridPane;
+
 import java.io.Serializable;
 import java.util.Random;
 
 public class MinesweeperGameState implements Serializable {
     private int rows, cols;
     private Cell[][] board;
+
+    @FXML
+    private GridPane boardGrid;
+
 
     public MinesweeperGameState(int rows, int cols) {
         this.rows = rows;
@@ -119,5 +126,13 @@ public class MinesweeperGameState implements Serializable {
     public boolean isValidCell(int row, int col) {
         return row >= 0 && row < rows && col >= 0 && col < cols;
     }
+
+    public Cell getCell(int row, int col) {
+        if (isValidCell(row, col)) {
+            return board[row][col];
+        }
+        return null;
+    }
+
     // getter-e si metode auxiliare
 }

@@ -16,21 +16,57 @@ import java.util.logging.Logger;
 public class MinesweeperRequests {
     private static final Logger logger = AppLogger.getLogger();
 
+//    public static void handleNewGame(List<String> request, ThreadCreator thread, ObjectOutputStream output, ObjectInputStream input) throws IOException {
+//        // Exemplu: parsezi modul de joc
+//        if (request.size() < 3) {
+//            output.writeObject("Eroare: Mod de joc lipsa");
+//            return;
+//        }
+//
+//        String mode = request.get(2); // "easy", "medium", "hard"
+//
+//        // Aici creezi jocul efectiv - pentru acum poate fi doar un mesaj
+//        // Mai tarziu poti genera tabla si salva intr-un hashmap cu userul
+//        System.out.println("Creating new Minesweeper game with mode: " + mode);
+//
+//        output.writeObject("SUCCESS: Game created with mode " + mode);
+//    }
+
     public static void handleNewGame(List<String> request, ThreadCreator thread, ObjectOutputStream output, ObjectInputStream input) throws IOException {
-        // Exemplu: parsezi modul de joc
         if (request.size() < 3) {
             output.writeObject("Eroare: Mod de joc lipsa");
             return;
         }
 
         String mode = request.get(2); // "easy", "medium", "hard"
+        int rows = 9, cols = 9, mines = 10;
 
-        // Aici creezi jocul efectiv - pentru acum poate fi doar un mesaj
-        // Mai tarziu poti genera tabla si salva intr-un hashmap cu userul
+        switch (mode.toLowerCase()) {
+            case "medium":
+                rows = cols = 16;
+                mines = 40;
+                break;
+            case "hard":
+                rows = cols = 24;
+                mines = 99;
+                break;
+            case "easy":
+            default:
+                // valorile default de mai sus
+                break;
+        }
+
+        MinesweeperGameState game = new MinesweeperGameState(rows, cols);
+        game.placeMines(mines);
+        game.calculateNumbers();
+
+        // Salvezi jocul in thread
+        thread.setMinesweeperGameState(game); // metoda pe care trebuie sa o ai in ThreadCreator
+
         System.out.println("Creating new Minesweeper game with mode: " + mode);
-
         output.writeObject("SUCCESS: Game created with mode " + mode);
     }
+
 
     public static void handleReveal(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
         try {

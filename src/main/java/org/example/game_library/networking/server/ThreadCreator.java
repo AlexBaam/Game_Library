@@ -328,5 +328,6 @@
         public void setMinesweeperGameState(MinesweeperGameState gameState) {
             this.minesweeperGameState = gameState;
         }
+
     }
 
