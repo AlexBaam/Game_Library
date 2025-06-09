@@ -20,7 +20,7 @@ public class MinesweeperRequests {
     private static final Logger logger = AppLogger.getLogger();
 
     public static void handleMinesweeperRequest(List<String> request, ThreadCreator clientThread,
-                                                ObjectOutputStream output, ObjectInputStream input,
+                                                ObjectOutputStream output, ObjectInputStream input, // input e pasat, dar nu e folosit aici, e ok
                                                 User currentUser, MinesweeperGame currentGame) throws IOException {
         if (request.size() == 1) {
             output.writeObject("SUCCESS_MINESWEEPER_MENU");
@@ -36,40 +36,46 @@ public class MinesweeperRequests {
             return;
         }
 
+        // Folosim currentGame pasat, care este currentMinesweeperGame din ThreadCreator
+        // și pe care o setăm prin clientThread.setCurrentMinesweeperGame(newGame);
+        MinesweeperGame game = clientThread.getCurrentMinesweeperGame(); // Ne asigurăm că folosim instanța corectă
+
         switch (subCommand) {
             case NEWGAME:
+                // Aici se creează un joc nou și se setează în ThreadCreator
                 handleNewGame(request, clientThread, output, currentUser);
                 break;
             case CLICK:
-                if (currentGame == null) {
+                if (game == null) { // Verificăm instanța jocului curent
                     output.writeObject("FAILURE: No active Minesweeper game found for this session. Please start a new game.");
                     return;
                 }
-                handleClick(request, output, currentGame);
+                handleClick(request, output, game); // Pasez instanța 'game'
                 // Dupa click, verificam daca jocul s-a terminat si curatam pe server
-                if (currentGame.isGameOver() || currentGame.isGameWon()) {
-                    clientThread.setCurrentMinesweeperGame(null);
+                if (game.isGameOver() || game.isGameWon()) {
+                    clientThread.setCurrentMinesweeperGame(null); // Curățăm pe ThreadCreator
                     logger.log(Level.INFO, "Minesweeper game ended (click). Game state cleared for user {0}.", currentUser.getUsername());
                 }
                 break;
             case FORFEIT:
-                if (currentGame == null) {
+                if (game == null) { // Verificăm instanța jocului curent
                     output.writeObject("FAILURE: No active Minesweeper game to forfeit.");
                     return;
                 }
-                handleForfeit(output, currentGame); // handleForfeit nu mai are nevoie de clientThread
+                handleForfeit(output, game); // Pasez instanța 'game'
                 clientThread.setCurrentMinesweeperGame(null); // curatam aici
                 logger.log(Level.INFO, "Minesweeper game forfeited. Game state cleared for user {0}.", currentUser.getUsername());
                 break;
             case SAVE:
-                if (currentGame == null) {
+                if (game == null) {
                     output.writeObject("FAILURE: No active Minesweeper game to save.");
                     return;
                 }
-                handleSaveGame(request, output, currentGame, currentUser);
+                handleSaveGame(request, output, game, currentUser);
                 break;
             case LOAD:
-                handleLoadGame(request, output, currentUser, clientThread); // Load trebuie sa seteze jocul in ThreadCreator
+                // Load trebuie sa seteze jocul in ThreadCreator
+                handleLoadGame(request, output, currentUser, clientThread);
                 break;
             case SCORE:
                 handleScore(request, clientThread, output, input, new UserRepository());
@@ -95,7 +101,7 @@ public class MinesweeperRequests {
         }
 
         MinesweeperGame newGame = new MinesweeperGame(difficulty);
-        clientThread.setCurrentMinesweeperGame(newGame);
+        clientThread.setCurrentMinesweeperGame(newGame); // SETEAZĂ JOCUL PE THREAD-UL CURENT
 
         output.writeObject("SUCCESS;rows=" + newGame.getRows() + ";cols=" + newGame.getCols() + ";mines=" + newGame.getTotalMines());
         logger.log(Level.INFO, "User {0} started a new Minesweeper game with difficulty {1}. Board: {2}x{3}, {4} mines.",
@@ -123,22 +129,19 @@ public class MinesweeperRequests {
                 return;
             }
 
-            List<Object> response = new ArrayList<>();
+            // *** CORECTIA MAJORĂ PENTRU COMUNICARE: Combinarea celor două răspunsuri ***
+            List<Object> combinedResponse = new ArrayList<>();
             if (game.isGameOver()) {
-                response.add("GAME_OVER");
+                combinedResponse.add("GAME_OVER");
             } else if (game.isGameWon()) {
-                response.add("GAME_WON");
+                combinedResponse.add("GAME_WON");
             } else {
-                response.add("BOARD_UPDATE");
+                combinedResponse.add("BOARD_UPDATE");
             }
-            response.addAll(updatedCells);
+            combinedResponse.add(game.getTotalMines() - game.getFlaggedCellsCount()); // Adaugă minele rămase
+            combinedResponse.addAll(updatedCells); // Adaugă celulele actualizate
 
-            output.writeObject(response);
-
-            List<Object> minesLeftResponse = new ArrayList<>();
-            minesLeftResponse.add("MINES_LEFT");
-            minesLeftResponse.add(game.getTotalMines() - game.getFlaggedCellsCount());
-            output.writeObject(minesLeftResponse);
+            output.writeObject(combinedResponse); // Trimite UN SINGUR obiect
 
             logger.log(Level.INFO, "Minesweeper game state updated after click ({0},{1},{2}). Game Over: {3}, Game Won: {4}",
                     new Object[]{row, col, clickType, game.isGameOver(), game.isGameWon()});
@@ -156,6 +159,17 @@ public class MinesweeperRequests {
         game.setGameOver(true);
         List<Object> response = new ArrayList<>();
         response.add("GAME_OVER");
+        // De asemenea, poți include numărul de mine rămase sau orice altceva în response
+        response.add(game.getTotalMines() - game.getFlaggedCellsCount()); // Include mines left at forfeit
+        // Și celulele (dacă vrei să arăți toate minele la forfeit)
+        // for (int r = 0; r < game.getRows(); r++) {
+        //    for (int c = 0; c < game.getCols(); c++) {
+        //        if (game.getCell(r, c).isMine()) {
+        //            game.getCell(r, c).setRevealed(true); // reveal all mines on forfeit
+        //            response.add(game.getCell(r, c));
+        //        }
+        //    }
+        // }
         output.writeObject(response);
         logger.log(Level.INFO, "Minesweeper game forfeited.");
     }

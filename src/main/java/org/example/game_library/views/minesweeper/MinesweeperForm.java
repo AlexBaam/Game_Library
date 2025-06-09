@@ -1,10 +1,9 @@
 package org.example.game_library.views.minesweeper;
 
-import javafx.util.Duration;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform; // Import pentru a rula pe UI thread
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,28 +14,29 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseButton; // Pentru a distinge click-urile
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.example.game_library.networking.client.ClientToServerProxy;
-import org.example.game_library.networking.server.minesweeper_game_logic.Cell; // Importă clasa Cell
+import org.example.game_library.networking.server.minesweeper_game_logic.Cell;
 import org.example.game_library.utils.loggers.AppLogger;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MinesweeperForm { // Am redenumit această clasă în MinesweeperForm, dacă nu era deja așa
+public class MinesweeperForm {
     private static final Logger logger = AppLogger.getLogger();
-
-    private final AtomicBoolean isListening = new AtomicBoolean(false);
-    private Thread listenerThread;
 
     @FXML
     private GridPane boardGrid;
@@ -49,69 +49,59 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
     @FXML
     private Button forfeitButton;
 
-    private Button[][] uiCells; // Matrice pentru a stoca referințele butoanelor UI
+    private Button[][] uiCells;
     private Timeline gameTimer;
     private int timeElapsedInSeconds;
-    private int totalMines; // Numărul total de mine, primit de la server
-    private int flaggedMinesCount; // Numărul de steaguri plasate de utilizator
+    private int totalMines;
+    private Thread listenerThread;
+    private final AtomicBoolean isListening = new AtomicBoolean(false);
 
     public void initializeGameUI(int rows, int cols, int totalMines) {
         this.totalMines = totalMines;
-        this.flaggedMinesCount = 0; // Resetăm contorul de steaguri
-        minesRemainingLabel.setText("Mines: " + (totalMines - flaggedMinesCount));
+        minesRemainingLabel.setText("Mines: " + totalMines);
 
         setupBoardUI(rows, cols);
         startTimer();
-
-        // Asigură-te că oprești orice thread de ascultare anterior
-        stopListeningForServerUpdates();
-        // Apoi pornești unul nou
         startListeningForServerUpdates();
     }
 
     private void setupBoardUI(int rows, int cols) {
-        boardGrid.getChildren().clear(); // Curăță orice butoane vechi
+        boardGrid.getChildren().clear();
         boardGrid.getRowConstraints().clear();
         boardGrid.getColumnConstraints().clear();
 
         uiCells = new Button[rows][cols];
 
-        // Adaugă constrângeri dinamice pentru rânduri și coloane
         for (int i = 0; i < rows; i++) {
             RowConstraints rc = new RowConstraints();
-            rc.setPrefHeight(30); // Înălțimea preferată a celulei
+            rc.setPrefHeight(30);
             boardGrid.getRowConstraints().add(rc);
         }
         for (int i = 0; i < cols; i++) {
             ColumnConstraints cc = new ColumnConstraints();
-            cc.setPrefWidth(30); // Lățimea preferată a celulei
+            cc.setPrefWidth(30);
             boardGrid.getColumnConstraints().add(cc);
         }
 
-        // Creează și adaugă butoanele în GridPane
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 Button cellButton = new Button();
-                cellButton.setMinSize(30, 30); // Dimensiunea minimă a celulei
-                cellButton.setMaxSize(30, 30); // Dimensiunea maximă a celulei
-                cellButton.getStyleClass().add("minesweeper-cell"); // Adaugă clasa CSS
-                // Nu seta textul inițial, e acoperită
+                cellButton.setMinSize(30, 30);
+                cellButton.setMaxSize(30, 30);
+                cellButton.getStyleClass().add("minesweeper-cell");
 
-                final int row = r; // Variabile finale pentru lambda
-                final int col = c;
+                final int row = r;
+                final int intCol = c;
 
-                cellButton.setOnMouseClicked(event -> handleCellClick(event, row, col));
+                cellButton.setOnMouseClicked(event -> handleCellClick(event, row, intCol));
 
-                GridPane.setConstraints(cellButton, col, row); // Col, Row
+                GridPane.setConstraints(cellButton, intCol, row);
                 boardGrid.getChildren().add(cellButton);
-                uiCells[r][c] = cellButton;
+                uiCells[r][intCol] = cellButton;
             }
         }
-        // Ajustează dimensiunea GridPane-ului pentru a centra
         boardGrid.setPrefWidth(cols * 30);
         boardGrid.setPrefHeight(rows * 30);
-        boardGrid.setLayoutX((boardGrid.getParent().getBoundsInLocal().getWidth() - boardGrid.getPrefWidth()) / 2);
-        boardGrid.setLayoutY((boardGrid.getParent().getBoundsInLocal().getHeight() - boardGrid.getPrefHeight()) / 2);
     }
 
     private void startTimer() {
@@ -131,7 +121,6 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
     }
 
     private void updateTimerLabel() {
-
         int minutes = timeElapsedInSeconds / 60;
         int seconds = timeElapsedInSeconds % 60;
         timerLabel.setText(String.format("Time: %02d:%02d", minutes, seconds));
@@ -151,121 +140,120 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
         } else if (event.getButton() == MouseButton.SECONDARY) {
             clickType = "secondary";
         } else {
-            return; // Nu procesăm alte tipuri de click
+            return;
         }
 
         try {
-            // Trimiterea comenzii către server
             ClientToServerProxy.send(List.of("minesweeper", "click", String.valueOf(r), String.valueOf(c), clickType));
             logger.log(Level.INFO, "Sent minesweeper click to server: row={0}, col={1}, type={2}", new Object[]{r, c, clickType});
-
-            // Răspunsul de la server va fi gestionat de startListeningForServerUpdates
-            // Aici nu mai așteptăm un răspuns sincron, deoarece avem un thread dedicat.
-
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error sending click to server: {0}", e.getMessage());
             showAlert(Alert.AlertType.ERROR, "Connection Error", "Could not send move to server: " + e.getMessage());
         }
     }
 
-    // Metoda pentru a porni thread-ul de ascultare
     private void startListeningForServerUpdates() {
-        // Dacă există deja un thread care rulează, oprește-l
-        stopListeningForServerUpdates();
-
-        isListening.set(true); // Setăm flag-ul la true pentru a indica că thread-ul ar trebui să ruleze
+        isListening.set(true);
         listenerThread = new Thread(() -> {
             try {
-                while (isListening.get()) { // Citim starea AtomicBoolean
+                while (isListening.get()) {
                     Object raw = ClientToServerProxy.receive();
                     if (raw == null) {
-                        logger.log(Level.WARNING, "Received null from server. Listener might be closing.");
-                        // Nu continuăm, ieșim dacă nu mai primim nimic.
-                        break; // Ieșim din buclă dacă primim null
+                        logger.log(Level.WARNING, "Received null from server. Listener might be closing or server disconnected.");
+                        break;
                     }
 
-                    if (raw instanceof List<?> responseList) {
-                        if (responseList.isEmpty()) {
-                            continue;
-                        }
-
-                        String command = responseList.get(0).toString();
-
-                        Platform.runLater(() -> {
-                            if (!isListening.get()) { // Verificăm din nou dacă thread-ul ar trebui să se oprească
-                                return; // Nu mai procesăm dacă am semnalat oprirea
+                    Platform.runLater(() -> {
+                        if (raw instanceof List<?> responseList) {
+                            if (responseList.isEmpty()) {
+                                return;
                             }
-                            if ("BOARD_UPDATE".equals(command) && responseList.size() > 1) {
+
+                            String status = responseList.get(0).toString();
+                            int minesLeft = -1;
+                            if (responseList.size() > 1 && responseList.get(1) instanceof Integer) {
+                                minesLeft = (Integer) responseList.get(1);
+                                minesRemainingLabel.setText("Mines: " + minesLeft);
+                            } else {
+                                logger.log(Level.WARNING, "Mines left count missing or malformed in server response: " + responseList);
+                            }
+
+                            List<Cell> updatedCells = new ArrayList<>();
+                            if (responseList.size() > 2) {
                                 try {
-                                    @SuppressWarnings("unchecked")
-                                    List<Cell> updatedCells = (List<Cell>) responseList.subList(1, responseList.size());
+                                    for (int i = 2; i < responseList.size(); i++) {
+                                        if (responseList.get(i) instanceof Cell) {
+                                            updatedCells.add((Cell) responseList.get(i));
+                                        } else {
+                                            logger.log(Level.WARNING, "Non-Cell object found in updatedCells list: " + responseList.get(i).getClass().getName());
+                                        }
+                                    }
                                     updateBoardUI(updatedCells);
                                 } catch (ClassCastException e) {
-                                    logger.log(Level.SEVERE, "Received malformed board update: " + responseList, e);
+                                    logger.log(Level.SEVERE, "Received malformed cell update list: " + responseList.subList(2, responseList.size()), e);
                                 }
-                            } else if ("GAME_OVER".equals(command) || "GAME_WON".equals(command)) {
+                            }
+
+                            if ("GAME_OVER".equals(status) || "GAME_WON".equals(status)) {
                                 stopTimer();
                                 String message = "Game Over!";
-                                if ("GAME_WON".equals(command)) {
+                                if ("GAME_WON".equals(status)) {
                                     message = "Congratulations! You won!";
                                 }
                                 showAlert(Alert.AlertType.INFORMATION, "Game Result", message);
-                                stopListeningForServerUpdates(); // Oprim thread-ul explicit
                                 returnToNewGameScreen();
-                            } else if ("MINES_LEFT".equals(command) && responseList.size() > 1) {
-                                try {
-                                    int minesLeft = Integer.parseInt(responseList.get(1).toString());
-                                    minesRemainingLabel.setText("Mines: " + minesLeft);
-                                } catch (NumberFormatException e) {
-                                    logger.log(Level.WARNING, "Invalid mines left count received: " + responseList.get(1), e);
-                                }
-                            } else{
-                                showAlert(Alert.AlertType.ERROR, "Server Error", command); // command e de fapt mesajul de eroare
                             }
-                        });
-                    } else if (raw instanceof String response) {
-                        Platform.runLater(() -> {
-                            if (!isListening.get()) {
-                                return;
-                            }
+                        } else if (raw instanceof String response) {
                             if (response.startsWith("FAILURE")) {
                                 showAlert(Alert.AlertType.ERROR, "Server Error", response);
                             }
-                            // Alte mesaje simple de la server
-                        });
-                    }
+                        }
+                    });
                 }
-            } catch (IOException | ClassNotFoundException e) {
-                if (isListening.get()) { // Loghează doar dacă thread-ul nu a fost oprit intenționat
+            } catch (IOException e) {
+                if (isListening.get()) {
                     logger.log(Level.SEVERE, "Error during Minesweeper game updates listening.", e);
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Connection Lost", "Lost connection to server."));
                 } else {
-                    logger.log(Level.INFO, "Minesweeper listener thread stopped gracefully.");
+                    logger.log(Level.INFO, "Minesweeper listener thread stopped gracefully (socket closed).");
                 }
+            } catch (ClassNotFoundException e) {
+                logger.log(Level.SEVERE, "Received unknown object type from server.", e);
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Server Error", "Received unexpected data type from server."));
             } finally {
-                isListening.set(false); // Asigură-te că flag-ul e false la ieșirea din buclă
+                isListening.set(false);
             }
         });
         listenerThread.setDaemon(true);
         listenerThread.start();
     }
 
+    // In MinesweeperForm.java
     private void stopListeningForServerUpdates() {
-        if (isListening.get()) { // Verifică dacă thread-ul este activ
+        if (isListening.get()) {
             logger.log(Level.INFO, "Attempting to stop Minesweeper listener thread.");
-            isListening.set(false); // Semnalizează thread-ului să se oprească
-            // Nu apelăm listenerThread.interrupt() direct, deoarece readObject poate fi blocat.
-            // Serverul trebuie să închidă socket-ul pentru a debloca readObject.
-            // Dacă clientul ar trebui să poată închide socketul unilateral, e o altă discuție.
+            isListening.set(false);
+            try {
+                // This is the change: call close() instead of closeConnection()
+                ClientToServerProxy.close();
+                if (listenerThread != null && listenerThread.isAlive()) {
+                    listenerThread.join(1000);
+                    if (listenerThread.isAlive()) {
+                        logger.log(Level.WARNING, "Minesweeper listener thread did not terminate gracefully within timeout. Interrupting...");
+                        listenerThread.interrupt();
+                    }
+                }
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Error closing client socket for Minesweeper listener: {0}", e.getMessage());
+            } catch (InterruptedException e) {
+                logger.log(Level.WARNING, "Interrupted while waiting for Minesweeper listener thread to stop.", e);
+            }
         }
     }
 
-    // Această metodă va actualiza UI-ul pe baza datelor primite de la server
-    // Va parcurge doar celulele care au fost actualizate
     private void updateBoardUI(List<Cell> updatedCells) {
         for (Cell cell : updatedCells) {
             Button button = uiCells[cell.getRow()][cell.getCol()];
-            // Curăță toate stilurile dinamice
             button.getStyleClass().removeAll("revealed", "mine", "flagged",
                     "num-1", "num-2", "num-3", "num-4", "num-5", "num-6", "num-7", "num-8");
 
@@ -273,37 +261,33 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
                 button.getStyleClass().add("revealed");
                 if (cell.isMine()) {
                     button.getStyleClass().add("mine");
-                    button.setText(""); // Aici poți seta o imagine cu mina
-                    button.setDisable(true); // O mină descoperită e dezactivată
+                    button.setText("");
+                    button.setDisable(true);
                 } else {
                     if (cell.getAdjacentMinesCount() > 0) {
                         button.setText(String.valueOf(cell.getAdjacentMinesCount()));
                         button.getStyleClass().add("num-" + cell.getAdjacentMinesCount());
                     } else {
-                        button.setText(""); // Celulă goală (0 mine adiacente)
+                        button.setText("");
                     }
-                    button.setDisable(true); // O celulă descoperită e dezactivată
+                    button.setDisable(true);
                 }
             } else if (cell.isFlagged()) {
                 button.getStyleClass().add("flagged");
-                button.setText(""); // Aici poți seta o imagine cu un steag
-                button.setDisable(false); // Poți da click din nou pentru a scoate steagul
+                button.setText("");
+                button.setDisable(false);
             } else {
-                button.setText(""); // Celula acoperită
-                button.setDisable(false); // Este activă pentru click
+                button.setText("");
+                button.setDisable(false);
             }
         }
     }
 
-
-    // Metode pentru butoanele Save și Forfeit
     @FXML
     private void onSaveClick() {
-        // Logica pentru salvarea jocului (va veni mai târziu, dar trimitem o comandă generică acum)
         try {
             ClientToServerProxy.send(List.of("minesweeper", "save"));
             logger.log(Level.INFO, "Sent minesweeper save request to server.");
-            // Răspunsul va fi gestionat de startListeningForServerUpdates
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error sending save request: {0}", e.getMessage());
             showAlert(Alert.AlertType.ERROR, "Connection Error", "Could not send save request to server.");
@@ -319,11 +303,10 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            stopTimer(); // Oprește timerul
+            stopTimer();
             try {
                 ClientToServerProxy.send(List.of("minesweeper", "forfeit"));
                 logger.log(Level.INFO, "Sent minesweeper forfeit request to server.");
-                // Serverul va trimite GAME_OVER, care va fi gestionat de listener
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "Error sending forfeit request: {0}", e.getMessage());
                 showAlert(Alert.AlertType.ERROR, "Connection Error", "Could not send forfeit request to server.");
@@ -331,10 +314,7 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
         }
     }
 
-
-    // Metodă ajutătoare pentru a afișa alerte
     private void showAlert(Alert.AlertType type, String title, String content) {
-        // Folosim Platform.runLater pentru a asigura că alertele sunt afișate pe UI thread
         Platform.runLater(() -> {
             Alert alert = new Alert(type);
             alert.setTitle(title);
@@ -344,13 +324,14 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
         });
     }
 
-    // Metodă pentru a reveni la ecranul New Game sau la meniul principal Minesweeper
     private void returnToNewGameScreen() {
+        stopListeningForServerUpdates();
+
         Platform.runLater(() -> {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/minesweeper/minesweeperNewGameScreen.fxml"));
                 Parent root = loader.load();
-                Stage stage = (Stage) boardGrid.getScene().getWindow(); // Obținem Stage de la orice nod din scenă
+                Stage stage = (Stage) boardGrid.getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.setTitle("Minesweeper - New Game");
                 stage.show();
@@ -361,16 +342,6 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
         });
     }
 
-    // Aceste metode sunt pentru meniul principal Minesweeper.
-    // Daca MinesweeperForm este si pentru meniu SI pentru joc, atunci OK.
-    // Daca ai MinesweeperMainMenu.fxml si MinesweeperBoard.fxml atunci trebuie sa separi.
-    // Din exemplul tau TicTacToe, TicTacToeForm este meniul, iar TicTacToeBoard este tabla de joc.
-    // Deci, ar trebui sa ai MinesweeperMainMenu.java si MinesweeperBoard.java.
-    // Acum, ca sa nu facem prea multe, o sa presupun ca MinesweeperForm este controller-ul pentru tabla de joc.
-    // Functiile onNewGameClick, onLoadGameClick, onScoreboardClick, onBackClick, onExitClick
-    // sunt probabil din meniul principal de Minesweeper (cel care duce la MinesweeperNewGameScreen),
-    // nu din tabla de joc.
-    // Le voi lăsa deocamdată ca și comentarii sau ca atare, dar ține cont de separare.
     @FXML
     private void onNewGameClick(ActionEvent event) {
         logger.log(Level.INFO, "New Game Minesweeper clicked from main menu. Navigating to difficulty selection.");
@@ -387,18 +358,16 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
         }
     }
 
-    // Asigură-te că aceste metode sunt în controlerul potrivit (meniu vs. board)
     @FXML
     private void onLoadGameClick(ActionEvent event) {
         showAlert(Alert.AlertType.INFORMATION, "Load Game", "Funcționalitatea 'Load Game' Minesweeper nu este încă implementată.");
         logger.log(Level.INFO, "Load Game Minesweeper clicked.");
-        // Logică similară cu TicTacToeForm.onLoadClick, dar pentru Minesweeper
     }
 
     @FXML
     private void onScoreboardClick(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/minesweeper/scoreFormMinesweeper.fxml")); // Asigură-te că e corect numele fișierului
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/minesweeper/scoreFormMinesweeper.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -437,5 +406,4 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
             stage.close();
         }
     }
-
 }
