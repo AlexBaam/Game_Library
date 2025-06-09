@@ -6,7 +6,9 @@ public enum CommandMinesweeper {
     LOADGAME("load"),
     SCORE("score"),
     EXIT("exit"),
-    SAVEGAME("save");
+    SAVEGAME("save"),
+    REVEAL("reveal"),
+    FLAG("flag");
 
     private final String commandMinesweeper;
 

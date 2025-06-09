@@ -31,11 +31,24 @@ public class MinesweeperForm {
     private Button backButton;
 
     @FXML
-    private void onNewGameClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "New Game", "Funcționalitatea 'New Game' Minesweeper nu este încă implementată.");
-        logger.log(Level.INFO, "New Game Minesweeper clicked.");
+    private Button newGameButton;
 
+    @FXML
+    private void onNewGameClick(ActionEvent event) {
+        logger.log(Level.INFO, "User pressed new game button. (Minesweeper)");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/minesweeper/minesweeperNewGameScreen.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Minesweeper - New Game");
+            stage.show();
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Eroare", "Nu s-a putut incarca jocul Minesweeper.");
+        }
     }
+
 
     @FXML
     private void onLoadGameClick(ActionEvent event) {
@@ -101,4 +114,9 @@ public class MinesweeperForm {
     }
 
 
+    public void onSaveClick(ActionEvent actionEvent) {
+    }
+
+    public void onForfeitClick(ActionEvent actionEvent) {
+    }
 }
