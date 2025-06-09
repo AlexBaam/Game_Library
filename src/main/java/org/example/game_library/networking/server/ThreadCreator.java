@@ -135,13 +135,12 @@
                 case EXIT -> handleExit(request);
                 case TICTACTOE -> handleTicTacToe(request);
                 case MINESWEEPER -> {
-                    try {
-                        // Delegăm complet logica către MinesweeperRequests
-                        MinesweeperRequests.handleMinesweeperRequest(request, this, output, input, currentUser, currentMinesweeperGame);
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Error handling Minesweeper request for thread {0}: {1}");
-                        output.writeObject("FAILURE: Server error processing Minesweeper request.");
-                    }
+                        try {
+                            MinesweeperRequests.handleMinesweeperRequest(request, this, output, input, currentUser, currentMinesweeperGame);
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Error handling Minesweeper request for thread {0}: {1}");
+                            output.writeObject("FAILURE: Server error processing Minesweeper request.");
+                        }
                 }
                 default -> output.writeObject("Command " + request.get(0) + " not yet implemented!");
             }
@@ -242,42 +241,6 @@
             throw new EOFException();
         }
 
-//        private void handleMinesweeper(List<String> request) throws IOException {
-//            if (request.size() == 1) {
-//                output.writeObject("SUCCESS");
-//            } else if (request.size() >= 2) {
-//                String subCommandMinesweeper = request.get(1); // Acum este subcomanda, ex: "score"
-//                CommandMinesweeper cMinesweeper = CommandMinesweeper.fromString(subCommandMinesweeper);
-//
-//                if (cMinesweeper == null) {
-//                    output.writeObject("Comanda Minesweeper este nulă! Comandă: " + subCommandMinesweeper);
-//                    return;
-//                }
-//
-//                switch (cMinesweeper) {
-//                    // Eliminăm case-urile pentru NEWGAME, LOADGAME, SAVEGAME, etc. dacă nu vrei să le gestionezi aici
-//                    // case NEWGAME -> MinesweeperRequests.handleNewGame(request, this, output, input);
-//                    // case LOADGAME -> MinesweeperRequests.handleLoadGame(request, this, output, input);
-//                    // case SAVEGAME -> MinesweeperRequests.handleSaveGame(request, this, output, input);
-//                    case EXIT -> handleExit(request); // Păstrăm Exit dacă vrei să poți ieși din Minesweeper
-//                    case SCORE -> {
-//                        // Dacă ai nevoie de un parametru suplimentar (ex: "total_score"),
-//                        // acesta va fi request.get(2).
-//                        if (request.size() >= 3) { // Asigură-te că există "minesweeper", "score", "total_score"
-//                            String scoreType = request.get(2); // Aici va fi "total_score"
-//                            MinesweeperRequests.handleScore(request, this, output, input, scoreType, userRepository);
-//                        } else {
-//                            output.writeObject("Eroare: Tipul de scor nu a fost furnizat pentru comanda SCORE Minesweeper.");
-//                            logger.log(Level.WARNING, "Minesweeper score request is missing score type parameter.");
-//                        }
-//                    }
-//                    default -> output.writeObject("Comanda " + subCommandMinesweeper + " Minesweeper nu este implementată încă!");
-//                }
-//            } else {
-//                output.writeObject("Eșec la procesarea comenzii Minesweeper.");
-//            }
-//        }
-
         private void handleMinesweeper(List<String> request) throws IOException {
             if (request.size() == 1) {
                 output.writeObject("SUCCESS");
@@ -304,6 +267,11 @@
             } else {
                 output.writeObject("Eșec la procesarea comenzii TicTacToe.");
             }
+        }
+
+        public void setCurrentMinesweeperGame(MinesweeperGame game) {
+            this.currentMinesweeperGame = game;
+            logger.log(Level.INFO, "Thread {0}: Minesweeper game set to {1}", new Object[]{threadId, (game == null ? "null" : game.getClass().getSimpleName())});
         }
 
         private void handleTicTacToe(List<String> request) throws IOException {
@@ -351,10 +319,6 @@
 
         public MinesweeperGame getCurrentMinesweeperGame() {
             return currentMinesweeperGame;
-        }
-
-        public void setCurrentMinesweeperGame(MinesweeperGame currentMinesweeperGame) {
-            this.currentMinesweeperGame = currentMinesweeperGame;
         }
 
         public int getCurrentUserId() {

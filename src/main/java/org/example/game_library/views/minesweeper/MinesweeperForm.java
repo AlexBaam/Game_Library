@@ -35,7 +35,8 @@ import java.util.logging.Logger;
 public class MinesweeperForm { // Am redenumit această clasă în MinesweeperForm, dacă nu era deja așa
     private static final Logger logger = AppLogger.getLogger();
 
-    public int listening = 1;
+    private final AtomicBoolean isListening = new AtomicBoolean(false);
+    private Thread listenerThread;
 
     @FXML
     private GridPane boardGrid;
@@ -54,7 +55,6 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
     private int totalMines; // Numărul total de mine, primit de la server
     private int flaggedMinesCount; // Numărul de steaguri plasate de utilizator
 
-    // Această metodă va fi apelată din MinesweeperNewGameScreen pentru a inițializa tabla vizuală
     public void initializeGameUI(int rows, int cols, int totalMines) {
         this.totalMines = totalMines;
         this.flaggedMinesCount = 0; // Resetăm contorul de steaguri
@@ -63,9 +63,9 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
         setupBoardUI(rows, cols);
         startTimer();
 
-        // Serverul va trimite starea inițială a tablei (toate celulele acoperite)
-        // sau va aștepta primul click. Presupunem că primele mutări sunt inițiate de client.
-        // Începem să ascultăm după actualizări de la server.
+        // Asigură-te că oprești orice thread de ascultare anterior
+        stopListeningForServerUpdates();
+        // Apoi pornești unul nou
         startListeningForServerUpdates();
     }
 
@@ -131,6 +131,7 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
     }
 
     private void updateTimerLabel() {
+
         int minutes = timeElapsedInSeconds / 60;
         int seconds = timeElapsedInSeconds % 60;
         timerLabel.setText(String.format("Time: %02d:%02d", minutes, seconds));
@@ -167,15 +168,20 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
         }
     }
 
-    // Această metodă va asculta continuu după actualizări de la server
+    // Metoda pentru a porni thread-ul de ascultare
     private void startListeningForServerUpdates() {
-        Thread listenerThread = new Thread(() -> {
+        // Dacă există deja un thread care rulează, oprește-l
+        stopListeningForServerUpdates();
+
+        isListening.set(true); // Setăm flag-ul la true pentru a indica că thread-ul ar trebui să ruleze
+        listenerThread = new Thread(() -> {
             try {
-                while (listening == 1) {
+                while (isListening.get()) { // Citim starea AtomicBoolean
                     Object raw = ClientToServerProxy.receive();
                     if (raw == null) {
-                        logger.log(Level.WARNING, "Received null from server.");
-                        continue;
+                        logger.log(Level.WARNING, "Received null from server. Listener might be closing.");
+                        // Nu continuăm, ieșim dacă nu mai primim nimic.
+                        break; // Ieșim din buclă dacă primim null
                     }
 
                     if (raw instanceof List<?> responseList) {
@@ -185,46 +191,43 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
 
                         String command = responseList.get(0).toString();
 
-                        Platform.runLater(() -> { // Toate actualizările UI trebuie să fie pe JavaFX Application Thread
+                        Platform.runLater(() -> {
+                            if (!isListening.get()) { // Verificăm din nou dacă thread-ul ar trebui să se oprească
+                                return; // Nu mai procesăm dacă am semnalat oprirea
+                            }
                             if ("BOARD_UPDATE".equals(command) && responseList.size() > 1) {
-                                // Serverul trimite o listă de celule actualizate sau o matrice completă
-                                // Presupunem că serverul trimite o listă de obiecte Cell
-                                // Sau o reprezentare serializată a tablei (ex: List<List<String>>)
-                                // Pentru simplitate acum, vom presupune că primim o listă de obiecte Cell
                                 try {
                                     @SuppressWarnings("unchecked")
                                     List<Cell> updatedCells = (List<Cell>) responseList.subList(1, responseList.size());
-                                    // Sau, dacă serverul trimite o reprezentare mai complexă a tablei
-                                    // handleFullBoardUpdate(responseList.get(1)); // Daca primesti intreg board-ul
-
                                     updateBoardUI(updatedCells);
                                 } catch (ClassCastException e) {
-                                    logger.log(Level.SEVERE, "Received malformed board update: {0}", responseList);
+                                    logger.log(Level.SEVERE, "Received malformed board update: " + responseList, e);
                                 }
-
                             } else if ("GAME_OVER".equals(command) || "GAME_WON".equals(command)) {
                                 stopTimer();
                                 String message = "Game Over!";
                                 if ("GAME_WON".equals(command)) {
                                     message = "Congratulations! You won!";
                                 }
-
                                 showAlert(Alert.AlertType.INFORMATION, "Game Result", message);
-                                // Aici ar trebui să treci la ecranul de scor sau la meniul New Game
+                                stopListeningForServerUpdates(); // Oprim thread-ul explicit
                                 returnToNewGameScreen();
-                                listening = 0;
                             } else if ("MINES_LEFT".equals(command) && responseList.size() > 1) {
                                 try {
                                     int minesLeft = Integer.parseInt(responseList.get(1).toString());
                                     minesRemainingLabel.setText("Mines: " + minesLeft);
                                 } catch (NumberFormatException e) {
-                                    logger.log(Level.WARNING, "Invalid mines left count received: {0}", responseList.get(1));
+                                    logger.log(Level.WARNING, "Invalid mines left count received: " + responseList.get(1), e);
                                 }
+                            } else{
+                                showAlert(Alert.AlertType.ERROR, "Server Error", command); // command e de fapt mesajul de eroare
                             }
-                            // Poți adăuga și alte comenzi de la server (ex: "ERROR", "INVALID_MOVE")
                         });
                     } else if (raw instanceof String response) {
                         Platform.runLater(() -> {
+                            if (!isListening.get()) {
+                                return;
+                            }
                             if (response.startsWith("FAILURE")) {
                                 showAlert(Alert.AlertType.ERROR, "Server Error", response);
                             }
@@ -233,12 +236,28 @@ public class MinesweeperForm { // Am redenumit această clasă în MinesweeperFo
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {
-                logger.log(Level.SEVERE, "Error during Minesweeper game initialization.", e);
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Connection Lost", "Lost connection to server."));
+                if (isListening.get()) { // Loghează doar dacă thread-ul nu a fost oprit intenționat
+                    logger.log(Level.SEVERE, "Error during Minesweeper game updates listening.", e);
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Connection Lost", "Lost connection to server."));
+                } else {
+                    logger.log(Level.INFO, "Minesweeper listener thread stopped gracefully.");
+                }
+            } finally {
+                isListening.set(false); // Asigură-te că flag-ul e false la ieșirea din buclă
             }
         });
-        listenerThread.setDaemon(true); // Rulează ca daemon thread
+        listenerThread.setDaemon(true);
         listenerThread.start();
+    }
+
+    private void stopListeningForServerUpdates() {
+        if (isListening.get()) { // Verifică dacă thread-ul este activ
+            logger.log(Level.INFO, "Attempting to stop Minesweeper listener thread.");
+            isListening.set(false); // Semnalizează thread-ului să se oprească
+            // Nu apelăm listenerThread.interrupt() direct, deoarece readObject poate fi blocat.
+            // Serverul trebuie să închidă socket-ul pentru a debloca readObject.
+            // Dacă clientul ar trebui să poată închide socketul unilateral, e o altă discuție.
+        }
     }
 
     // Această metodă va actualiza UI-ul pe baza datelor primite de la server
