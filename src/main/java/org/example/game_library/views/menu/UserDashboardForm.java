@@ -130,21 +130,31 @@ public class UserDashboardForm {
 
             String response = (String) ClientToServerProxy.receive();
 
-            logger.log(Level.INFO, "Received delete account response from server: {0}", response);
+            logger.log(Level.INFO, "Received Minesweeper menu access response from server: {0}", response); // Corectat mesajul de logare
 
-            if("SUCCESS".equals(response)) {
+            // Aici verifici răspunsul specific de la server
+            if("SUCCESS_MINESWEEPER_MENU".equals(response) || "SUCCESS".equals(response)) { // Verifică ambele, pentru flexibilitate
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/minesweeper/minesweeperForm.fxml"));
                 Parent root = loader.load();
                 Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
+                stage.setTitle("Minesweeper Main Menu"); // Adaugă un titlu pentru fereastră
+                stage.show(); // Asigură-te că fereastra e vizibilă
             } else {
-                logger.log(Level.WARNING, "Login failed for user: {0}. Response: {1}", response);
+                // Aici afișezi eroarea reală de la server
+                logger.log(Level.WARNING, "Failed to access Minesweeper menu. Server response: {0}", response);
+                showAlert(Alert.AlertType.ERROR, "Eroare Minesweeper", "Nu s-a putut accesa meniul Minesweeper. Răspuns server: " + response);
             }
 
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.log(Level.SEVERE, "IO Error while trying to access Minesweeper menu: " + e.getMessage(), e);
+            showAlert(Alert.AlertType.ERROR, "Eroare de comunicare", "Nu s-a putut comunica cu serverul pentru meniul Minesweeper.");
+        } catch (ClassNotFoundException e) {
+            logger.log(Level.SEVERE, "Class Not Found Error while trying to access Minesweeper menu: " + e.getMessage(), e);
+            showAlert(Alert.AlertType.ERROR, "Eroare de protocol", "Eroare la citirea răspunsului de la server pentru meniul Minesweeper.");
+        } catch (Exception e) { // Catch-all pentru orice altă excepție neașteptată
+            logger.log(Level.SEVERE, "Unexpected error while trying to access Minesweeper menu: " + e.getMessage(), e);
+            showAlert(Alert.AlertType.ERROR, "Eroare necunoscută", "A apărut o eroare neașteptată la accesarea Minesweeper.");
         }
     }
 

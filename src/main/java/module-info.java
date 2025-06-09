@@ -15,6 +15,7 @@ module org.example.game_library {
     requires jbcrypt;
     requires jdk.jdi;
     requires com.fasterxml.jackson.databind;
+    requires kotlin.stdlib;
 
     exports org.example.game_library.database.model;
     opens org.example.game_library.database.model;

@@ -5,6 +5,7 @@
     import org.example.game_library.networking.enums.Command;
     import org.example.game_library.networking.enums.CommandMinesweeper;
     import org.example.game_library.networking.enums.CommandTicTacToe;
+    import org.example.game_library.networking.server.minesweeper_game_logic.MinesweeperGame;
     import org.example.game_library.networking.server.minesweeper_game_logic.MinesweeperRequests;
     import org.example.game_library.networking.server.tictactoe_game_logic.ScoreEntry;
     import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeGame;
@@ -34,6 +35,7 @@
         private User currentUser;
 
         private TicTacToeGame ticTacToeGame;
+        private MinesweeperGame currentMinesweeperGame;
 
         private UserRepository userRepository;
 
@@ -132,7 +134,15 @@
                 case DELETE -> handleDelete();
                 case EXIT -> handleExit(request);
                 case TICTACTOE -> handleTicTacToe(request);
-                case MINESWEEPER -> handleMinesweeper(request);
+                case MINESWEEPER -> {
+                    try {
+                        // Delegăm complet logica către MinesweeperRequests
+                        MinesweeperRequests.handleMinesweeperRequest(request, this, output, input, currentUser, currentMinesweeperGame);
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Error handling Minesweeper request for thread {0}: {1}");
+                        output.writeObject("FAILURE: Server error processing Minesweeper request.");
+                    }
+                }
                 default -> output.writeObject("Command " + request.get(0) + " not yet implemented!");
             }
         }
@@ -337,6 +347,14 @@
 
         public TicTacToeGame getTicTacToeGame() {
             return ticTacToeGame;
+        }
+
+        public MinesweeperGame getCurrentMinesweeperGame() {
+            return currentMinesweeperGame;
+        }
+
+        public void setCurrentMinesweeperGame(MinesweeperGame currentMinesweeperGame) {
+            this.currentMinesweeperGame = currentMinesweeperGame;
         }
 
         public int getCurrentUserId() {

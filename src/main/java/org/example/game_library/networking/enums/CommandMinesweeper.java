@@ -3,10 +3,12 @@ package org.example.game_library.networking.enums;
 public enum CommandMinesweeper {
 
     NEWGAME("newgame"),
-    LOADGAME("load"),
+    LOAD("load"),
     SCORE("score"),
     EXIT("exit"),
-    SAVEGAME("save");
+    SAVE("save"),
+    FORFEIT("forfeit"),
+    CLICK("click");
 
     private final String commandMinesweeper;
 
