@@ -31,7 +31,7 @@ public class Minesweeper {
 
     public Minesweeper(User user) {
         this.user = user;
-        this.userId = user.getUser_id();
+        this.userId = user.getUserId();
         this.totalWins = 0;
         this.bestScore = 0;
         this.totalScore = 0;

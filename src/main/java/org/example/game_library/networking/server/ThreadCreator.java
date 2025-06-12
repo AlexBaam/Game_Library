@@ -326,7 +326,7 @@
                     default -> output.writeObject("Command " + request.get(1) + " not implemented yet!");
                 }
             } else {
-                output.writeObject("Eșec la procesarea comenzii TicTacToe.");
+                output.writeObject("Failed to run the command TicTacToe.");
             }
         }
 

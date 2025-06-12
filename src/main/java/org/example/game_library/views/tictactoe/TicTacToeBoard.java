@@ -12,9 +12,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import lombok.Setter;
 import org.example.game_library.networking.client.ClientToServerProxy;
 import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeGame;
 import org.example.game_library.utils.loggers.AppLogger;
+import org.example.game_library.utils.ui.ShowAlert;
 
 import java.io.IOException;
 import java.util.List;
@@ -60,15 +62,17 @@ public class TicTacToeBoard {
     @FXML
     private GridPane boardGrid;
 
+    @Setter
     private String currentSymbol = "X";
 
+    @Setter
     private String mode;
 
+    @Setter
     private Stage stage;
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
+    private static final String TICTACTOE = "tictactoe";
+    private static final String NEWGAMEPATH = "/org/example/game_library/FXML/tictactoe/tictactoeNewGameScreen.fxml";
 
     private void togglePlayer() {
         currentSymbol = currentSymbol.equals("X") ? "O" : "X";
@@ -84,7 +88,7 @@ public class TicTacToeBoard {
         if (col == null) col = 0;
 
         try {
-            ClientToServerProxy.send(List.of("tictactoe", "move", row.toString(), col.toString(), currentSymbol));
+            ClientToServerProxy.send(List.of(TICTACTOE, "move", row.toString(), col.toString(), currentSymbol));
 
             clicked.setText(currentSymbol);
             clicked.setDisable(true);
@@ -96,7 +100,9 @@ public class TicTacToeBoard {
             boolean done = false;
             while (!done) {
                 Object raw = ClientToServerProxy.receive();
-                if (!(raw instanceof String)) continue;
+                if (!(raw instanceof String)){
+                    continue;
+                }
 
                 String response = (String) raw;
 
@@ -110,17 +116,17 @@ public class TicTacToeBoard {
                     aiCell.setDisable(true);
                 } else if (response.startsWith("WIN:")) {
                     logger.log(Level.INFO, response);
-                    showAlert(Alert.AlertType.INFORMATION, "Game Over", "Player " + currentSymbol + " wins!");
+                    ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Game Over", "Player " + currentSymbol + " wins!");
                     returnToNewGameScreen(event);
                     done = true;
                 } else if (response.startsWith("LOSE:")) {
                     logger.log(Level.INFO, response);
-                    showAlert(Alert.AlertType.INFORMATION, "Game Over", "You lost!");
+                    ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Game Over", "You lost!");
                     returnToNewGameScreen(event);
                     done = true;
                 } else if (response.equalsIgnoreCase("DRAW!")) {
                     logger.log(Level.INFO, response);
-                    showAlert(Alert.AlertType.INFORMATION, "Game Over", "It's a draw!");
+                    ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Game Over", "It's a draw!");
                     returnToNewGameScreen(event);
                     done = true;
                 } else if (response.equalsIgnoreCase("SUCCESS")) {
@@ -129,7 +135,7 @@ public class TicTacToeBoard {
                     done = true;
                 } else if (response.startsWith("FAILURE")) {
                     logger.log(Level.INFO, response);
-                    showAlert(Alert.AlertType.WARNING, "Invalid move", response);
+                    ShowAlert.showAlert(Alert.AlertType.WARNING, "Invalid move", response);
                     done = true;
                 } else {
                     logger.log(Level.WARNING, "Unhandled: {0}", response);
@@ -137,11 +143,11 @@ public class TicTacToeBoard {
             }
 
         } catch (IOException | ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Connection Error", "Lost connection to server: " + e.getMessage());
-            e.printStackTrace();
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Connection Error", "Lost connection to server: " + e.getMessage());
+            logger.log(Level.SEVERE, "Lost connection to server: {0}", e.getMessage());
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Unexpected Error", e.getMessage());
-            e.printStackTrace();
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Unexpected Error", e.getMessage());
+            logger.log(Level.SEVERE, "Unexpected Error: {0}", e.getMessage());
         }
     }
 
@@ -163,16 +169,16 @@ public class TicTacToeBoard {
     @FXML
     public void onSaveClick() {
         try {
-            ClientToServerProxy.send(List.of("tictactoe", "save"));
+            ClientToServerProxy.send(List.of(TICTACTOE, "save"));
             String response = (String) ClientToServerProxy.receive();
 
             if ("SUCCESS".equals(response)) {
-                showAlert(Alert.AlertType.INFORMATION, "Game Saved", "Your game was saved successfully!");
+                ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Game Saved", "Your game was saved successfully!");
             } else {
-                showAlert(Alert.AlertType.ERROR, "Save Failed", response);
+                ShowAlert.showAlert(Alert.AlertType.ERROR, "Save Failed", response);
             }
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Could not save game: " + e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Error", "Could not save game: " + e.getMessage());
         }
     }
 
@@ -195,7 +201,7 @@ public class TicTacToeBoard {
                 try {
                     logger.log(Level.INFO, "User decided to forfeit the game.");
 
-                    ClientToServerProxy.send(List.of("tictactoe", "forfeit"));
+                    ClientToServerProxy.send(List.of(TICTACTOE, "forfeit"));
 
                     String response =  (String) ClientToServerProxy.receive();
 
@@ -204,9 +210,7 @@ public class TicTacToeBoard {
 
                         FXMLLoader loader = new FXMLLoader(
                                 getClass().
-                                    getResource(
-                                        "/org/example/game_library/FXML/tictactoe/tictactoeNewGameScreen.fxml"
-                                    )
+                                    getResource(NEWGAMEPATH)
                         );
 
                         Parent root = loader.load();
@@ -218,10 +222,8 @@ public class TicTacToeBoard {
                         logger.log(Level.WARNING, "Failed to forfeit the game.");
                         logger.log(Level.WARNING, "Server response: {0}", response);
                     }
-                } catch (IOException e) {
-                    showAlert(Alert.AlertType.ERROR, "Error", "Couldn't forfeit the game! Reason: " + e.getMessage());
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+                } catch (IOException | ClassNotFoundException e) {
+                    ShowAlert.showAlert(Alert.AlertType.ERROR, "Error", "Couldn't forfeit the game! Reason: " + e.getMessage());
                 }
             } else {
                 logger.log(Level.INFO, "User gave up on the forfeit of the game.");
@@ -229,38 +231,30 @@ public class TicTacToeBoard {
         });
     }
 
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
     private void returnToNewGameScreen(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeNewGameScreen.fxml"));
+                    getClass().getResource(NEWGAMEPATH));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("TicTacToe - New Game");
             stage.show();
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Couldn't go back to new game screen.");
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Navigation Error", "Couldn't go back to new game screen! Reason: " + e.getMessage());
         }
     }
 
     private void returnToNewGameScreen() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeNewGameScreen.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(NEWGAMEPATH));
             Parent root = loader.load();
 
             stage.setScene(new Scene(root));
             stage.setTitle("TicTacToe - New Game");
             stage.show();
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Couldn't go back to new game screen.");
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Navigation Error", "Couldn't go back to new game screen! Reason: " + e.getMessage());
         }
     }
 
@@ -284,22 +278,18 @@ public class TicTacToeBoard {
         this.currentSymbol = loadedGame.getCurrentSymbol();
     }
 
-    public void setCurrentSymbol(String symbol) {
-        this.currentSymbol = symbol;
-    }
-
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-
     public void startListeningForUpdates() {
-        if (!"network".equalsIgnoreCase(mode)) return;
+        if (!"network".equalsIgnoreCase(mode)){
+            return;
+        }
 
         Thread listenerThread = new Thread(() -> {
             try {
                 while (true) {
                     Object raw = ClientToServerProxy.receive();
-                    if (!(raw instanceof String message)) continue;
+                    if (!(raw instanceof String message)){
+                        continue;
+                    }
 
                     if (message.startsWith("OPPONENT_MOVED:")) {
                         String[] coords = message.substring("OPPONENT_MOVED:".length()).split(",");
@@ -316,7 +306,7 @@ public class TicTacToeBoard {
 
                     } else if (message.startsWith("WIN:") || message.startsWith("LOSE:") || message.equals("DRAW!")) {
                         Platform.runLater(() -> {
-                            showAlert(Alert.AlertType.INFORMATION, "Game Over", message);
+                            ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Game Over", message);
                             returnToNewGameScreen();
                         });
                         break;
