@@ -101,7 +101,7 @@ public class MinesweeperRequests {
             }
         }
     }
-    
+
 
     public static void handleFlag(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
         MinesweeperGameState gameState = null;

@@ -384,6 +384,7 @@ public class MinesweeperBoard {
                 }
             }
         }
+        boardGrid.layout(); //!!!!!!!!
     }
 
     private void revealAllMinesAtGameOver() {

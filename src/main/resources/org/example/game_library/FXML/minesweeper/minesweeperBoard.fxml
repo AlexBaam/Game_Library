@@ -79,8 +79,6 @@
                         </ImageView>
                     </graphic>
                 </Button>
-            </children>
-            <children>
                 <Button fx:id="saveButton" mnemonicParsing="false" onAction="#onSaveClick" prefHeight="50.0" prefWidth="120.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Save" />
                 <Button fx:id="forfeitButton" mnemonicParsing="false" onAction="#onForfeitClick" prefHeight="50.0" prefWidth="120.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Forfeit" />
             </children>

@@ -11,10 +11,6 @@ public class MinesweeperGameState implements Serializable {
     private int mineCount;
     private Cell[][] board;
 
-    @FXML
-    private GridPane boardGrid;
-
-
     public MinesweeperGameState(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
@@ -83,7 +79,10 @@ public class MinesweeperGameState implements Serializable {
             for (int d = 0; d < 8; d++) {
                 int ni = row + dx[d];
                 int nj = col + dy[d];
-                revealCell(ni, nj);
+                if (isValidCell(ni, nj) && !board[ni][nj].isRevealed()) {
+                    revealCell(ni, nj);
+                }
+                //revealCell(ni, nj);
             }
         }
 
@@ -101,25 +100,27 @@ public class MinesweeperGameState implements Serializable {
         }
     }
 
-    public Object getBoardForClient() {
-        return board.toString();
+    public Cell[][] getBoardForClient() {
+        return board;
     }
 
     public String flagCell(int x, int y) {
         if (isValidCell(x, y)) {
             Cell cell = board[x][y];
 
-            if (cell.isFlagged()) {
-                return "Cell already flagged at " + x + ", " + y;
-            }
+//            if (cell.isFlagged()) {
+//                return "Cell already flagged at " + x + ", " + y;
+//            }
+//
+//            cell.setFlagged(true);
+//            return "Cell flagged at " + x + ", " + y;
+            cell.setFlagged(!cell.isFlagged()); // inversăm starea
+            return "Flag toggled at " + x + ", " + y;
 
-            cell.setFlagged(true);
-            return "Cell flagged at " + x + ", " + y;
         } else {
             return "Invalid cell!";
         }
     }
-
 
     public boolean isValidCell(int row, int col) {
         return row >= 0 && row < rows && col >= 0 && col < cols;
