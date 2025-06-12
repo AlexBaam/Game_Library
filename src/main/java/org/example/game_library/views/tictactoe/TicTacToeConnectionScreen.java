@@ -89,12 +89,14 @@ public class TicTacToeConnectionScreen {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeBoard.fxml"));
                 Parent root = loader.load();
 
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
                 TicTacToeBoard controller = loader.getController();
                 controller.setMode(mode);
                 controller.setCurrentSymbol("X");
+                controller.setStage(stage);
                 controller.startListeningForUpdates();
 
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.setTitle("TicTacToe - Online Game");
                 stage.show();

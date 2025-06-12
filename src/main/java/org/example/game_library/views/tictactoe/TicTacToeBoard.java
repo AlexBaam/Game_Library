@@ -64,6 +64,12 @@ public class TicTacToeBoard {
 
     private String mode;
 
+    private Stage stage;
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
     private void togglePlayer() {
         currentSymbol = currentSymbol.equals("X") ? "O" : "X";
     }
@@ -245,6 +251,19 @@ public class TicTacToeBoard {
         }
     }
 
+    private void returnToNewGameScreen() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeNewGameScreen.fxml"));
+            Parent root = loader.load();
+
+            stage.setScene(new Scene(root));
+            stage.setTitle("TicTacToe - New Game");
+            stage.show();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Couldn't go back to new game screen.");
+        }
+    }
+
     public void loadGameToUI(TicTacToeGame loadedGame) {
         String[][] board = loadedGame.getBoard();
 
@@ -298,7 +317,7 @@ public class TicTacToeBoard {
                     } else if (message.startsWith("WIN:") || message.startsWith("LOSE:") || message.equals("DRAW!")) {
                         Platform.runLater(() -> {
                             showAlert(Alert.AlertType.INFORMATION, "Game Over", message);
-                            returnToNewGameScreen(null);
+                            returnToNewGameScreen();
                         });
                         break;
                     }

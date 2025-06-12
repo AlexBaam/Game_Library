@@ -58,12 +58,14 @@ public class TicTacToeJoinScreen {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeBoard.fxml"));
                 Parent root = loader.load();
 
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
                 TicTacToeBoard controller = loader.getController();
                 controller.setCurrentSymbol(symbol);
                 controller.setMode(mode);
+                controller.setStage(stage);
                 controller.startListeningForUpdates();
 
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.setTitle("TicTacToe - Multiplayer Game");
                 stage.show();

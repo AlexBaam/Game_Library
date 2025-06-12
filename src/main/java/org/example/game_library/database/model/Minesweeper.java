@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "minesweeper_score")
+@Table(name = "minesweeper_scores")
 public class Minesweeper {
     @Id
     @Column(name = "user_id")
