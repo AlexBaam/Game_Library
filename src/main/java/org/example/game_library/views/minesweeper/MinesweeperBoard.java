@@ -73,6 +73,7 @@ public class MinesweeperBoard {
         updateMineCountLabel();
     }
 
+
     private void populateBoardUI() {
         boardGrid.getChildren().clear();
         boardGrid.getRowConstraints().clear();
@@ -90,10 +91,27 @@ public class MinesweeperBoard {
             boardGrid.getColumnConstraints().add(colConstraints);
         }
 
+        // 🔸 Calculeaza dimensiunea celulei in functie de fereastra
+        double maxBoardSize = 480;
+        boardGrid.setMaxWidth(400); // Redu dimensiunea maximă a tablei de joc
+        boardGrid.setMaxHeight(400); // Redu dimensiunea maximă a tablei de joc
+        boardGrid.setPrefSize(400, 400); // Setează dimensiunea preferată
+
+//        boardGrid.setMaxWidth(maxBoardSize);
+//        boardGrid.setMaxHeight(maxBoardSize);
+//        boardGrid.setPrefSize(maxBoardSize, maxBoardSize);
+
+        double cellWidth = maxBoardSize / cols;
+        double cellHeight = maxBoardSize / rows;
+        double cellSize = Math.min(cellWidth, cellHeight);
+
+
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 Button cellButton = new Button();
-                cellButton.setPrefSize(40, 40);
+                cellButton.setPrefSize(cellSize, cellSize);
+                cellButton.setMinSize(cellSize, cellSize);
+                cellButton.setMaxSize(cellSize, cellSize);
                 cellButton.getStyleClass().add("minesweeper-cell");
 
                 final int r = row;
@@ -117,10 +135,12 @@ public class MinesweeperBoard {
                 boardGrid.add(cellButton, col, row);
             }
         }
+
         updateBoardUI();
     }
 
-//    private void onCellClick(int row, int col) {
+
+    //    private void onCellClick(int row, int col) {
 //        logger.log(Level.INFO, "Cell clicked (reveal): ({0}, {1})", new Object[]{row, col});
 //        try {
 //            ClientToServerProxy.send(List.of("minesweeper", "reveal", String.valueOf(row), String.valueOf(col)));

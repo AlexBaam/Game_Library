@@ -155,5 +155,6 @@ public class MinesweeperGameState implements Serializable {
         return mineCount;
     }
 
+
     // getter-e si metode auxiliare
 }
