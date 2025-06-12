@@ -25,7 +25,7 @@ public class MinesweeperGameState implements Serializable {
     }
 
     public void placeMines(int mineCount) {
-        this.mineCount = mineCount; // Salvează numărul de mine
+        this.mineCount = mineCount;
         Random random = new Random();
         int placedMines = 0;
 
@@ -63,7 +63,6 @@ public class MinesweeperGameState implements Serializable {
     }
 
     public boolean revealCell(int row, int col) {
-        // Ignoram daca e in afara tablei sau deja dezvaluita sau are steag
         if (row < 0 || row >= rows || col < 0 || col >= cols)
             return false;
 
@@ -74,10 +73,9 @@ public class MinesweeperGameState implements Serializable {
         cell.setRevealed(true);
 
         if (cell.hasMine()) {
-            return true; // Ai calcat pe mina!
+            return true;
         }
 
-        // Daca n-are mine in jur, dezvaluim in cascada
         if (cell.getAdjacentMines() == 0) {
             int[] dx = {-1, -1, -1, 0, 0, 1, 1, 1};
             int[] dy = {-1, 0, 1, -1, 1, -1, 0, 1};
@@ -98,7 +96,6 @@ public class MinesweeperGameState implements Serializable {
 
         Cell cell = board[row][col];
 
-        // Nu poti pune steag pe o celula deja dezvaluita
         if (!cell.isRevealed()) {
             cell.setFlagged(!cell.isFlagged());
         }
@@ -109,15 +106,14 @@ public class MinesweeperGameState implements Serializable {
     }
 
     public String flagCell(int x, int y) {
-        // Verifică dacă celula este validă
         if (isValidCell(x, y)) {
-            Cell cell = board[x][y];  // Extrage celula din tablă
+            Cell cell = board[x][y];
 
             if (cell.isFlagged()) {
                 return "Cell already flagged at " + x + ", " + y;
             }
 
-            cell.setFlagged(true);  // Marchează celula cu steag
+            cell.setFlagged(true);
             return "Cell flagged at " + x + ", " + y;
         } else {
             return "Invalid cell!";
@@ -137,11 +133,8 @@ public class MinesweeperGameState implements Serializable {
     }
 
     public Cell[][] getBoard() {
-        return board; // Returnează referința direct. Este OK atâta timp cât Cell este imutabilă sau clientul nu o modifică.
-        // Alternativ, returnează o copie profundă dacă vrei să previi orice modificare.
-        // Pentru acest joc, returnarea directă e acceptabilă.
+        return board;
     }
-
 
     public int getRows() {
         return rows;
@@ -155,6 +148,4 @@ public class MinesweeperGameState implements Serializable {
         return mineCount;
     }
 
-
-    // getter-e si metode auxiliare
 }

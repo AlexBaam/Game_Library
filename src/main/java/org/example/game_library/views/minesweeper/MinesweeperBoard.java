@@ -91,15 +91,10 @@ public class MinesweeperBoard {
             boardGrid.getColumnConstraints().add(colConstraints);
         }
 
-        // 🔸 Calculeaza dimensiunea celulei in functie de fereastra
         double maxBoardSize = 480;
-        boardGrid.setMaxWidth(400); // Redu dimensiunea maximă a tablei de joc
-        boardGrid.setMaxHeight(400); // Redu dimensiunea maximă a tablei de joc
-        boardGrid.setPrefSize(400, 400); // Setează dimensiunea preferată
-
-//        boardGrid.setMaxWidth(maxBoardSize);
-//        boardGrid.setMaxHeight(maxBoardSize);
-//        boardGrid.setPrefSize(maxBoardSize, maxBoardSize);
+        boardGrid.setMaxWidth(400);
+        boardGrid.setMaxHeight(400);
+        boardGrid.setPrefSize(400, 400);
 
         double cellWidth = maxBoardSize / cols;
         double cellHeight = maxBoardSize / rows;
@@ -140,38 +135,6 @@ public class MinesweeperBoard {
     }
 
 
-    //    private void onCellClick(int row, int col) {
-//        logger.log(Level.INFO, "Cell clicked (reveal): ({0}, {1})", new Object[]{row, col});
-//        try {
-//            ClientToServerProxy.send(List.of("minesweeper", "reveal", String.valueOf(row), String.valueOf(col)));
-//
-//            Object receivedGameState = ClientToServerProxy.receive();
-//            Object receivedStatus = ClientToServerProxy.receive();
-//
-//            if (receivedGameState instanceof MinesweeperGameState newGameState && receivedStatus instanceof String statusMessage) {
-//                currentGameState = newGameState;
-//                updateBoardUI();
-//
-//                if (statusMessage.contains("game over")) {
-//                    showAlert(Alert.AlertType.INFORMATION, "Game Over!", "You hit a mine! Game lost.");
-//                    disableBoard();
-//                    // Adaugă logica pentru a afișa toate minele la game over
-//                    revealAllMinesAtGameOver();
-//                } else if (isGameWon()) {
-//                    showAlert(Alert.AlertType.INFORMATION, "Congratulations!", "You cleared the minefield! Game won.");
-//                    disableBoard();
-//                }
-//            } else {
-//                logger.log(Level.WARNING, "Received unexpected object type for reveal. State: {0}, Status: {1}",
-//                        new Object[]{receivedGameState != null ? receivedGameState.getClass().getName() : "null",
-//                                receivedStatus != null ? receivedStatus.getClass().getName() : "null"});
-//                showAlert(Alert.AlertType.ERROR, "Error", "Failed to update game state after reveal. Please check server logs.");
-//            }
-//        } catch (IOException | ClassNotFoundException e) {
-//            showAlert(Alert.AlertType.ERROR, "Network Error", "Could not reveal cell: " + e.getMessage());
-//            logger.log(Level.SEVERE, "Error revealing cell: {0}", e.getMessage());
-//        }
-//    }
     private void onCellClick(int row, int col) {
         logger.log(Level.INFO, "Cell clicked (reveal): ({0}, {1})", new Object[]{row, col});
         try {
@@ -228,29 +191,6 @@ public class MinesweeperBoard {
         }
     }
 
-//    private void onCellRightClick(int row, int col) {
-//        logger.log(Level.INFO, "Cell right-clicked (flag): ({0}, {1})", new Object[]{row, col});
-//        try {
-//            ClientToServerProxy.send(List.of("minesweeper", "flag", String.valueOf(row), String.valueOf(col)));
-//
-//            Object receivedGameState = ClientToServerProxy.receive();
-//            Object receivedStatus = ClientToServerProxy.receive();
-//
-//            if (receivedGameState instanceof MinesweeperGameState newGameState && receivedStatus instanceof String statusMessage) {
-//                currentGameState = newGameState;
-//                updateBoardUI();
-//                updateMineCountLabel();
-//            } else {
-//                logger.log(Level.WARNING, "Received unexpected object type for flag. State: {0}, Status: {1}",
-//                        new Object[]{receivedGameState != null ? receivedGameState.getClass().getName() : "null",
-//                                receivedStatus != null ? receivedStatus.getClass().getName() : "null"});
-//                showAlert(Alert.AlertType.ERROR, "Error", "Failed to update game state after flagging. Please check server logs.");
-//            }
-//        } catch (IOException | ClassNotFoundException e) {
-//            showAlert(Alert.AlertType.ERROR, "Network Error", "Could not flag cell: " + e.getMessage());
-//            logger.log(Level.SEVERE, "Error flagging cell: {0}", e.getMessage());
-//        }
-//    }
 
     @FXML
     public void onSaveClick() {
@@ -276,7 +216,7 @@ public class MinesweeperBoard {
 
                     ClientToServerProxy.send(List.of("minesweeper", "forfeit"));
 
-                    Object receivedObject = ClientToServerProxy.receive(); // Folosește Object, nu String direct
+                    Object receivedObject = ClientToServerProxy.receive();
                     String response;
 
                     if (receivedObject instanceof String statusResponse) {
@@ -298,7 +238,6 @@ public class MinesweeperBoard {
                     showAlert(Alert.AlertType.ERROR, "Error", "Couldn't forfeit the game! Reason: " + e.getMessage());
                     logger.log(Level.SEVERE, "IOException during forfeit: {0}", e.getMessage());
                 } catch (ClassNotFoundException e) {
-                    //throw new RuntimeException("Error during deserialization after forfeit", e);
                     showAlert(Alert.AlertType.ERROR, "Error", "Failed to process server response after forfeit: " + e.getMessage());
                     logger.log(Level.SEVERE, "ClassNotFoundException during deserialization after forfeit: {0}", e.getMessage());
                 }
@@ -320,10 +259,8 @@ public class MinesweeperBoard {
 
                 if (receivedGameState instanceof MinesweeperGameState newGameState && receivedStatus instanceof String statusMessage) {
                     currentGameState = newGameState;
-                    // --- ADAUGĂ ACESTE LINII ---
-                    updateBoardUI(); // Actualizează vizual tabla de joc
-                    updateMineCountLabel(); // Actualizează numărul de mine (deși shovel nu îl schimbă direct, e bine să fie consistent)
-                    // --------------------------
+                    updateBoardUI();
+                    updateMineCountLabel();
 
                     if (statusMessage.contains("game over")) {
                         showAlert(Alert.AlertType.INFORMATION, "Game Over!", "You hit a mine! Game lost.");
@@ -362,10 +299,8 @@ public class MinesweeperBoard {
 
                 if (receivedGameState instanceof MinesweeperGameState newGameState && receivedStatus instanceof String statusMessage) {
                     currentGameState = newGameState;
-                    // --- ADAUGĂ ACESTE LINII ---
-                    updateBoardUI();       // Actualizează vizual tabla de joc
-                    updateMineCountLabel(); // Actualizează numărul de mine rămase (foarte important pentru flag)
-                    // --------------------------
+                    updateBoardUI();
+                    updateMineCountLabel();
                 } else {
                     logger.log(Level.WARNING, "Received unexpected object type for flag. State: {0}, Status: {1}",
                             new Object[]{receivedGameState != null ? receivedGameState.getClass().getName() : "null",
@@ -391,7 +326,6 @@ public class MinesweeperBoard {
             }
             selectedRow = -1;
             selectedCol = -1;
-            // Dezactivează butoanele de acțiune până la o nouă selecție
             if (shovelButton != null) shovelButton.setDisable(true);
             if (flagButton != null) flagButton.setDisable(true);
         }
@@ -416,11 +350,9 @@ public class MinesweeperBoard {
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                // Asigură-te că obții butonul corect
                 Button cellButton = (Button) boardGrid.getChildren().get(row * cols + col);
                 Cell cell = board[row][col];
 
-                // Elimină stilul de selecție înainte de a aplica alte stiluri
                 cellButton.getStyleClass().removeAll("flagged", "mine", "revealed-empty", "selected-cell");
                 for(int i = 1; i <= 8; i++) cellButton.getStyleClass().remove("number" + i);
                 cellButton.setText("");
@@ -442,13 +374,11 @@ public class MinesweeperBoard {
                 } else if (cell.isFlagged()) {
                     cellButton.setText("🚩");
                     cellButton.getStyleClass().add("flagged");
-                    // O celulă cu steag ar trebui să poată fi selectată pentru a-i scoate steagul
                     cellButton.setDisable(false);
                 } else {
                     cellButton.setDisable(false);
                 }
 
-                // Reaplică stilul de selecție dacă celula curentă este cea selectată
                 if (row == selectedRow && col == selectedCol) {
                     cellButton.getStyleClass().add("selected-cell");
                 }
@@ -467,7 +397,7 @@ public class MinesweeperBoard {
                     cellButton.getStyleClass().add("mine");
                     cellButton.setText("💣");
                 }
-                cellButton.setDisable(true); // Dezactivează toate butoanele
+                cellButton.setDisable(true);
             }
         }
     }

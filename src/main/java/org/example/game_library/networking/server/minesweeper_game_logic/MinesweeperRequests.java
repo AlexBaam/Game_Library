@@ -101,53 +101,7 @@ public class MinesweeperRequests {
             }
         }
     }
-
-//    public static void handleFlag(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
-//        MinesweeperGameState gameState = null;
-//        String result = "ERROR: Unknown error during flag.";
-//
-//        try {
-//            int x = Integer.parseInt(request.get(2));
-//            int y = Integer.parseInt(request.get(3));
-//
-//            gameState = threadCreator.getMinesweeperGameState();
-//
-//            if (gameState == null) {
-//                result = "ERROR: No game in progress.";
-//            } else {
-//                // *** AICI ESTE MODIFICAREA! ***
-//                // În loc de gameState.flagCell(x, y), apelăm gameState.toggleFlag(x, y)
-//                gameState.toggleFlag(x, y); // Această metodă actualizează Cell direct, nu returnează String
-//
-//                // Modificăm și mesajul de rezultat, deoarece toggleFlag nu returnează un String de stare
-//                result = "Cell flag toggled at " + x + ", " + y;
-//                logger.log(Level.INFO, "Cell flag toggled at ({0},{1}) for thread {2}. Result: {3}", new Object[]{x, y, threadCreator.getId(), result});
-//            }
-//
-//        } catch (IndexOutOfBoundsException e) {
-//            logger.log(Level.WARNING, "Invalid coordinates for flag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-//            result = "ERROR: Invalid coordinates.";
-//        } catch (NumberFormatException e) {
-//            logger.log(Level.WARNING, "Non-numeric coordinates for flag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-//            result = "ERROR: Invalid coordinate format.";
-//        } catch (Exception e) {
-//            logger.log(Level.SEVERE, "Unexpected error in handleFlag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-//            result = "ERROR: An unexpected error occurred during flagging.";
-//        } finally {
-//            try {
-//                output.writeObject(gameState); // Trimitem starea actualizată a jocului
-//                output.writeObject(result);    // Trimitem mesajul de succes/eroare
-//                output.flush();
-//            } catch (IOException e) {
-//                logger.log(Level.SEVERE, "Error sending response in handleFlag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-//            }
-//        }
-//    }
-
-//
-    // În MinesweeperRequests.java
-
-    // În MinesweeperRequests.java
+    
 
     public static void handleFlag(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
         MinesweeperGameState gameState = null;
