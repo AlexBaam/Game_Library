@@ -25,6 +25,12 @@ public class MinesweeperForm {
     public Button newGameButton;
 
     @FXML
+    public Button loadGameButton;
+
+    @FXML
+    public Button scoreboardButton;
+
+    @FXML
     private Button scoreButton;
 
     @FXML
