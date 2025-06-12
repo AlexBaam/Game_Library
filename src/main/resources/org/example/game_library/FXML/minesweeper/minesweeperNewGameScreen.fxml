@@ -13,63 +13,69 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.game_library.views.minesweeper.MinesweeperNewGameScreen">
-    <children>
-        <Rectangle arcHeight="5.0" arcWidth="5.0" height="720.0" smooth="false" stroke="BLACK" strokeType="OUTSIDE" strokeWidth="0.0" width="800.0">
-            <fill>
-                <LinearGradient endX="0.7850378787878786" endY="0.7765151072632183" startX="0.049242422436222885" startY="0.011363643588441774">
-                    <stops>
-                        <Stop>
-                            <color>
-                                <Color red="1.0" green="0.644444465637207" blue="0.644444465637207" />
-                            </color>
-                        </Stop>
-                        <Stop offset="1.0">
-                            <color>
-                                <Color red="0.6629629731178284" green="0.8090123534202576" blue="1.0" />
-                            </color>
-                        </Stop>
-                    </stops>
-                </LinearGradient>
-            </fill>
-        </Rectangle>
-        <Pane layoutX="300.0" layoutY="160.0" prefHeight="200.0" prefWidth="200.0">
-            <children>
-                <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true">
-                    <image>
-                        <Image url="@../../images/minesweeper.png" />
-                    </image>
-                </ImageView>
-            </children>
-        </Pane>
-        <Label alignment="CENTER" layoutX="300.0" layoutY="100.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="200.0" text="Minesweeper" textAlignment="CENTER">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0"
+            prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.game_library.views.minesweeper.MinesweeperNewGameScreen">
+    <Rectangle arcHeight="5.0" arcWidth="5.0" height="720.0" smooth="false" stroke="BLACK" strokeType="OUTSIDE"
+               strokeWidth="0.0" width="800.0">
+        <fill>
+            <LinearGradient endX="0.7850378787878786" endY="0.7765151072632183" startX="0.049242422436222885"
+                            startY="0.011363643588441774">
+                <stops>
+                    <Stop>
+                        <color>
+                            <Color red="1.0" green="0.644444465637207" blue="0.644444465637207"/>
+                        </color>
+                    </Stop>
+                    <Stop offset="1.0">
+                        <color>
+                            <Color red="0.6629629731178284" green="0.8090123534202576" blue="1.0"/>
+                        </color>
+                    </Stop>
+                </stops>
+            </LinearGradient>
+        </fill>
+    </Rectangle>
+    <Pane layoutX="300.0" layoutY="160.0" prefHeight="200.0" prefWidth="200.0">
+        <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true">
+            <Image url="@../../images/minesweeper.png"/>
+        </ImageView>
+    </Pane>
+    <Label alignment="CENTER" layoutX="300.0" layoutY="100.0" maxHeight="-Infinity" maxWidth="-Infinity"
+           minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="200.0" text="Minesweeper"
+           textAlignment="CENTER">
+        <font>
+            <Font name="System Bold" size="24.0"/>
+        </font>
+    </Label>
+    <VBox layoutX="300.0" layoutY="432.0" prefHeight="200.0" prefWidth="200.0">
+        <Button fx:id="easyButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                minWidth="-Infinity" mnemonicParsing="false" onAction="#onEasyClick" prefHeight="50.0"
+                prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Easy">
             <font>
-                <Font name="System Bold" size="24.0" />
+                <Font name="System Bold" size="14.0"/>
             </font>
-        </Label>
-        <VBox layoutX="300.0" layoutY="432.0" prefHeight="200.0" prefWidth="200.0">
-            <children>
-                <Button fx:id="easyButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onEasyClick" prefHeight="50.0" prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Easy">
-                    <font>
-                        <Font name="System Bold" size="14.0" />
-                    </font>
-                </Button>
-                <Button fx:id="mediumButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onMediumClick" prefHeight="50.0" prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Medium">
-                    <font>
-                        <Font name="System Bold" size="14.0" />
-                    </font>
-                </Button>
-                <Button fx:id="hardButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onHardClick" prefHeight="50.0" prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Hard">
-                    <font>
-                        <Font name="System Bold" size="14.0" />
-                    </font>
-                </Button>
-                <Button fx:id="backButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Back">
-                    <font>
-                        <Font name="System Bold" size="14.0" />
-                    </font>
-                </Button>
-            </children>
-        </VBox>
-    </children>
+        </Button>
+        <Button fx:id="mediumButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                minWidth="-Infinity" mnemonicParsing="false" onAction="#onMediumClick" prefHeight="50.0"
+                prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Medium">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Button>
+        <Button fx:id="hardButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                minWidth="-Infinity" mnemonicParsing="false" onAction="#onHardClick" prefHeight="50.0"
+                prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Hard">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Button>
+        <Button fx:id="backButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                minWidth="-Infinity" mnemonicParsing="false" onAction="#onBackClick" prefHeight="50.0"
+                prefWidth="200.0" styleClass="transparent-button" stylesheets="@../styles.css" text="Back">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Button>
+    </VBox>
 </AnchorPane>

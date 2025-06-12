@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.example.game_library.networking.client.ClientToServerProxy;
 import org.example.game_library.utils.loggers.AppLogger;
+import org.example.game_library.utils.ui.ShowAlert;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,11 +32,11 @@ public class TicTacToeJoinScreen {
     private TextField roomIDButton;
 
     @FXML
-    public void OnJoinClick(ActionEvent event) {
+    public void onJoinClick(ActionEvent event) {
         String roomId = roomIDButton.getText().trim().toUpperCase();
 
         if (roomId.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Missing Room ID", "Please enter a room ID before joining.");
+            ShowAlert.showAlert(Alert.AlertType.WARNING, "Missing Room ID", "Please enter a room ID before joining.");
             return;
         }
 
@@ -47,7 +48,7 @@ public class TicTacToeJoinScreen {
                 String mode = "network";
                 String symbol = "O";
 
-                for (String part : response.split(":|;")) {
+                for (String part : response.split("[:;]")) {
                     if (part.startsWith("mode=")) {
                         mode = part.split("=")[1];
                     } else if (part.startsWith("symbol=")) {
@@ -71,11 +72,11 @@ public class TicTacToeJoinScreen {
                 stage.show();
 
             } else {
-                showAlert(Alert.AlertType.ERROR, "Join Failed", response);
+                ShowAlert.showAlert(Alert.AlertType.ERROR, "Join Failed", response);
             }
 
         } catch (IOException | ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Could not join room: " + e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Error", "Could not join room: " + e.getMessage());
         }
     }
 
@@ -89,15 +90,7 @@ public class TicTacToeJoinScreen {
             stage.setScene(new Scene(root));
             logger.log(Level.INFO, "Navigated back to Connection Screen.");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to load back screen: " + e.getMessage());
+            logger.log(Level.SEVERE, "Failed to load back screen: {0}", e.getMessage());
         }
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }
