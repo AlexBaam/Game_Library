@@ -60,82 +60,6 @@ public class MinesweeperRequests {
         }
     }
 
-
-    public static void handleReveal(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
-        MinesweeperGameState gameState = null;
-        String result = "ERROR: Unknown error during reveal.";
-
-        try {
-            int x = Integer.parseInt(request.get(2));
-            int y = Integer.parseInt(request.get(3));
-
-            gameState = threadCreator.getMinesweeperGameState();
-
-            if (gameState == null) {
-                result = "ERROR: No game in progress.";
-            } else {
-                boolean gameOver = gameState.revealCell(x, y);
-                result = gameOver ? "Cell revealed, game over!" : "Cell revealed successfully!";
-                logger.log(Level.INFO, "Cell revealed at ({0},{1}) for thread {2}. Game over: {3}", new Object[]{x, y, threadCreator.getId(), gameOver});
-            }
-
-        } catch (IndexOutOfBoundsException e) {
-            logger.log(Level.WARNING, "Invalid coordinates for reveal for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            result = "ERROR: Invalid coordinates.";
-        } catch (NumberFormatException e) {
-            logger.log(Level.WARNING, "Non-numeric coordinates for reveal for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            result = "ERROR: Invalid coordinate format.";
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Unexpected error in handleReveal for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            result = "ERROR: An unexpected error occurred during reveal.";
-        } finally {
-            try {
-                output.writeObject(gameState);
-                output.writeObject(result);
-                output.flush();
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Error sending response in handleReveal for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            }
-        }
-    }
-
-    public static void handleFlag(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
-        MinesweeperGameState gameState = null;
-        String result = "ERROR: Unknown error during flag.";
-
-        try {
-            int x = Integer.parseInt(request.get(2));
-            int y = Integer.parseInt(request.get(3));
-
-            gameState = threadCreator.getMinesweeperGameState();
-
-            if (gameState == null) {
-                result = "ERROR: No game in progress.";
-            } else {
-                result = gameState.flagCell(x, y);
-                logger.log(Level.INFO, "Cell flagged at ({0},{1}) for thread {2}. Result: {3}", new Object[]{x, y, threadCreator.getId(), result});
-            }
-
-        } catch (IndexOutOfBoundsException e) {
-            logger.log(Level.WARNING, "Invalid coordinates for flag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            result = "ERROR: Invalid coordinates.";
-        } catch (NumberFormatException e) {
-            logger.log(Level.WARNING, "Non-numeric coordinates for flag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            result = "ERROR: Invalid coordinate format.";
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Unexpected error in handleFlag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            result = "ERROR: An unexpected error occurred during flagging.";
-        } finally {
-            try {
-                output.writeObject(gameState);
-                output.writeObject(result);
-                output.flush();
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Error sending response in handleFlag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            }
-        }
-    }
-
     public static void handleForfeit(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
         String statusMessage = "ERROR: Failed to process forfeit.";
         try {
@@ -174,6 +98,139 @@ public class MinesweeperRequests {
                 output.flush();
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "Error sending Minesweeper scores response for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
+            }
+        }
+    }
+
+//    public static void handleFlag(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
+//        MinesweeperGameState gameState = null;
+//        String result = "ERROR: Unknown error during flag.";
+//
+//        try {
+//            int x = Integer.parseInt(request.get(2));
+//            int y = Integer.parseInt(request.get(3));
+//
+//            gameState = threadCreator.getMinesweeperGameState();
+//
+//            if (gameState == null) {
+//                result = "ERROR: No game in progress.";
+//            } else {
+//                // *** AICI ESTE MODIFICAREA! ***
+//                // În loc de gameState.flagCell(x, y), apelăm gameState.toggleFlag(x, y)
+//                gameState.toggleFlag(x, y); // Această metodă actualizează Cell direct, nu returnează String
+//
+//                // Modificăm și mesajul de rezultat, deoarece toggleFlag nu returnează un String de stare
+//                result = "Cell flag toggled at " + x + ", " + y;
+//                logger.log(Level.INFO, "Cell flag toggled at ({0},{1}) for thread {2}. Result: {3}", new Object[]{x, y, threadCreator.getId(), result});
+//            }
+//
+//        } catch (IndexOutOfBoundsException e) {
+//            logger.log(Level.WARNING, "Invalid coordinates for flag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
+//            result = "ERROR: Invalid coordinates.";
+//        } catch (NumberFormatException e) {
+//            logger.log(Level.WARNING, "Non-numeric coordinates for flag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
+//            result = "ERROR: Invalid coordinate format.";
+//        } catch (Exception e) {
+//            logger.log(Level.SEVERE, "Unexpected error in handleFlag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
+//            result = "ERROR: An unexpected error occurred during flagging.";
+//        } finally {
+//            try {
+//                output.writeObject(gameState); // Trimitem starea actualizată a jocului
+//                output.writeObject(result);    // Trimitem mesajul de succes/eroare
+//                output.flush();
+//            } catch (IOException e) {
+//                logger.log(Level.SEVERE, "Error sending response in handleFlag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
+//            }
+//        }
+//    }
+
+//
+    // În MinesweeperRequests.java
+
+    // În MinesweeperRequests.java
+
+    public static void handleFlag(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
+        MinesweeperGameState gameState = null;
+        String result = "ERROR: Unknown error during flag.";
+
+        try {
+            // Asigură-te că request-ul are suficiente elemente
+            if (request.size() < 4) { // Verificăm dacă sunt cel puțin "minesweeper", "flag", "row", "col"
+                result = "ERROR: Insufficient arguments for flag command.";
+                logger.log(Level.WARNING, "Insufficient arguments for flag command for thread {0}. Request: {1}",
+                        new Object[]{threadCreator.getId(), request});
+                return; // Ieșim devreme dacă nu sunt suficiente argumente
+            }
+
+            int x = Integer.parseInt(request.get(2));
+            int y = Integer.parseInt(request.get(3));
+
+            gameState = threadCreator.getMinesweeperGameState();
+
+            if (gameState == null) {
+                result = "ERROR: No game in progress.";
+            } else {
+                gameState.toggleFlag(x, y); // Apelează toggleFlag
+                result = "Cell flag toggled successfully!"; // Mesaj de succes generic
+                logger.log(Level.INFO, "Cell flag toggled at ({0},{1}) for thread {2}. Result: {3}", new Object[]{x, y, threadCreator.getId(), result});
+            }
+
+        } catch (NumberFormatException e) {
+            logger.log(Level.WARNING, "Non-numeric coordinates for flag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
+            result = "ERROR: Invalid coordinate format.";
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Unexpected error in handleFlag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
+            result = "ERROR: An unexpected error occurred during flagging.";
+        } finally {
+            try {
+                output.writeObject(gameState);
+                output.writeObject(result);
+                output.flush();
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Error sending response in handleFlag for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
+            }
+        }
+    }
+
+    public static void handleShovel(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input) {
+        MinesweeperGameState gameState = null;
+        String result = "ERROR: Unknown error during shovel.";
+
+        try {
+            // Asigură-te că request-ul are suficiente elemente înainte de a le accesa
+            if (request.size() < 4) { // Verificăm dacă sunt cel puțin "minesweeper", "shovel", "row", "col"
+                result = "ERROR: Insufficient arguments for shovel command.";
+                logger.log(Level.WARNING, "Insufficient arguments for shovel command for thread {0}. Request: {1}",
+                        new Object[]{threadCreator.getId(), request});
+                return; // Ieșim devreme dacă nu sunt suficiente argumente
+            }
+
+            int x = Integer.parseInt(request.get(2)); // Row
+            int y = Integer.parseInt(request.get(3)); // Col
+
+            gameState = threadCreator.getMinesweeperGameState();
+
+            if (gameState == null) {
+                result = "ERROR: No game in progress.";
+            } else {
+                boolean gameOver = gameState.revealCell(x, y); // Aici apelăm revealCell
+                result = gameOver ? "Cell revealed, game over!" : "Cell revealed successfully!";
+                logger.log(Level.INFO, "Cell revealed at ({0},{1}) for thread {2}. Game over: {3}", new Object[]{x, y, threadCreator.getId(), gameOver});
+            }
+
+        } catch (NumberFormatException e) {
+            logger.log(Level.WARNING, "Non-numeric coordinates for shovel for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
+            result = "ERROR: Invalid coordinate format.";
+        } catch (Exception e) { // Catch-ul general trebuie să fie la final
+            logger.log(Level.SEVERE, "Unexpected error in handleShovel for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
+            result = "ERROR: An unexpected error occurred during shovel.";
+        } finally {
+            try {
+                output.writeObject(gameState); // Trimitem starea actualizată a jocului
+                output.writeObject(result);    // Trimitem mesajul de succes/eroare
+                output.flush();
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Error sending response in handleShovel for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
             }
         }
     }

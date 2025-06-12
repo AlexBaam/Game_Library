@@ -49,7 +49,6 @@ public class MinesweeperForm {
         }
     }
 
-
     @FXML
     private void onLoadGameClick(ActionEvent event) {
         showAlert(Alert.AlertType.INFORMATION, "Load Game", "Funcționalitatea 'Load Game' Minesweeper nu este încă implementată.");

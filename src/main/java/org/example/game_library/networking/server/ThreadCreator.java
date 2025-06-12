@@ -21,6 +21,7 @@
 
     import static org.example.game_library.networking.enums.CommandMinesweeper.*;
     import static org.example.game_library.networking.enums.CommandTicTacToe.FORFEIT;
+    import static org.example.game_library.networking.enums.CommandTicTacToe.SHOVEL;
 
     public class ThreadCreator extends Thread {
         private final Socket clientSocket;
@@ -255,11 +256,11 @@
                     case NEWGAME -> MinesweeperRequests.handleNewGame(request, this, output, input);
                     //case LOADGAME -> MinesweeperRequests.handleLoadGame(request, this, output, input);
                     //case SAVEGAME -> MinesweeperRequests.handleSaveGame(request, this, output, input);
-                    case REVEAL -> MinesweeperRequests.handleReveal(request, this, output, input);
                     case FLAG -> MinesweeperRequests.handleFlag(request, this, output, input);
                     case EXIT -> handleExit(request);
                     case SCORE -> MinesweeperRequests.handleScore(request, this, output, input, userRepository);
                     case FORFEIT -> MinesweeperRequests.handleForfeit(request, this, output, input);
+                    case SHOVEL -> MinesweeperRequests.handleShovel(request, this, output, input);
                     default -> output.writeObject("Comanda Minesweeper " + subCommandStr + " nu este implementată.");
                 }
             } else {

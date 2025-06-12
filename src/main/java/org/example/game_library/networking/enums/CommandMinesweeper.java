@@ -7,7 +7,7 @@ public enum CommandMinesweeper {
     SCORE("score"),
     EXIT("exit"),
     SAVEGAME("save"),
-    REVEAL("reveal"),
+    SHOVEL("shovel"),
     FLAG("flag"),
     FORFEIT("forfeit");
 
