@@ -45,13 +45,13 @@ public class MinesweeperForm {
             stage.show();
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Eroare", "Nu s-a putut incarca jocul Minesweeper.");
+            showAlert(Alert.AlertType.ERROR, "Eroare", "Could not load Minesweeper game.");
         }
     }
 
     @FXML
     private void onLoadGameClick(ActionEvent event) {
-        ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Load Game", "Funcționalitatea 'Load Game' Minesweeper nu este încă implementată.");
+        ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Load Game", "The Minesweeper 'Load Game' functionality is not yet implemented.");
         logger.log(Level.INFO, "Load Game Minesweeper clicked.");
 
     }
@@ -68,7 +68,7 @@ public class MinesweeperForm {
             stage.show();
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error loading the Minesweeper Scoreboard: {0}",  e.getMessage());
-            ShowAlert.showAlert(Alert.AlertType.ERROR, "Eroare de navigare", "Nu s-a putut afișa clasamentul Minesweeper.");
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Eroare de navigare", "Unable to display Minesweeper leaderboard.");
         }
     }
 
