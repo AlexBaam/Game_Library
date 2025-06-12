@@ -87,12 +87,14 @@ public class AiHandler implements MoveHandler {
     private boolean handleEndGame(TicTacToeGame game, String resultMessage, ObjectOutputStream output, ThreadCreator threadCreator) {
         try {
             if (game.checkWin()) {
-                User currentUser = threadCreator.getCurrentUser();
-                if (currentUser != null) {
-                    try {
-                        TicTacToeRepository.incrementWins(currentUser, "ai");
-                    } catch (Exception e) {
-                        System.err.println("Could not update score: " + e.getMessage());
+                if (resultMessage.startsWith("WIN:")) {
+                    User currentUser = threadCreator.getCurrentUser();
+                    if (currentUser != null) {
+                        try {
+                            TicTacToeRepository.incrementWins(currentUser, "ai");
+                        } catch (Exception e) {
+                            System.err.println("Could not update score: " + e.getMessage());
+                        }
                     }
                 }
                 output.writeObject(resultMessage);

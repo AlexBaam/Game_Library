@@ -3,6 +3,7 @@ package org.example.game_library.networking.server.tictactoe_game_logic;
 import jakarta.persistence.PersistenceException;
 import org.example.game_library.database.model.User;
 import org.example.game_library.database.repository.SavedGameRepository;
+import org.example.game_library.database.repository.TicTacToeRepository;
 import org.example.game_library.database.repository.UserRepository;
 import org.example.game_library.networking.server.ThreadCreator;
 import org.example.game_library.utils.loggers.AppLogger;
@@ -105,7 +106,7 @@ public class TicTacToeRequests {
 
     public static void handleScore(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input, String scoreType, UserRepository userRepository) {
         try {
-            List<ScoreEntry> topPlayers = userRepository.getTicTacToeTopRankedPlayers(3, scoreType);
+            List<ScoreEntry> topPlayers = TicTacToeRepository.getTicTacToeTopRankedPlayers(3, scoreType);
             output.writeObject(topPlayers);
             logger.log(Level.INFO, "Sent TicTacToe top ranked players (type: {0}) to client for thread {1}.", new Object[]{scoreType, threadCreator.getId()});
         } catch (IllegalArgumentException e) {

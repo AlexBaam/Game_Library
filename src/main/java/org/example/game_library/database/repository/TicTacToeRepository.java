@@ -2,6 +2,7 @@ package org.example.game_library.database.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.PersistenceException;
 import org.example.game_library.database.model.TicTacToe;
 import org.example.game_library.database.model.User;
 import org.example.game_library.networking.server.tictactoe_game_logic.ScoreEntry;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TicTacToeRepository {
-
 
     public static void incrementWins(User user, String mode) {
         EntityManager em = JPAUtils.getEntityManager();
@@ -42,11 +42,11 @@ public class TicTacToeRepository {
         }
     }
 
-    public List<ScoreEntry> getTicTacToeTopRankedPlayers(int topRanks, String scoreType) {
+    public static List<ScoreEntry> getTicTacToeTopRankedPlayers(int topRanks, String scoreType) {
         EntityManager em = JPAUtils.getEntityManager();
         try {
             if (!scoreType.equals("network_wins") && !scoreType.equals("ai_wins")) {
-                throw new IllegalArgumentException("Invalid score type provided for ranking: " + scoreType);
+                throw new IllegalArgumentException("Tip de scor invalid furnizat pentru clasament: " + scoreType);
             }
 
             List<Object[]> resultList = em.createNativeQuery(
@@ -63,8 +63,12 @@ public class TicTacToeRepository {
                 topPlayers.add(new ScoreEntry(rank, username, wins));
             }
             return topPlayers;
+        } catch (Exception e) {
+            throw new PersistenceException("Error retrieving Minesweeper scores: " + e.getMessage(), e);
         } finally {
-            em.close();
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
 }

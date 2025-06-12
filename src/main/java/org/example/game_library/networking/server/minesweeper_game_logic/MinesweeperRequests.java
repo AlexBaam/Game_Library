@@ -1,6 +1,7 @@
 package org.example.game_library.networking.server.minesweeper_game_logic;
 
 import jakarta.persistence.PersistenceException;
+import org.example.game_library.database.repository.MinesweeperRepository;
 import org.example.game_library.database.repository.UserRepository;
 import org.example.game_library.networking.server.ThreadCreator;
 import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntryM;
@@ -18,7 +19,7 @@ public class MinesweeperRequests {
 
     public static void handleScore(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input, UserRepository userRepository) {
         try {
-            List<ScoreEntryM> topPlayers = userRepository.getMinesweeperTopRankedPlayers(3);
+            List<ScoreEntryM> topPlayers = MinesweeperRepository.getMinesweeperTopRankedPlayers(3);
 
             output.writeObject(topPlayers);
             logger.log(Level.INFO, "Sent Minesweeper top ranked players to client for thread {0}.", threadCreator.getId());
