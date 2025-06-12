@@ -82,7 +82,6 @@ public class MinesweeperGameState implements Serializable {
                 if (isValidCell(ni, nj) && !board[ni][nj].isRevealed()) {
                     revealCell(ni, nj);
                 }
-                //revealCell(ni, nj);
             }
         }
 
@@ -108,13 +107,7 @@ public class MinesweeperGameState implements Serializable {
         if (isValidCell(x, y)) {
             Cell cell = board[x][y];
 
-//            if (cell.isFlagged()) {
-//                return "Cell already flagged at " + x + ", " + y;
-//            }
-//
-//            cell.setFlagged(true);
-//            return "Cell flagged at " + x + ", " + y;
-            cell.setFlagged(!cell.isFlagged()); // inversăm starea
+            cell.setFlagged(!cell.isFlagged());
             return "Flag toggled at " + x + ", " + y;
 
         } else {
