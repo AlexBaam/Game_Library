@@ -51,10 +51,6 @@ public class ScoreFormMinesweeper {
 
         loadScores();
         rankTitleLabel.setText("Top Minesweeper Scores");
-
-        // Aici este modificarea esențială:
-        // Trimite comanda exact cum ai sugerat tu.
-        // Apelăm fără parametru scoreType, deoarece este implicit
     }
 
     private void loadScores() {
@@ -70,7 +66,7 @@ public class ScoreFormMinesweeper {
                         data.add((ScoreEntryM) item);
                     } else {
                         logger.log(Level.WARNING, "Received unexpected object type in Minesweeper score list: " + item.getClass().getName());
-                        showAlert(Alert.AlertType.ERROR, "Eroare de date", "A apărut o eroare la interpretarea datelor de scor Minesweeper.");
+                        showAlert(Alert.AlertType.ERROR, "Eroare de date", "An error occurred while interpreting Minesweeper score data.");
                         return;
                     }
                 }
@@ -81,20 +77,20 @@ public class ScoreFormMinesweeper {
 
                 scoreTable.setItems(data);
                System.out.println("Numar iteme in tabela: " + scoreTable.getItems().size());
-                logger.log(Level.INFO, "Scorurile Minesweeper au fost încărcate cu succes. Număr de înregistrări: " + data.size());
+                logger.log(Level.INFO, "Minesweeper scores have been successfully uploaded. Number of records: " + data.size());
             } else if (response instanceof String errorMessage) {
                 showAlert(Alert.AlertType.ERROR, "Eroare Server", "Server error for Minesweeper scores: " + errorMessage);
                 logger.log(Level.WARNING, "Server error when loading Minesweeper scores: " + errorMessage);
             } else {
-                showAlert(Alert.AlertType.ERROR, "Eroare comunicare", "Răspuns neașteptat de la server pentru clasamentul Minesweeper: " + (response != null ? response.getClass().getName() : "null"));
+                showAlert(Alert.AlertType.ERROR, "Eroare comunicare", "Unexpected response from the Minesweeper leaderboard server: " + (response != null ? response.getClass().getName() : "null"));
                 logger.log(Level.WARNING, "Unexpected response from server for Minesweeper scores: " + (response != null ? response.getClass().getName() : "null"));
             }
 
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare rețea", "Nu s-a putut conecta la server pentru a obține scorurile Minesweeper.");
+            showAlert(Alert.AlertType.ERROR, "Network error", "Could not connect to the server to get Minesweeper scores.");
             logger.log(Level.SEVERE, "Network error when loading Minesweeper scores: " + e.getMessage());
         } catch (ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare protocol", "Probleme la deserializarea datelor de scor Minesweeper de la server.");
+            showAlert(Alert.AlertType.ERROR, "Eroare protocol", "Problems deserializing Minesweeper score data from the server.");
             logger.log(Level.SEVERE, "ClassNotFoundException when loading Minesweeper scores: " + e.getMessage());
         }
     }
@@ -107,10 +103,10 @@ public class ScoreFormMinesweeper {
 
             Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            logger.log(Level.INFO, "Navigat înapoi la meniul principal al utilizatorului.");
+            logger.log(Level.INFO, "Navigated back to the main user menu.");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Eroare la încărcarea meniului principal al utilizatorului: " + e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Eroare de navigare", "Nu s-a putut reveni la meniul principal.");
+            logger.log(Level.SEVERE, "Error loading the user main menu: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Navigation error", "Could not return to the main menu.");
         }
     }
 

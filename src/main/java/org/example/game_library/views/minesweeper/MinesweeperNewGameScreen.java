@@ -56,15 +56,12 @@ public class MinesweeperNewGameScreen {
         try {
             ClientToServerProxy.send(List.of("minesweeper", "newgame", modeRequested));
 
-            // Citim PRIMUL obiect: Așteptăm MinesweeperGameState (poate fi null în caz de eroare)
             Object firstReceivedObject = ClientToServerProxy.receive();
-            // Citim AL DOILEA obiect: Așteptăm String-ul de răspuns (SUCCESS/ERROR)
             Object secondReceivedObject = ClientToServerProxy.receive();
 
             MinesweeperGameState initialGameState = null;
             String statusResponse = "ERROR: Unknown server response.";
 
-            // Verificăm și castăm obiectele primite
             if (firstReceivedObject instanceof MinesweeperGameState) {
                 initialGameState = (MinesweeperGameState) firstReceivedObject;
             }
@@ -72,13 +69,12 @@ public class MinesweeperNewGameScreen {
                 statusResponse = (String) secondReceivedObject;
             }
 
-            // Acum verificăm dacă jocul a fost inițializat cu succes
             if (initialGameState != null && statusResponse.toLowerCase().startsWith("success")) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/minesweeper/minesweeperBoard.fxml"));
                 Parent root = loader.load();
 
                 MinesweeperBoard controller = loader.getController();
-                controller.setInitialGameState(initialGameState); // Transmite starea jocului către controller
+                controller.setInitialGameState(initialGameState);
 
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
@@ -87,9 +83,8 @@ public class MinesweeperNewGameScreen {
                 logger.log(Level.INFO, "Game started successfully for mode: {0}", modeRequested);
 
             } else {
-                // Dacă nu a fost un succes, afișăm eroarea primită de la server
                 String errorMessage = "Failed to start new game.";
-                errorMessage += " Server response: " + statusResponse; // Folosim statusResponse care a fost parsată
+                errorMessage += " Server response: " + statusResponse;
                 logger.log(Level.WARNING, errorMessage);
                 showAlert(Alert.AlertType.ERROR, "Game Initialization Error", errorMessage);
             }

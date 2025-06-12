@@ -74,7 +74,7 @@ public class TicTacToeForm {
             stage.setTitle("Game Library - Tic Tac Toe Scoreboard");
             stage.show();
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare incarcare scoruri", "Nu s-a putut incarca ecranul de scoruri: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error loading scores", "Could not load the scores screen.: " + e.getMessage());
             logger.log(Level.SEVERE, "Failed to load scoreForm.fxml: " + e.getMessage());
         }
     }
@@ -107,7 +107,7 @@ public class TicTacToeForm {
             stage.show();
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Eroare", "Nu s-a putut incarca jocul TicTacToe.");
+            showAlert(Alert.AlertType.ERROR, "Eroare", "Could not load TicTacToe game.");
         }
     }
 

@@ -134,64 +134,6 @@ public class MinesweeperBoard {
         updateBoardUI();
     }
 
-
-    private void onCellClick(int row, int col) {
-        logger.log(Level.INFO, "Cell clicked (reveal): ({0}, {1})", new Object[]{row, col});
-        try {
-            ClientToServerProxy.send(List.of("minesweeper", "reveal", String.valueOf(row), String.valueOf(col)));
-
-            Object receivedGameState = ClientToServerProxy.receive();
-            Object receivedStatus = ClientToServerProxy.receive();
-
-            if (receivedGameState instanceof MinesweeperGameState newGameState && receivedStatus instanceof String statusMessage) {
-                currentGameState = newGameState;
-                updateBoardUI();
-
-                if (statusMessage.contains("game over")) {
-                    showAlert(Alert.AlertType.INFORMATION, "Game Over!", "You hit a mine! Game lost.");
-                    disableBoard();
-                    revealAllMinesAtGameOver();
-                } else if (isGameWon()) {
-                    showAlert(Alert.AlertType.INFORMATION, "Congratulations!", "You cleared the minefield! Game won.");
-                    disableBoard();
-                }
-            } else {
-                logger.log(Level.WARNING, "Received unexpected object type for reveal. State: {0}, Status: {1}",
-                        new Object[]{receivedGameState != null ? receivedGameState.getClass().getName() : "null",
-                                receivedStatus != null ? receivedStatus.getClass().getName() : "null"});
-                showAlert(Alert.AlertType.ERROR, "Error", "Failed to update game state after reveal. Please check server logs.");
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Network Error", "Could not reveal cell: " + e.getMessage());
-            logger.log(Level.SEVERE, "Error revealing cell: {0}", e.getMessage());
-        }
-    }
-
-    private void onCellRightClick(int row, int col) {
-        logger.log(Level.INFO, "Cell right-clicked (flag): ({0}, {1})", new Object[]{row, col});
-        try {
-            ClientToServerProxy.send(List.of("minesweeper", "flag", String.valueOf(row), String.valueOf(col)));
-
-            Object receivedGameState = ClientToServerProxy.receive();
-            Object receivedStatus = ClientToServerProxy.receive();
-
-            if (receivedGameState instanceof MinesweeperGameState newGameState && receivedStatus instanceof String statusMessage) {
-                currentGameState = newGameState;
-                updateBoardUI();
-                updateMineCountLabel();
-            } else {
-                logger.log(Level.WARNING, "Received unexpected object type for flag. State: {0}, Status: {1}",
-                        new Object[]{receivedGameState != null ? receivedGameState.getClass().getName() : "null",
-                                receivedStatus != null ? receivedStatus.getClass().getName() : "null"});
-                showAlert(Alert.AlertType.ERROR, "Error", "Failed to update game state after flagging. Please check server logs.");
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Network Error", "Could not flag cell: " + e.getMessage());
-            logger.log(Level.SEVERE, "Error flagging cell: {0}", e.getMessage());
-        }
-    }
-
-
     @FXML
     public void onSaveClick() {
         logger.log(Level.INFO, "Save button clicked.");
@@ -384,7 +326,7 @@ public class MinesweeperBoard {
                 }
             }
         }
-        boardGrid.layout(); //!!!!!!!!
+        boardGrid.layout();
     }
 
     private void revealAllMinesAtGameOver() {
@@ -455,4 +397,5 @@ public class MinesweeperBoard {
             logger.log(Level.SEVERE, "Error navigating back to new game screen: {0}", e.getMessage());
         }
     }
+
 }

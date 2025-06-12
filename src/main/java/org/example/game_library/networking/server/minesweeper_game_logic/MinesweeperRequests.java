@@ -16,14 +16,13 @@ import java.util.logging.Logger;
 public class MinesweeperRequests {
 
     private MinesweeperRequests(){
-        //Default constructor
     }
 
     private static final Logger logger = AppLogger.getLogger();
 
     public static void handleNewGame(List<String> request, ThreadCreator thread, ObjectOutputStream output, ObjectInputStream input) throws IOException {
         MinesweeperGameState game = null;
-        String statusMessage = "ERROR: Uninitialized status message."; // Inițializat cu o valoare implicită
+        String statusMessage = "ERROR: Uninitialized status message.";
 
         try {
             if (request.size() < 3) {
@@ -112,12 +111,11 @@ public class MinesweeperRequests {
         String result = "ERROR: Unknown error during flag.";
 
         try {
-            // Asigură-te că request-ul are suficiente elemente
-            if (request.size() < 4) { // Verificăm dacă sunt cel puțin "minesweeper", "flag", "row", "col"
+            if (request.size() < 4) {
                 result = "ERROR: Insufficient arguments for flag command.";
                 logger.log(Level.WARNING, "Insufficient arguments for flag command for thread {0}. Request: {1}",
                         new Object[]{threadCreator.getId(), request});
-                return; // Ieșim devreme dacă nu sunt suficiente argumente
+                return;
             }
 
             int x = Integer.parseInt(request.get(2));
@@ -128,8 +126,8 @@ public class MinesweeperRequests {
             if (gameState == null) {
                 result = "ERROR: No game in progress.";
             } else {
-                gameState.toggleFlag(x, y); // Apelează toggleFlag
-                result = "Cell flag toggled successfully!"; // Mesaj de succes generic
+                gameState.toggleFlag(x, y);
+                result = "Cell flag toggled successfully!";
                 logger.log(Level.INFO, "Cell flag toggled at ({0},{1}) for thread {2}. Result: {3}", new Object[]{x, y, threadCreator.getId(), result});
             }
 
@@ -155,23 +153,22 @@ public class MinesweeperRequests {
         String result = "ERROR: Unknown error during shovel.";
 
         try {
-            // Asigură-te că request-ul are suficiente elemente înainte de a le accesa
-            if (request.size() < 4) { // Verificăm dacă sunt cel puțin "minesweeper", "shovel", "row", "col"
+            if (request.size() < 4) {
                 result = "ERROR: Insufficient arguments for shovel command.";
                 logger.log(Level.WARNING, "Insufficient arguments for shovel command for thread {0}. Request: {1}",
                         new Object[]{threadCreator.getId(), request});
-                return; // Ieșim devreme dacă nu sunt suficiente argumente
+                return;
             }
 
-            int x = Integer.parseInt(request.get(2)); // Row
-            int y = Integer.parseInt(request.get(3)); // Col
+            int x = Integer.parseInt(request.get(2));
+            int y = Integer.parseInt(request.get(3));
 
             gameState = threadCreator.getMinesweeperGameState();
 
             if (gameState == null) {
                 result = "ERROR: No game in progress.";
             } else {
-                boolean gameOver = gameState.revealCell(x, y); // Aici apelăm revealCell
+                boolean gameOver = gameState.revealCell(x, y);
                 result = gameOver ? "Cell revealed, game over!" : "Cell revealed successfully!";
                 logger.log(Level.INFO, "Cell revealed at ({0},{1}) for thread {2}. Game over: {3}", new Object[]{x, y, threadCreator.getId(), gameOver});
             }
@@ -179,13 +176,13 @@ public class MinesweeperRequests {
         } catch (NumberFormatException e) {
             logger.log(Level.WARNING, "Non-numeric coordinates for shovel for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
             result = "ERROR: Invalid coordinate format.";
-        } catch (Exception e) { // Catch-ul general trebuie să fie la final
+        } catch (Exception e) {
             logger.log(Level.SEVERE, "Unexpected error in handleShovel for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
             result = "ERROR: An unexpected error occurred during shovel.";
         } finally {
             try {
-                output.writeObject(gameState); // Trimitem starea actualizată a jocului
-                output.writeObject(result);    // Trimitem mesajul de succes/eroare
+                output.writeObject(gameState);
+                output.writeObject(result);
                 output.flush();
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "Error sending response in handleShovel for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
