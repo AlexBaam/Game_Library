@@ -4,12 +4,12 @@ public enum CommandMinesweeper {
 
     NEWGAME("newgame"),
     LOADGAME("load"),
-    SCORE("score"),
-    EXIT("exit"),
     SAVEGAME("save"),
+    SCORE("score"),
     SHOVEL("shovel"),
     FLAG("flag"),
-    FORFEIT("forfeit");
+    FORFEIT("forfeit"),
+    EXIT("exit");
 
     private final String commandMinesweeper;
 

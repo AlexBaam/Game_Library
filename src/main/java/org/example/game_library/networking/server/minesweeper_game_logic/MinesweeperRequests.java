@@ -84,25 +84,17 @@ public class MinesweeperRequests {
         }
     }
 
-    public static void handleScore(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input, UserRepository userRepository) {
-        Object responseObj = null;
+    public static void handleScore(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input, UserRepository userRepository) throws IOException {
         try {
             List<ScoreEntryM> topPlayers = MinesweeperRepository.getMinesweeperTopRankedPlayers(3);
             output.writeObject(topPlayers);
             logger.log(Level.INFO, "Sent Minesweeper top ranked players to client for thread {0}.", threadCreator.getId());
         } catch (PersistenceException e) {
             logger.log(Level.SEVERE, "Database error retrieving Minesweeper scores for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            responseObj = "ERROR: Database error retrieving Minesweeper scores.";
+            output.writeObject("ERROR: Database error retrieving Minesweeper scores.");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Unexpected error in MinesweeperRequests.handleScore for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            responseObj = "ERROR: An unexpected error occurred while retrieving Minesweeper scores.";
-        } finally {
-            try {
-                output.writeObject(responseObj);
-                output.flush();
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Error sending Minesweeper scores response for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
-            }
+            output.writeObject("ERROR: An unexpected error occurred while retrieving Minesweeper scores.");
         }
     }
 
