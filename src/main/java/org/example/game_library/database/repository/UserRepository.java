@@ -30,10 +30,10 @@ public class UserRepository {
     public User authenticate(String username, String password) throws LoginException {
         User user = findByUsername(username);
         if (user == null)
-            throw new LoginException("Utilizator inexistent.");
+            throw new LoginException("User does not exist..");
 
         if (!BCrypt.checkpw(password, user.getPassword()))
-            throw new LoginException("Parola incorecta.");
+            throw new LoginException("Incorrect password.");
 
         EntityManager em = JPAUtils.getEntityManager();
         try {
@@ -43,7 +43,7 @@ public class UserRepository {
             em.getTransaction().commit();
             return user;
         } catch (PersistenceException e) {
-            throw new LoginException("Eroare la login: " + e.getMessage(), e);
+            throw new LoginException("Login error: " + e.getMessage(), e);
         } finally {
             em.close();
         }

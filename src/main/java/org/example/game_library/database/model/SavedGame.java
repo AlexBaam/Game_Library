@@ -32,6 +32,6 @@ public class SavedGame {
     private LocalDateTime savedAt;
 
     public SavedGame() {
-        //Default constructor
+
     }
 }

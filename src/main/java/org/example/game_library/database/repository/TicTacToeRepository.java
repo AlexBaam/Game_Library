@@ -29,7 +29,7 @@ public class TicTacToeRepository {
                 case "local" -> score.setLocalWins(score.getLocalWins() + 1);
                 case "network" -> score.setNetworkWins(score.getNetworkWins() + 1);
                 case "ai" -> score.setAiWins(score.getAiWins() + 1);
-                default -> throw new IllegalArgumentException("Mod invalid: " + mode);
+                default -> throw new IllegalArgumentException("Invalid mod: " + mode);
             }
 
             em.merge(score);
@@ -46,7 +46,7 @@ public class TicTacToeRepository {
         EntityManager em = JPAUtils.getEntityManager();
         try {
             if (!scoreType.equals("network_wins") && !scoreType.equals("ai_wins")) {
-                throw new IllegalArgumentException("Tip de scor invalid furnizat pentru clasament: " + scoreType);
+                throw new IllegalArgumentException("Invalid score type provided for ranking: " + scoreType);
             }
 
             List<Object[]> resultList = em.createNativeQuery(
