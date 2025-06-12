@@ -228,7 +228,7 @@
                     logged = false;
                     currentUser = null;
                 } else {
-                    output.writeObject("Eroare la deconectare. Va rugam sa incercati din nou.");
+                    output.writeObject("Error while logging out. Please try again.");
                     logger.log(Level.WARNING, "Failed to update logged_in status to FALSE for user {0}.", currentUser.getUsername());
                 }
             } catch (Exception e) {
@@ -252,7 +252,7 @@
                 CommandMinesweeper subCommand = CommandMinesweeper.fromString(subCommandStr);
 
                 if (subCommand == null) {
-                    output.writeObject("Eroare: Subcomandă Minesweeper invalidă: " + subCommandStr);
+                    output.writeObject("Error: Invalid Minesweeper subcommand: " + subCommandStr);
                     return;
                 }
 
@@ -265,10 +265,10 @@
                     case SCORE -> MinesweeperRequests.handleScore(request, this, output, input, userRepository);
                     case FORFEIT -> MinesweeperRequests.handleForfeit(request, this, output, input);
                     case SHOVEL -> MinesweeperRequests.handleShovel(request, this, output, input);
-                    default -> output.writeObject("Comanda Minesweeper " + subCommandStr + " nu este implementată.");
+                    default -> output.writeObject("The comand Minesweeper " + subCommandStr + " is not implemented.");
                 }
             } else {
-                output.writeObject("Eșec la procesarea comenzii TicTacToe.");
+                output.writeObject("TicTacToe command processing failed.");
             }
         }
 
