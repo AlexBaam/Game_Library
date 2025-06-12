@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import org.example.game_library.networking.client.ClientToServerProxy;
 import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeGame;
 import org.example.game_library.utils.loggers.AppLogger;
+import org.example.game_library.utils.ui.ShowAlert;
 
 import java.io.IOException;
 import java.util.List;
@@ -74,8 +75,8 @@ public class TicTacToeForm {
             stage.setTitle("Game Library - Tic Tac Toe Scoreboard");
             stage.show();
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Error loading scores", "Could not load the scores screen.: " + e.getMessage());
-            logger.log(Level.SEVERE, "Failed to load scoreForm.fxml: " + e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Error loading scores", "Could not load the scores screen.: " + e.getMessage());
+            logger.log(Level.SEVERE, "Failed to load scoreForm.fxml: {0}", e.getMessage());
         }
     }
 
@@ -90,8 +91,8 @@ public class TicTacToeForm {
             stage.setScene(new Scene(root));
             logger.log(Level.INFO, "Navigated back to user dashboard.");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to load back screen (user dashboard): " + e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Eroare de navigare", "Nu s-a putut intoarce la meniul principal.");
+            logger.log(Level.SEVERE, "Failed to load the Dashboard: {0}", e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Eroare de navigare", "Nu s-a putut intoarce la meniul principal.");
         }
     }
 
@@ -107,16 +108,8 @@ public class TicTacToeForm {
             stage.show();
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Eroare", "Could not load TicTacToe game.");
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Eroare", "Could not load TicTacToe game.");
         }
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     @FXML
@@ -128,7 +121,7 @@ public class TicTacToeForm {
 
             if (obj instanceof String response) {
                 if (response.startsWith("FAILURE")) {
-                    showAlert(Alert.AlertType.ERROR, "Eroare la incarcare", response);
+                    ShowAlert.showAlert(Alert.AlertType.ERROR, "Eroare la incarcare", response);
                     return;
                 }
             }
@@ -145,10 +138,10 @@ public class TicTacToeForm {
                 stage.setTitle("TicTacToe - Loaded Game");
                 stage.show();
             } else {
-                showAlert(Alert.AlertType.ERROR, "Unexpected", "Unknown response from server.");
+                ShowAlert.showAlert(Alert.AlertType.ERROR, "Unexpected", "Unknown response from server.");
             }
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Could not load game: " + e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Error", "Could not load game: " + e.getMessage());
         }
     }
 }

@@ -42,6 +42,7 @@ module org.example.game_library {
 
     exports org.example.game_library.utils.jpa;
     opens org.example.game_library.utils.jpa to javafx.fxml;
+
     exports org.example.game_library.networking.server.minesweeper_game_logic;
     opens org.example.game_library.networking.server.minesweeper_game_logic to javafx.fxml;
 

@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import org.example.game_library.networking.client.ClientToServerProxy;
 import org.example.game_library.networking.server.minesweeper_game_logic.MinesweeperGameState;
@@ -20,6 +21,18 @@ import java.util.logging.Logger;
 public class MinesweeperNewGameScreen {
 
     private static final Logger logger = AppLogger.getLogger();
+
+    @FXML
+    public Button easyButton;
+
+    @FXML
+    public Button mediumButton;
+
+    @FXML
+    public Button hardButton;
+
+    @FXML
+    public Button backButton;
 
     @FXML
     public void onEasyClick(ActionEvent event) {

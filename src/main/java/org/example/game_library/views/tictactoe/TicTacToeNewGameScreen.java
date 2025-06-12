@@ -38,13 +38,13 @@ public class TicTacToeNewGameScreen {
     }
 
     @FXML
-    public void OnLocalClick(ActionEvent event) {
+    public void onLocalClick(ActionEvent event) {
         logger.log(Level.INFO, "User pressed 'vs Local' button. (TicTacToe - New Game)");
         startGame("local", event);
     }
 
     @FXML
-    public void OnPlayerClick(ActionEvent event) {
+    public void onPlayerClick(ActionEvent event) {
         logger.log(Level.INFO, "User pressed 'vs Player' button. (TicTacToe - New Game)");
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/tictactoe/tictactoeConnectionScreen.fxml"));
@@ -54,7 +54,7 @@ public class TicTacToeNewGameScreen {
             stage.setScene(new Scene(root));
             logger.log(Level.INFO, "Navigated to Connection Screen.");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to load back screen: " + e.getMessage());
+            logger.log(Level.SEVERE, "Failed to load back screen: {0}", e.getMessage());
         }
     }
 
@@ -69,7 +69,7 @@ public class TicTacToeNewGameScreen {
             stage.setScene(new Scene(root));
             logger.log(Level.INFO, "Navigated back to main menu.");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to load back screen: " + e.getMessage());
+            logger.log(Level.SEVERE, "Failed to load back screen: {0}", e.getMessage());
         }
     }
 
@@ -82,7 +82,7 @@ public class TicTacToeNewGameScreen {
                 String actualMode = modeRequested;
 
                 if (response.contains("mode=")) {
-                    for (String part : response.split(":|;")) {
+                    for (String part : response.split("[:;]")) {
                         if (part.startsWith("mode=")) {
                             actualMode = part.split("=")[1];
                             break;
