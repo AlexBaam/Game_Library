@@ -7,6 +7,7 @@
     import org.example.game_library.networking.enums.Command;
     import org.example.game_library.networking.enums.CommandMinesweeper;
     import org.example.game_library.networking.enums.CommandTicTacToe;
+    import org.example.game_library.networking.server.minesweeper_game_logic.MinesweeperGameState;
     import org.example.game_library.networking.server.minesweeper_game_logic.MinesweeperRequests;
     import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeGame;
     import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeRequests;
@@ -18,6 +19,10 @@
     import java.util.logging.*;
 
     import jakarta.persistence.PersistenceException;
+
+    import static org.example.game_library.networking.enums.CommandMinesweeper.*;
+    import static org.example.game_library.networking.enums.CommandTicTacToe.FORFEIT;
+    import static org.example.game_library.networking.enums.CommandTicTacToe.SHOVEL;
 
     public class ThreadCreator extends Thread {
         private final Socket clientSocket;
@@ -37,6 +42,9 @@
         private TicTacToeGame ticTacToeGame;
 
         private final UserRepository userRepository;
+
+        private MinesweeperGameState minesweeperGameState;
+
 
         public ThreadCreator(Socket socket) {
             this.clientSocket = socket;
@@ -235,42 +243,6 @@
             throw new EOFException();
         }
 
-//        private void handleMinesweeper(List<String> request) throws IOException {
-//            if (request.size() == 1) {
-//                output.writeObject("SUCCESS");
-//            } else if (request.size() >= 2) {
-//                String subCommandMinesweeper = request.get(1); // Acum este subcomanda, ex: "score"
-//                CommandMinesweeper cMinesweeper = CommandMinesweeper.fromString(subCommandMinesweeper);
-//
-//                if (cMinesweeper == null) {
-//                    output.writeObject("Comanda Minesweeper este nulă! Comandă: " + subCommandMinesweeper);
-//                    return;
-//                }
-//
-//                switch (cMinesweeper) {
-//                    // Eliminăm case-urile pentru NEWGAME, LOADGAME, SAVEGAME, etc. dacă nu vrei să le gestionezi aici
-//                    // case NEWGAME -> MinesweeperRequests.handleNewGame(request, this, output, input);
-//                    // case LOADGAME -> MinesweeperRequests.handleLoadGame(request, this, output, input);
-//                    // case SAVEGAME -> MinesweeperRequests.handleSaveGame(request, this, output, input);
-//                    case EXIT -> handleExit(request); // Păstrăm Exit dacă vrei să poți ieși din Minesweeper
-//                    case SCORE -> {
-//                        // Dacă ai nevoie de un parametru suplimentar (ex: "total_score"),
-//                        // acesta va fi request.get(2).
-//                        if (request.size() >= 3) { // Asigură-te că există "minesweeper", "score", "total_score"
-//                            String scoreType = request.get(2); // Aici va fi "total_score"
-//                            MinesweeperRequests.handleScore(request, this, output, input, scoreType, userRepository);
-//                        } else {
-//                            output.writeObject("Eroare: Tipul de scor nu a fost furnizat pentru comanda SCORE Minesweeper.");
-//                            logger.log(Level.WARNING, "Minesweeper score request is missing score type parameter.");
-//                        }
-//                    }
-//                    default -> output.writeObject("Comanda " + subCommandMinesweeper + " Minesweeper nu este implementată încă!");
-//                }
-//            } else {
-//                output.writeObject("Eșec la procesarea comenzii Minesweeper.");
-//            }
-//        }
-
         private void handleMinesweeper(List<String> request) throws IOException {
             if (request.size() == 1) {
                 output.writeObject("SUCCESS");
@@ -285,11 +257,14 @@
                 }
 
                 switch (subCommand) {
-                   // case NEWGAME -> MinesweeperRequests.handleNewGame(request, this, output, input);
+                    case NEWGAME -> MinesweeperRequests.handleNewGame(request, this, output, input);
                     //case LOADGAME -> MinesweeperRequests.handleLoadGame(request, this, output, input);
                     //case SAVEGAME -> MinesweeperRequests.handleSaveGame(request, this, output, input);
+                    case FLAG -> MinesweeperRequests.handleFlag(request, this, output, input);
                     case EXIT -> handleExit(request);
                     case SCORE -> MinesweeperRequests.handleScore(request, this, output, input, userRepository);
+                    case FORFEIT -> MinesweeperRequests.handleForfeit(request, this, output, input);
+                    case SHOVEL -> MinesweeperRequests.handleShovel(request, this, output, input);
                     default -> output.writeObject("Comanda Minesweeper " + subCommandStr + " nu este implementată.");
                 }
             } else {
@@ -335,5 +310,14 @@
         public ObjectOutputStream getOutputStream() {
             return output;
         }
+
+        public MinesweeperGameState getMinesweeperGameState() {
+            return this.minesweeperGameState;
+        }
+
+        public void setMinesweeperGameState(MinesweeperGameState gameState) {
+            this.minesweeperGameState = gameState;
+        }
+
     }
 

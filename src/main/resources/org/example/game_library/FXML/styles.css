@@ -57,3 +57,47 @@
 .tictactoe-cell:pressed {
     -fx-background-color: #d0d0d0;
 }
+
+
+.minesweeper-cell {
+    -fx-background-color: #cccccc;
+    -fx-border-color: #888888;
+    -fx-border-width: 1px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+
+.minesweeper-cell.selected-cell {
+    -fx-border-color: #0000FF;
+    -fx-border-width: 3px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,255,0.5), 10, 0.0, 0, 0);
+}
+
+.minesweeper-cell.flagged {
+    -fx-background-color: #add8e6;
+    -fx-text-fill: red;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.minesweeper-cell.mine {
+    -fx-background-color: #ff0000;
+    -fx-text-fill: white;
+}
+
+.minesweeper-cell.revealed-empty {
+    -fx-background-color: #dddddd;
+}
+
+.minesweeper-cell.number1 { -fx-text-fill: blue; }
+.minesweeper-cell.number2 { -fx-text-fill: green; }
+.minesweeper-cell.number3 { -fx-text-fill: red; }
+.minesweeper-cell.number4 { -fx-text-fill: darkblue; }
+.minesweeper-cell.number5 { -fx-text-fill: darkred; }
+.minesweeper-cell.number6 { -fx-text-fill: teal; }
+.minesweeper-cell.number7 { -fx-text-fill: black; }
+.minesweeper-cell.number8 { -fx-text-fill: gray; }
+
+

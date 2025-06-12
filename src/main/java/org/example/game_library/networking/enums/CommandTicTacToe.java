@@ -8,7 +8,9 @@ public enum CommandTicTacToe {
     EXIT("exit"),
     FORFEIT("forfeit"),
     MOVE("move"),
-    SAVEGAME("save");
+    SAVEGAME("save"),
+    SHOVEL("shovel"),
+    FLAG("flag");
 
     private final String commandTicTacToe;
 

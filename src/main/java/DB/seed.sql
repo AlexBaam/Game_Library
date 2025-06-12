@@ -91,9 +91,6 @@ CREATE TRIGGER trigger_log_user_deletion
     FOR EACH ROW
     EXECUTE FUNCTION log_user_deletion();
 
-
-
-
 CREATE OR REPLACE FUNCTION manage_user_login_and_sessions()
 RETURNS TRIGGER AS $$
 DECLARE
