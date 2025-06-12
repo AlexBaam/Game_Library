@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.example.game_library.utils.ui.ShowAlert.showAlert;
+
 
 public class ScoreFormMinesweeper {
     private static final Logger logger = AppLogger.getLogger();
@@ -65,7 +67,7 @@ public class ScoreFormMinesweeper {
                     if (item instanceof ScoreEntryM) {
                         data.add((ScoreEntryM) item);
                     } else {
-                        logger.log(Level.WARNING, "Received unexpected object type in Minesweeper score list: " + item.getClass().getName());
+                        logger.log(Level.WARNING, "Received unexpected object type in Minesweeper score list: {0}", item.getClass().getName());
                         showAlert(Alert.AlertType.ERROR, "Eroare de date", "An error occurred while interpreting Minesweeper score data.");
                         return;
                     }
@@ -76,22 +78,22 @@ public class ScoreFormMinesweeper {
                }
 
                 scoreTable.setItems(data);
-               System.out.println("Numar iteme in tabela: " + scoreTable.getItems().size());
-                logger.log(Level.INFO, "Minesweeper scores have been successfully uploaded. Number of records: " + data.size());
+               System.out.println("Number of items in the table: " + scoreTable.getItems().size());
+                logger.log(Level.INFO, "Minesweeper scores have been successfully uploaded. Number of records: {0}",  data.size());
             } else if (response instanceof String errorMessage) {
                 showAlert(Alert.AlertType.ERROR, "Eroare Server", "Server error for Minesweeper scores: " + errorMessage);
-                logger.log(Level.WARNING, "Server error when loading Minesweeper scores: " + errorMessage);
+                logger.log(Level.WARNING, "Server error when loading Minesweeper scores: {0}",  errorMessage);
             } else {
                 showAlert(Alert.AlertType.ERROR, "Eroare comunicare", "Unexpected response from the Minesweeper leaderboard server: " + (response != null ? response.getClass().getName() : "null"));
-                logger.log(Level.WARNING, "Unexpected response from server for Minesweeper scores: " + (response != null ? response.getClass().getName() : "null"));
+                logger.log(Level.WARNING, "Unexpected response from server for Minesweeper scores: {0}",  (response != null ? response.getClass().getName() : "null"));
             }
 
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Network error", "Could not connect to the server to get Minesweeper scores.");
-            logger.log(Level.SEVERE, "Network error when loading Minesweeper scores: " + e.getMessage());
+            logger.log(Level.SEVERE, "Network error when loading Minesweeper scores: {0}",  e.getMessage());
         } catch (ClassNotFoundException e) {
             showAlert(Alert.AlertType.ERROR, "Eroare protocol", "Problems deserializing Minesweeper score data from the server.");
-            logger.log(Level.SEVERE, "ClassNotFoundException when loading Minesweeper scores: " + e.getMessage());
+            logger.log(Level.SEVERE, "ClassNotFoundException when loading Minesweeper scores: {0}",  e.getMessage());
         }
     }
 
@@ -105,16 +107,9 @@ public class ScoreFormMinesweeper {
             stage.setScene(new Scene(root));
             logger.log(Level.INFO, "Navigated back to the main user menu.");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error loading the user main menu: " + e.getMessage());
+            logger.log(Level.SEVERE, "Error loading the user main menu: {0}", e.getMessage());
             showAlert(Alert.AlertType.ERROR, "Navigation error", "Could not return to the main menu.");
         }
     }
 
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
 }

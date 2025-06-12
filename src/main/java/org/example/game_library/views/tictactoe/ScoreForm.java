@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.example.game_library.utils.ui.ShowAlert.showAlert;
+
 public class ScoreForm {
     private static final Logger logger = AppLogger.getLogger();
 
@@ -75,27 +77,27 @@ public class ScoreForm {
                     if (item instanceof ScoreEntry) {
                         data.add((ScoreEntry) item);
                     } else {
-                        logger.log(Level.WARNING, "Received unexpected object type in score list: " + item.getClass().getName());
+                        logger.log(Level.WARNING, "Received unexpected object type in score list: {0}", item.getClass().getName());
                         showAlert(Alert.AlertType.ERROR, "Eroare de date", "A apărut o eroare la interpretarea datelor de scor.");
                         return;
                     }
                 }
                 scoreTable.setItems(data);
-                logger.log(Level.INFO, "Scorurile TicTacToe au fost încărcate cu succes. Număr de înregistrări: " + data.size());
+                logger.log(Level.INFO, "TicTacToe scores have been successfully uploaded. Number of records: {0}", data.size());
             } else if (response instanceof String errorMessage) {
                 showAlert(Alert.AlertType.ERROR, "Eroare Server", errorMessage);
-                logger.log(Level.WARNING, "Eroare server la încărcarea scorurilor: " + errorMessage);
+                logger.log(Level.WARNING, "Server error loading scores: {0}", errorMessage);
             } else {
                 showAlert(Alert.AlertType.ERROR, "Eroare comunicare", "Unexpected response from server: " + response);
-                logger.log(Level.WARNING, "Unexpected response from server: " + (response != null ? response.getClass().getName() : "null"));
+                logger.log(Level.WARNING, "Unexpected response from server: {0}", (response != null ? response.getClass().getName() : "null"));
             }
 
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare rețea", "Nu s-a putut conecta la server pentru a obține scorurile.");
-            logger.log(Level.SEVERE, "Eroare de rețea la încărcarea scorurilor: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Network error", "Could not connect to the server to get the scores.");
+            logger.log(Level.SEVERE, "Network error loading scores: {0}", e.getMessage());
         } catch (ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Eroare protocol", "Probleme la deserializarea datelor de scor de la server.");
-            logger.log(Level.SEVERE, "ClassNotFoundException la încărcarea scorurilor: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Eroare protocol", "Problems deserializing score data from the server.");
+            logger.log(Level.SEVERE, "ClassNotFoundException when loading scores: {0}", e.getMessage());
         }
     }
 
@@ -125,18 +127,12 @@ public class ScoreForm {
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            logger.log(Level.INFO, "Navigat înapoi la meniul principal TicTacToe din clasament.");
+            logger.log(Level.INFO, "Navigated back to the main TicTacToe menu from the leaderboard.");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Eroare la încărcarea meniului principal TicTacToe: " + e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Eroare de navigare", "Nu s-a putut reveni la meniul TicTacToe.");
+            logger.log(Level.SEVERE, "Error loading TicTacToe main menu: {0}", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Navigation error", "Could not return to TicTacToe menu.");
         }
     }
 
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
+
 }
