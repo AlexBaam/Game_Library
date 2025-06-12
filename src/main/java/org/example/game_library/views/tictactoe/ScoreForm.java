@@ -86,8 +86,8 @@ public class ScoreForm {
                 showAlert(Alert.AlertType.ERROR, "Eroare Server", errorMessage);
                 logger.log(Level.WARNING, "Eroare server la încărcarea scorurilor: " + errorMessage);
             } else {
-                showAlert(Alert.AlertType.ERROR, "Eroare comunicare", "Răspuns neașteptat de la server: " + response);
-                logger.log(Level.WARNING, "Răspuns neașteptat de la server: " + (response != null ? response.getClass().getName() : "null"));
+                showAlert(Alert.AlertType.ERROR, "Eroare comunicare", "Unexpected response from server: " + response);
+                logger.log(Level.WARNING, "Unexpected response from server: " + (response != null ? response.getClass().getName() : "null"));
             }
 
         } catch (IOException e) {
