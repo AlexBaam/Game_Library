@@ -58,7 +58,6 @@
     -fx-background-color: #d0d0d0;
 }
 
-
 .minesweeper-cell {
     -fx-background-color: #cccccc;
     -fx-border-color: #888888;
@@ -67,7 +66,6 @@
     -fx-font-weight: bold;
     -fx-alignment: center;
 }
-
 
 .minesweeper-cell.selected-cell {
     -fx-border-color: #0000FF;
