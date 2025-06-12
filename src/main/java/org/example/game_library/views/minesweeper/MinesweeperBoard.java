@@ -37,6 +37,8 @@ public class MinesweeperBoard {
     private int selectedRow = -1;
     private int selectedCol = -1;
 
+    private Button[][] buttonMatrix;
+
     @FXML
     private Button forfeitButton;
     @FXML
@@ -78,6 +80,7 @@ public class MinesweeperBoard {
         boardGrid.getChildren().clear();
         boardGrid.getRowConstraints().clear();
         boardGrid.getColumnConstraints().clear();
+        buttonMatrix = new Button[rows][cols];
 
         for (int i = 0; i < rows; i++) {
             RowConstraints rowConstraints = new RowConstraints();
@@ -113,7 +116,7 @@ public class MinesweeperBoard {
                 final int c = col;
                 cellButton.setOnMouseClicked(event -> {
                     if (selectedRow != -1 && selectedCol != -1) {
-                        Button prevSelectedButton = (Button) boardGrid.getChildren().get(selectedRow * cols + selectedCol);
+                        Button prevSelectedButton = buttonMatrix[selectedRow][selectedCol];
                         if (prevSelectedButton != null) {
                             prevSelectedButton.getStyleClass().remove("selected-cell");
                         }
@@ -127,11 +130,14 @@ public class MinesweeperBoard {
 
                     logger.log(Level.INFO, "Cell selected: ({0}, {1})", new Object[]{selectedRow, selectedCol});
                 });
+
+                buttonMatrix[row][col] = cellButton;
                 boardGrid.add(cellButton, col, row);
             }
         }
 
         updateBoardUI();
+        Platform.runLater(() -> boardGrid.requestLayout());
     }
 
 
@@ -146,6 +152,7 @@ public class MinesweeperBoard {
             if (receivedGameState instanceof MinesweeperGameState newGameState && receivedStatus instanceof String statusMessage) {
                 currentGameState = newGameState;
                 updateBoardUI();
+                Platform.runLater(() -> boardGrid.requestLayout());
 
                 if (statusMessage.contains("game over")) {
                     showAlert(Alert.AlertType.INFORMATION, "Game Over!", "You hit a mine! Game lost.");
@@ -260,6 +267,7 @@ public class MinesweeperBoard {
                 if (receivedGameState instanceof MinesweeperGameState newGameState && receivedStatus instanceof String statusMessage) {
                     currentGameState = newGameState;
                     updateBoardUI();
+                    Platform.runLater(() -> boardGrid.requestLayout());
                     updateMineCountLabel();
 
                     if (statusMessage.contains("game over")) {
@@ -300,6 +308,7 @@ public class MinesweeperBoard {
                 if (receivedGameState instanceof MinesweeperGameState newGameState && receivedStatus instanceof String statusMessage) {
                     currentGameState = newGameState;
                     updateBoardUI();
+                    Platform.runLater(() -> boardGrid.requestLayout());
                     updateMineCountLabel();
                 } else {
                     logger.log(Level.WARNING, "Received unexpected object type for flag. State: {0}, Status: {1}",
@@ -320,7 +329,7 @@ public class MinesweeperBoard {
 
     private void deselectCell() {
         if (selectedRow != -1 && selectedCol != -1) {
-            Button prevSelectedButton = (Button) boardGrid.getChildren().get(selectedRow * cols + selectedCol);
+            Button prevSelectedButton = buttonMatrix[selectedRow][selectedCol];
             if (prevSelectedButton != null) {
                 prevSelectedButton.getStyleClass().remove("selected-cell");
             }
@@ -350,11 +359,13 @@ public class MinesweeperBoard {
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                Button cellButton = (Button) boardGrid.getChildren().get(row * cols + col);
+                Button cellButton = buttonMatrix[row][col]; // FOLOSEȘTI MATRICEA !!!
                 Cell cell = board[row][col];
 
                 cellButton.getStyleClass().removeAll("flagged", "mine", "revealed-empty", "selected-cell");
-                for(int i = 1; i <= 8; i++) cellButton.getStyleClass().remove("number" + i);
+                for (int i = 1; i <= 8; i++) {
+                    cellButton.getStyleClass().remove("number" + i);
+                }
                 cellButton.setText("");
 
                 if (cell.isRevealed()) {
@@ -384,8 +395,11 @@ public class MinesweeperBoard {
                 }
             }
         }
-        boardGrid.layout(); //!!!!!!!!
+
+        // Forțează redesenarea UI
+        Platform.runLater(() -> boardGrid.requestLayout());
     }
+
 
     private void revealAllMinesAtGameOver() {
         if (currentGameState == null) return;
@@ -393,7 +407,7 @@ public class MinesweeperBoard {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 Cell cell = board[row][col];
-                Button cellButton = (Button) boardGrid.getChildren().get(row * cols + col);
+                Button cellButton = buttonMatrix[row][col];
                 if (cell.hasMine()) {
                     cellButton.getStyleClass().add("mine");
                     cellButton.setText("💣");
