@@ -1,5 +1,6 @@
 package org.example.game_library.views.minesweeper;
 
+import javafx.scene.control.*;
 import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntryM;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,10 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.example.game_library.networking.client.ClientToServerProxy;
@@ -29,6 +26,9 @@ import java.util.logging.Logger;
 
 public class ScoreFormMinesweeper {
     private static final Logger logger = AppLogger.getLogger();
+
+    @FXML
+    public Button backButton;
 
     @FXML
     private TableView<ScoreEntryM> scoreTable;

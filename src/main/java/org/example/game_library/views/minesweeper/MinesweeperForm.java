@@ -22,6 +22,9 @@ public class MinesweeperForm {
     private static final Logger logger = AppLogger.getLogger();
 
     @FXML
+    public Button newGameButton;
+
+    @FXML
     private Button scoreButton;
 
     @FXML
