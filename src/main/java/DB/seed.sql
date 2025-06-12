@@ -1,5 +1,3 @@
-DROP VIEW IF EXISTS top10_minesweeper;
-
 DROP TABLE IF EXISTS saved_games;
 DROP TABLE IF EXISTS tictactoe_scores;
 DROP TABLE IF EXISTS minesweeper_scores;
