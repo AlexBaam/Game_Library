@@ -1,23 +1,23 @@
-DROP VIEW IF EXISTS top10_minesweeper;
+DROP VIEW IF EXISTS top10_minesweeper Cascade;
 
-DROP TABLE IF EXISTS saved_games;
-DROP TABLE IF EXISTS tictactoe_scores;
-DROP TABLE IF EXISTS minesweeper_scores;
-DROP TABLE IF EXISTS user_deletion_log;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS game_types;
+DROP TABLE IF EXISTS saved_games Cascade;
+DROP TABLE IF EXISTS tictactoe_scores Cascade;
+DROP TABLE IF EXISTS minesweeper_scores Cascade;
+DROP TABLE IF EXISTS user_deletion_log Cascade;
+DROP TABLE IF EXISTS users Cascade;
+DROP TABLE IF EXISTS game_types Cascade;
 
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    logged_in BOOLEAN NOT NULL
+                       user_id SERIAL PRIMARY KEY,
+                       username VARCHAR(50) UNIQUE NOT NULL,
+                       email VARCHAR(100) UNIQUE NOT NULL,
+                       password TEXT NOT NULL,
+                       logged_in BOOLEAN NOT NULL
 );
 
 CREATE TABLE game_types (
-    game_type_id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL
+                            game_type_id SERIAL PRIMARY KEY,
+                            name VARCHAR(50) UNIQUE NOT NULL
 );
 
 CREATE TABLE tictactoe_scores (
@@ -29,28 +29,28 @@ CREATE TABLE tictactoe_scores (
 );
 
 CREATE TABLE minesweeper_scores (
-    user_id INTEGER PRIMARY KEY,
-    total_wins INTEGER DEFAULT 0,
-    best_score INTEGER DEFAULT 0,
-    total_score INTEGER DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+                                    user_id INTEGER PRIMARY KEY,
+                                    total_wins INTEGER DEFAULT 0,
+                                    best_score INTEGER DEFAULT 0,
+                                    total_score INTEGER DEFAULT 0,
+                                    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE saved_games (
-    save_id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    game_type_id INTEGER NOT NULL,
-    game_state JSONB NOT NULL,
-    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (game_type_id) REFERENCES game_types(game_type_id)
+                             save_id SERIAL PRIMARY KEY,
+                             user_id INTEGER NOT NULL,
+                             game_type_id INTEGER NOT NULL,
+                             game_state JSONB NOT NULL,
+                             saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                             FOREIGN KEY (game_type_id) REFERENCES game_types(game_type_id)
 );
 
 CREATE TABLE user_deletion_log (
-    log_id SERIAL PRIMARY KEY,
-    user_id INTEGER,
-    username VARCHAR(50),
-    deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                   log_id SERIAL PRIMARY KEY,
+                                   user_id INTEGER,
+                                   username VARCHAR(50),
+                                   deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE VIEW top10_minesweeper AS

@@ -259,6 +259,7 @@
                     case FLAG -> MinesweeperRequests.handleFlag(request, this, output, input);
                     case EXIT -> handleExit(request);
                     case SCORE -> MinesweeperRequests.handleScore(request, this, output, input, userRepository);
+                    case FORFEIT -> MinesweeperRequests.handleForfeit(request, this, output, input);
                     default -> output.writeObject("Comanda Minesweeper " + subCommandStr + " nu este implementată.");
                 }
             } else {

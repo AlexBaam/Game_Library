@@ -8,6 +8,7 @@ import java.util.Random;
 
 public class MinesweeperGameState implements Serializable {
     private int rows, cols;
+    private int mineCount;
     private Cell[][] board;
 
     @FXML
@@ -24,6 +25,7 @@ public class MinesweeperGameState implements Serializable {
     }
 
     public void placeMines(int mineCount) {
+        this.mineCount = mineCount; // Salvează numărul de mine
         Random random = new Random();
         int placedMines = 0;
 
@@ -132,6 +134,25 @@ public class MinesweeperGameState implements Serializable {
             return board[row][col];
         }
         return null;
+    }
+
+    public Cell[][] getBoard() {
+        return board; // Returnează referința direct. Este OK atâta timp cât Cell este imutabilă sau clientul nu o modifică.
+        // Alternativ, returnează o copie profundă dacă vrei să previi orice modificare.
+        // Pentru acest joc, returnarea directă e acceptabilă.
+    }
+
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getCols() {
+        return cols;
+    }
+
+    public int getMineCount() {
+        return mineCount;
     }
 
     // getter-e si metode auxiliare

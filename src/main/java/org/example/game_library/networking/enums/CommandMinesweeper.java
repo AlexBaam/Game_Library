@@ -8,7 +8,8 @@ public enum CommandMinesweeper {
     EXIT("exit"),
     SAVEGAME("save"),
     REVEAL("reveal"),
-    FLAG("flag");
+    FLAG("flag"),
+    FORFEIT("forfeit");
 
     private final String commandMinesweeper;
 
