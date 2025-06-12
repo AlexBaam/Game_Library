@@ -77,6 +77,13 @@ public class RegisterForm {
             if ("SUCCESS".equals(response)) {
                 logger.log(Level.INFO, "Account successfully registered into the database!");
                 ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Account created!");
+
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass()
+                        .getResource("/org/example/game_library/FXML/menu/userDashboardForm.fxml"));
+                Parent root = fxmlLoader.load();
+                Stage stage = (Stage) usernameField.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                logger.log(Level.INFO, "Redirected to user dashboard after successful registration.");
             } else {
                 logger.log(Level.WARNING, "Registration failed! Reason: {0}", response);
                 ShowAlert.showAlert(Alert.AlertType.ERROR, "Registration Failed", response);

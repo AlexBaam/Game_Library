@@ -151,6 +151,8 @@
             User user = userRepository.registration(email, username, password);
 
             if (user != null) {
+                logged = true;
+                currentUser = user;
                 output.writeObject("SUCCESS");
             } else {
                 output.writeObject("FAILURE");
@@ -180,7 +182,7 @@
 
         private void handleDelete() throws IOException {
             if (!logged || currentUser == null) {
-                output.writeObject("Nu sunteti autentificat pentru a sterge contul.");
+                output.writeObject("You must login first!");
                 logger.log(Level.WARNING, "Attempted delete by unauthenticated thread {0}.", threadId);
                 return;
             }
@@ -193,19 +195,19 @@
                     logged = false;
                     currentUser = null;
                 } else {
-                    output.writeObject("Eroare la stergerea contului. Utilizatorul nu a putut fi gasit sau sters.");
+                    output.writeObject("Error deleting account! User could not be found or deleted!");
                     logger.log(Level.WARNING, "Failed to delete user {0}.", currentUser.getUsername());
                 }
             } catch (PersistenceException e) {
                 logger.log(Level.SEVERE, "Database error during user deletion for {0}: {1}", new Object[]{currentUser.getUsername(), e.getMessage()});
-                output.writeObject("Eroare de baza de date la stergerea contului: " + e.getMessage());
+                output.writeObject("Error deleting account: " + e.getMessage());
             }
         }
 
         private void handleLogout(List<String> request) throws IOException {
 
             if (!logged || currentUser == null) {
-                output.writeObject("Nu sunteti autentificat pentru a va deconecta.");
+                output.writeObject("You must login first!.");
                 logger.log(Level.WARNING, "Attempted logout by unauthenticated thread {0}.", threadId);
                 return;
             }

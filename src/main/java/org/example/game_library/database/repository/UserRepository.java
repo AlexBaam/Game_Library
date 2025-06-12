@@ -72,7 +72,7 @@ public class UserRepository {
 
         try {
             User newUser = new User(username, email, hashedPassword);
-            newUser.setLoggedIn(false);
+            newUser.setLoggedIn(true);
 
             em.getTransaction().begin();
             em.persist(newUser);
