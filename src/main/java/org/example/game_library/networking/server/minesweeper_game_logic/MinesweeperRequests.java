@@ -20,10 +20,8 @@ public class MinesweeperRequests {
     public static void handleScore(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input, UserRepository userRepository) {
         try {
             List<ScoreEntryM> topPlayers = MinesweeperRepository.getMinesweeperTopRankedPlayers(3);
-
             output.writeObject(topPlayers);
             logger.log(Level.INFO, "Sent Minesweeper top ranked players to client for thread {0}.", threadCreator.getId());
-
         } catch (PersistenceException e) {
             logger.log(Level.SEVERE, "Database error retrieving Minesweeper scores for thread {0}: {1}", new Object[]{threadCreator.getId(), e.getMessage()});
             try {

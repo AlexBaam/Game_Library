@@ -1,5 +1,6 @@
 package org.example.game_library.database.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -19,10 +20,9 @@ public class SavedGameRepository {
 
     private SavedGameRepository() {}
 
-    public static void saveGame(User user, String gameTypeName, TicTacToeGame game) throws Exception {
-        EntityManager em = JPAUtils.getEntityManager();
+    public static void saveGame(User user, String gameTypeName, TicTacToeGame game) {
 
-        try {
+        try (EntityManager em = JPAUtils.getEntityManager()) {
             GameType gameType = em.createQuery(
                             "SELECT g FROM GameType g WHERE LOWER(g.name) = :name", GameType.class)
                     .setParameter("name", gameTypeName.toLowerCase())
@@ -33,9 +33,9 @@ public class SavedGameRepository {
             em.getTransaction().begin();
 
             em.createNativeQuery("""
-                INSERT INTO saved_games (user_id, game_type_id, game_state, saved_at)
-                VALUES (?1, ?2, CAST(?3 AS jsonb), ?4)
-            """)
+                                INSERT INTO saved_games (user_id, game_type_id, game_state, saved_at)
+                                VALUES (?1, ?2, CAST(?3 AS jsonb), ?4)
+                            """)
                     .setParameter(1, user.getUser_id())
                     .setParameter(2, gameType.getGameTypeId())
                     .setParameter(3, gameStateJson)
@@ -43,20 +43,19 @@ public class SavedGameRepository {
                     .executeUpdate();
 
             em.getTransaction().commit();
-        } finally {
-            em.close();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static List<TicTacToeGame> loadGamesForUser(User user, String gameTypeName) throws Exception {
-        EntityManager em = JPAUtils.getEntityManager();
+    public static List<TicTacToeGame> loadGamesForUser(User user, String gameTypeName) {
 
-        try {
+        try (EntityManager em = JPAUtils.getEntityManager()) {
             TypedQuery<SavedGame> query = em.createQuery("""
-                SELECT s FROM SavedGame s
-                WHERE s.user = :user AND LOWER(s.gameType.name) = :name
-                ORDER BY s.savedAt DESC
-            """, SavedGame.class);
+                        SELECT s FROM SavedGame s
+                        WHERE s.user = :user AND LOWER(s.gameType.name) = :name
+                        ORDER BY s.savedAt DESC
+                    """, SavedGame.class);
 
             query.setParameter("user", user);
             query.setParameter("name", gameTypeName.toLowerCase());
@@ -70,8 +69,8 @@ public class SavedGameRepository {
             }
 
             return games;
-        } finally {
-            em.close();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 }

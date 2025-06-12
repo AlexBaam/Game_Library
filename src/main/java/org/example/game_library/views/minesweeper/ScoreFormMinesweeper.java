@@ -1,5 +1,7 @@
 package org.example.game_library.views.minesweeper;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.control.*;
 import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntryM;
 import javafx.collections.FXCollections;
@@ -47,9 +49,9 @@ public class ScoreFormMinesweeper {
 
     @FXML
     public void initialize() {
-        rankColumn.setCellValueFactory(new PropertyValueFactory<>("rank"));
-        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        totalScoreColumn.setCellValueFactory(new PropertyValueFactory<>("totalScore"));
+        rankColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getRank()));
+        usernameColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getUsername()));
+        totalScoreColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getTotalScore()));
 
         loadScores();
         rankTitleLabel.setText("Top Minesweeper Scores");
@@ -77,12 +79,12 @@ public class ScoreFormMinesweeper {
                     }
                 }
 
-//                for (ScoreEntryM entry : data) {
-//                    System.out.println("Rank: " + entry.getRank() + ", Username: " + entry.getUsername() + ", TotalScore: " + entry.getTotalScore());
-//                }
+                for (ScoreEntryM entry : data) {
+                    System.out.println("Rank: " + entry.getRank() + ", Username: " + entry.getUsername() + ", TotalScore: " + entry.getTotalScore());
+               }
 
                 scoreTable.setItems(data);
-               // System.out.println("Numar iteme in tabela: " + scoreTable.getItems().size());
+               System.out.println("Numar iteme in tabela: " + scoreTable.getItems().size());
                 logger.log(Level.INFO, "Scorurile Minesweeper au fost încărcate cu succes. Număr de înregistrări: " + data.size());
             } else if (response instanceof String errorMessage) {
                 showAlert(Alert.AlertType.ERROR, "Eroare Server", "Server error for Minesweeper scores: " + errorMessage);

@@ -51,15 +51,6 @@ CREATE TABLE user_deletion_log (
                                    deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE VIEW top10_minesweeper AS
-SELECT u.username, ms.best_score
-FROM minesweeper_scores ms
-         JOIN users u ON u.user_id = ms.user_id
-WHERE ms.best_score > 0
-ORDER BY ms.best_score ASC
-    LIMIT 10;
-
-
 CREATE OR REPLACE FUNCTION check_email_and_username_uniqueness()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -139,8 +130,6 @@ CREATE TRIGGER trg_create_scores_after_user_insert
     FOR EACH ROW
     EXECUTE FUNCTION create_score_entries_after_user_insert();
 
-
-
 CREATE OR REPLACE FUNCTION get_user_tictactoe_rank_manual(p_user_id INTEGER, p_score_type VARCHAR)
 RETURNS INTEGER AS $$
 DECLARE
@@ -173,12 +162,11 @@ CREATE OR REPLACE FUNCTION get_tictactoe_top_ranked_players(p_top_ranks INTEGER,
 RETURNS TABLE (
     rank_nr BIGINT,
     username VARCHAR(50),
-    wins INTEGER -- Asigură-te că este "wins" aici
+    wins INTEGER
 ) AS $$
 DECLARE
 v_sql TEXT;
 BEGIN
-    -- Validează p_score_type pentru a preveni injecția SQL
     IF p_score_type NOT IN ('network_wins', 'ai_wins') THEN
         RAISE EXCEPTION 'Tip de scor invalid: %', p_score_type;
 END IF;
@@ -229,7 +217,7 @@ RETURN QUERY
         JOIN
             users u ON u.user_id = ms.user_id
         WHERE
-            ms.total_score > 0
+            ms.total_score >= 0
     )
 SELECT
     rs.current_rank,

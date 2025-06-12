@@ -53,13 +53,10 @@ public class MinesweeperForm {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/game_library/FXML/minesweeper/scoreForm.fxml"));
             Parent root = loader.load();
 
-            //ScoreForm scoreController = loader.getController();
-
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             logger.log(Level.INFO, "Navigat la clasamentul Minesweeper.");
             stage.show();
-            //scoreController.loadScoresExplicitly();
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Eroare la încărcarea clasamentului Minesweeper: " + e.getMessage(), e);
             showAlert(Alert.AlertType.ERROR, "Eroare de navigare", "Nu s-a putut afișa clasamentul Minesweeper.");
