@@ -20,10 +20,6 @@
 
     import jakarta.persistence.PersistenceException;
 
-    import static org.example.game_library.networking.enums.CommandMinesweeper.*;
-    import static org.example.game_library.networking.enums.CommandTicTacToe.FORFEIT;
-    import static org.example.game_library.networking.enums.CommandTicTacToe.SHOVEL;
-
     public class ThreadCreator extends Thread {
         private final Socket clientSocket;
 

@@ -19,5 +19,6 @@ public class GameType {
     private String name;
 
     public GameType() {
+        //Default cons
     }
 }

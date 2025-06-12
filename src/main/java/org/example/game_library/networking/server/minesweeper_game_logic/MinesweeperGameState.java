@@ -1,8 +1,5 @@
 package org.example.game_library.networking.server.minesweeper_game_logic;
 
-import javafx.fxml.FXML;
-import javafx.scene.layout.GridPane;
-
 import java.io.Serializable;
 import java.util.Random;
 
@@ -96,22 +93,6 @@ public class MinesweeperGameState implements Serializable {
 
         if (!cell.isRevealed()) {
             cell.setFlagged(!cell.isFlagged());
-        }
-    }
-
-    public Cell[][] getBoardForClient() {
-        return board;
-    }
-
-    public String flagCell(int x, int y) {
-        if (isValidCell(x, y)) {
-            Cell cell = board[x][y];
-
-            cell.setFlagged(!cell.isFlagged());
-            return "Flag toggled at " + x + ", " + y;
-
-        } else {
-            return "Invalid cell!";
         }
     }
 
