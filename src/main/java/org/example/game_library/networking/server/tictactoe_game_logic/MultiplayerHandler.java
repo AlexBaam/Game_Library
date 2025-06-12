@@ -1,5 +1,6 @@
 package org.example.game_library.networking.server.tictactoe_game_logic;
 
+import org.example.game_library.database.repository.TicTacToeRepository;
 import org.example.game_library.networking.server.ThreadCreator;
 import org.example.game_library.utils.loggers.AppLogger;
 
@@ -46,6 +47,13 @@ public class MultiplayerHandler implements MoveHandler {
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Failed to notify opponent: {0}", e.getMessage());
             }
+
+            try {
+                TicTacToeRepository.incrementWins(threadCreator.getCurrentUser(), "network");
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to update score: {0}", e.getMessage());
+            }
+
             game.resetGame();
             RoomManager.removeRoom(room.getRoomId());
             return;

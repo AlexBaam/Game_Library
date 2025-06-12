@@ -58,16 +58,32 @@ public class AiHandler implements MoveHandler {
     }
 
     private int[] makeAIMove(TicTacToeGame game, String aiSymbol) {
+        int bestScore = Integer.MIN_VALUE;
+        int[] bestMove = null;
+
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (game.getBoard()[i][j].equals(" ")) {
-                    game.makeMove(i, j, aiSymbol);
-                    return new int[]{i, j};
+                    game.getBoard()[i][j] = aiSymbol;
+
+                    int score = minimax(game, 0, false, aiSymbol);
+                    game.getBoard()[i][j] = " ";
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = new int[]{i, j};
+                    }
                 }
             }
         }
-        return null;
+
+        if (bestMove != null) {
+            game.makeMove(bestMove[0], bestMove[1], aiSymbol);
+        }
+
+        return bestMove;
     }
+
     private boolean handleEndGame(TicTacToeGame game, String resultMessage, ObjectOutputStream output, ThreadCreator threadCreator) {
         try {
             if (game.checkWin()) {
@@ -94,6 +110,42 @@ public class AiHandler implements MoveHandler {
         } catch (IOException e) {
             logger.log(Level.SEVERE, "IOException while processing end game: {0}", e.getMessage());
             return false;
+        }
+    }
+
+    private int minimax(TicTacToeGame game, int depth, boolean isMaximizing, String aiSymbol) {
+        String playerSymbol = aiSymbol.equals("X") ? "O" : "X";
+
+        if (game.checkWinForSymbol(aiSymbol)) return 10 - depth;
+        if (game.checkWinForSymbol(playerSymbol)) return depth - 10;
+        if (game.isBoardFull()) return 0;
+
+        if (isMaximizing) {
+            int bestScore = Integer.MIN_VALUE;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (game.getBoard()[i][j].equals(" ")) {
+                        game.getBoard()[i][j] = aiSymbol;
+                        int score = minimax(game, depth + 1, false, aiSymbol);
+                        game.getBoard()[i][j] = " ";
+                        bestScore = Math.max(bestScore, score);
+                    }
+                }
+            }
+            return bestScore;
+        } else {
+            int bestScore = Integer.MAX_VALUE;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (game.getBoard()[i][j].equals(" ")) {
+                        game.getBoard()[i][j] = playerSymbol;
+                        int score = minimax(game, depth + 1, true, aiSymbol);
+                        game.getBoard()[i][j] = " ";
+                        bestScore = Math.min(bestScore, score);
+                    }
+                }
+            }
+            return bestScore;
         }
     }
 }

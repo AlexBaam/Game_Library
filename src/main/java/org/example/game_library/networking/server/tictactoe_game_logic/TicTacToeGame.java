@@ -99,4 +99,18 @@ public class TicTacToeGame implements Serializable {
     public void setMode(String mode) {
         this.mode = mode;
     }
+
+    public boolean checkWinForSymbol(String symbol) {
+        String[][] board = getBoard();
+
+        for (int i = 0; i < 3; i++) {
+            if (board[i][0].equals(symbol) && board[i][1].equals(symbol) && board[i][2].equals(symbol)) return true;
+            if (board[0][i].equals(symbol) && board[1][i].equals(symbol) && board[2][i].equals(symbol)) return true;
+        }
+
+        if (board[0][0].equals(symbol) && board[1][1].equals(symbol) && board[2][2].equals(symbol)) return true;
+        if (board[0][2].equals(symbol) && board[1][1].equals(symbol) && board[2][0].equals(symbol)) return true;
+
+        return false;
+    }
 }

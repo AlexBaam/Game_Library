@@ -1,12 +1,13 @@
     package org.example.game_library.networking.server;
 
+    import lombok.Getter;
+    import lombok.Setter;
     import org.example.game_library.database.model.User;
     import org.example.game_library.database.repository.UserRepository;
     import org.example.game_library.networking.enums.Command;
     import org.example.game_library.networking.enums.CommandMinesweeper;
     import org.example.game_library.networking.enums.CommandTicTacToe;
     import org.example.game_library.networking.server.minesweeper_game_logic.MinesweeperRequests;
-    import org.example.game_library.networking.server.tictactoe_game_logic.ScoreEntry;
     import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeGame;
     import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeRequests;
     import org.example.game_library.utils.loggers.AppLogger;
@@ -18,9 +19,6 @@
 
     import jakarta.persistence.PersistenceException;
 
-    import static org.example.game_library.networking.enums.CommandMinesweeper.*;
-    import static org.example.game_library.networking.enums.CommandTicTacToe.FORFEIT;
-
     public class ThreadCreator extends Thread {
         private final Socket clientSocket;
 
@@ -31,11 +29,14 @@
         private final long threadId;
 
         private boolean logged = false;
+        @Getter
         private User currentUser;
 
+        @Getter
+        @Setter
         private TicTacToeGame ticTacToeGame;
 
-        private UserRepository userRepository;
+        private final UserRepository userRepository;
 
         public ThreadCreator(Socket socket) {
             this.clientSocket = socket;
@@ -58,14 +59,14 @@
             logger.log(Level.INFO, "Thread {0} started successfully!", threadId);
 
             try {
-
                 while (true) {
 
                     Object obj;
                     try{
                         obj = input.readObject();
                     } catch (EOFException e) {
-                        logger.log(Level.INFO, "Thread {0} received EOF – closing connection.", threadId);
+                        logger.log(Level.WARNING, "Thread {0} received EOF – closing connection.", threadId);
+                        logger.log(Level.SEVERE, "Message for thread {0}: {1}", new Object[]{threadId, e.getMessage()});
                         break;
                     }
 
@@ -84,7 +85,7 @@
                         continue;
                     }
 
-                    String command = request.get(0).toLowerCase();
+                    String command = request.getFirst().toLowerCase();
                     Command commandEnum = Command.fromString(command);
 
                     if (commandEnum == null) {
@@ -122,7 +123,7 @@
                 case LOGIN -> handleLogin(request);
                 case REGISTER -> handleRegister(request);
                 case EXIT -> handleExit(request);
-                default -> output.writeObject("Command " + request.get(0) + " not yet implemented!");
+                default -> output.writeObject("Command " + request.getFirst() + " not yet implemented!");
             }
         }
 
@@ -133,7 +134,7 @@
                 case EXIT -> handleExit(request);
                 case TICTACTOE -> handleTicTacToe(request);
                 case MINESWEEPER -> handleMinesweeper(request);
-                default -> output.writeObject("Command " + request.get(0) + " not yet implemented!");
+                default -> output.writeObject("Command " + request.getFirst() + " not yet implemented!");
             }
         }
 
@@ -272,9 +273,7 @@
             if (request.size() == 1) {
                 output.writeObject("SUCCESS");
                 logger.log(Level.INFO, "Thread {0} successfully entered Minesweeper menu.", threadId);
-                return;
-            } else if(request.size() >= 2)
-            {
+            } else if(request.size() >= 2) {
                 String subCommandStr = request.get(1);
                 CommandMinesweeper subCommand = CommandMinesweeper.fromString(subCommandStr);
 
@@ -304,7 +303,7 @@
                 CommandTicTacToe cTTT = CommandTicTacToe.fromString(commandTicTacToe);
 
                 if (cTTT == null) {
-                    output.writeObject("Comanda TicTacToe este nulă! Comandă: " + commandTicTacToe);
+                    output.writeObject("TicTacToe command is null! Command: " + commandTicTacToe);
                     return;
                 }
 
@@ -320,31 +319,15 @@
                             String scoreType = request.get(2);
                             TicTacToeRequests.handleScore(request, this, output, input, scoreType, userRepository);
                         } else {
-                            output.writeObject("Eroare: Tipul de scor nu a fost furnizat pentru comanda SCORE.");
-                            logger.log(Level.WARNING, "Cererea de scor TicTacToe nu are parametrul de tip de scor.");
+                            output.writeObject("Error: Score type could not be retrieved SCORE.");
+                            logger.log(Level.WARNING, "Score request is missing the 'SCORE' parameter!");
                         }
                     }
-                    default -> output.writeObject("Comanda " + request.get(1) + " nu este implementată încă!");
+                    default -> output.writeObject("Command " + request.get(1) + " not implemented yet!");
                 }
             } else {
                 output.writeObject("Eșec la procesarea comenzii TicTacToe.");
             }
-        }
-
-        public void setTicTacToeGame(TicTacToeGame ticTacToeGame) {
-            this.ticTacToeGame = ticTacToeGame;
-        }
-
-        public TicTacToeGame getTicTacToeGame() {
-            return ticTacToeGame;
-        }
-
-        public int getCurrentUserId() {
-            return currentUser.getUser_id();
-        }
-
-        public User getCurrentUser() {
-            return currentUser;
         }
 
         public ObjectOutputStream getOutputStream() {
