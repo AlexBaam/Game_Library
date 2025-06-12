@@ -19,7 +19,7 @@ public class TicTacToeRepository {
 
         try {
             tx.begin();
-            TicTacToe score = em.find(TicTacToe.class, user.getUser_id());
+            TicTacToe score = em.find(TicTacToe.class, user.getUserId());
 
             if (score == null) {
                 score = new TicTacToe(user);

@@ -11,10 +11,10 @@ public class LoggerColor extends Formatter {
     private static final String BLUE = "\u001B[34m";
 
     @Override
-    public String format(LogRecord record) {
+    public String format(LogRecord recordForLogger) {
         String loggerColor;
 
-        switch (record.getLevel().getName()) {
+        switch (recordForLogger.getLevel().getName()) {
             case "SEVERE": loggerColor = RED; break;
             case "WARNING": loggerColor = YELLOW; break;
             case "INFO": loggerColor = GREEN; break;
@@ -24,8 +24,8 @@ public class LoggerColor extends Formatter {
 
         return String.format("%s[%s] %s%s%n",
                 loggerColor,
-                record.getLevel().getName(),
-                formatMessage(record),
+                recordForLogger.getLevel().getName(),
+                formatMessage(recordForLogger),
                 RESET);
     }
 }

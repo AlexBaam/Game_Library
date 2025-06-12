@@ -18,9 +18,7 @@ public class GameType {
     @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
 
-    public GameType() {}
-
-    public GameType(String name) {
-        this.name = name;
+    public GameType() {
+        //Default constructor
     }
 }

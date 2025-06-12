@@ -12,6 +12,7 @@ public class AppLogger {
 
     private AppLogger() {}
 
+    @Getter
     private static final Logger logger = Logger.getLogger("GameLibraryLogger");
 
     static {
@@ -39,7 +40,4 @@ public class AppLogger {
         }
     }
 
-    public static Logger getLogger() {
-        return logger;
-    }
 }

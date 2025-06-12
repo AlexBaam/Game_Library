@@ -4,7 +4,6 @@ import jakarta.persistence.PersistenceException;
 import org.example.game_library.database.repository.MinesweeperRepository;
 import org.example.game_library.database.repository.UserRepository;
 import org.example.game_library.networking.server.ThreadCreator;
-import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntryM;
 import org.example.game_library.utils.loggers.AppLogger;
 
 import java.io.IOException;
@@ -15,6 +14,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MinesweeperRequests {
+
+    private MinesweeperRequests(){
+        //Default constructor
+    }
+
     private static final Logger logger = AppLogger.getLogger();
 
     public static void handleScore(List<String> request, ThreadCreator threadCreator, ObjectOutputStream output, ObjectInputStream input, UserRepository userRepository) {

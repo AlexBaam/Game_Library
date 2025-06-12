@@ -10,6 +10,8 @@ import java.util.List;
 
 public class MinesweeperRepository {
 
+    private MinesweeperRepository() {}
+
     public static List<ScoreEntryM> getMinesweeperTopRankedPlayers(int topRanks) throws PersistenceException {
         EntityManager em = JPAUtils.getEntityManager();
         try {

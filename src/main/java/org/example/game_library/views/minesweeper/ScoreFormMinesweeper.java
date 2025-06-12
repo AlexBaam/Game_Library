@@ -12,12 +12,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.example.game_library.networking.client.ClientToServerProxy;
-// Nu mai e nevoie de CommandMinesweeper aici dacă nu îl folosești explicit
-// import org.example.game_library.networking.enums.CommandMinesweeper;
-//import org.example.game_library.networking.server.minesweeper_game_logic.ScoreEntry;
 import org.example.game_library.utils.loggers.AppLogger;
 
 import java.io.IOException;

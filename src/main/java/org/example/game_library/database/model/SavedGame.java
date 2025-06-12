@@ -3,7 +3,6 @@ package org.example.game_library.database.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.game_library.networking.server.tictactoe_game_logic.TicTacToeGame;
 
 import java.time.LocalDateTime;
 
@@ -32,12 +31,7 @@ public class SavedGame {
     @Column(name = "saved_at", columnDefinition = "timestamp", nullable = false, updatable = false)
     private LocalDateTime savedAt;
 
-    public SavedGame() {}
-
-    public SavedGame(User user, GameType gameType, String gameStateJSON) {
-        this.user = user;
-        this.gameType = gameType;
-        this.gameStateJSON = gameStateJSON;
-        this.savedAt = LocalDateTime.now();
+    public SavedGame() {
+        //Default constructor
     }
 }

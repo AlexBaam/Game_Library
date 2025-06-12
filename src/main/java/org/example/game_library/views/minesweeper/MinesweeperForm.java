@@ -8,10 +8,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.example.game_library.networking.client.ClientToServerProxy;
 import org.example.game_library.utils.loggers.AppLogger;
+import org.example.game_library.utils.ui.ShowAlert;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,14 +35,14 @@ public class MinesweeperForm {
 
     @FXML
     private void onNewGameClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "New Game", "Funcționalitatea 'New Game' Minesweeper nu este încă implementată.");
+        ShowAlert.showAlert(Alert.AlertType.INFORMATION, "New Game", "Funcționalitatea 'New Game' Minesweeper nu este încă implementată.");
         logger.log(Level.INFO, "New Game Minesweeper clicked.");
 
     }
 
     @FXML
     private void onLoadGameClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Load Game", "Funcționalitatea 'Load Game' Minesweeper nu este încă implementată.");
+        ShowAlert.showAlert(Alert.AlertType.INFORMATION, "Load Game", "Funcționalitatea 'Load Game' Minesweeper nu este încă implementată.");
         logger.log(Level.INFO, "Load Game Minesweeper clicked.");
 
     }
@@ -58,8 +58,8 @@ public class MinesweeperForm {
             logger.log(Level.INFO, "Navigat la clasamentul Minesweeper.");
             stage.show();
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Eroare la încărcarea clasamentului Minesweeper: " + e.getMessage(), e);
-            showAlert(Alert.AlertType.ERROR, "Eroare de navigare", "Nu s-a putut afișa clasamentul Minesweeper.");
+            logger.log(Level.SEVERE, "Error loading the Minesweeper Scoreboard: {0}",  e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Eroare de navigare", "Nu s-a putut afișa clasamentul Minesweeper.");
         }
     }
 
@@ -74,8 +74,8 @@ public class MinesweeperForm {
             stage.setScene(new Scene(root));
             logger.log(Level.INFO, "Navigated back to user dashboard.");
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to load back screen (user dashboard): " + e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Eroare de navigare", "Nu s-a putut intoarce la meniul principal.");
+            logger.log(Level.SEVERE, "Could not load the user dashboard: {0}", e.getMessage());
+            ShowAlert.showAlert(Alert.AlertType.ERROR, "Navigation error", "Couldn't load the user dashboard.");
         }
     }
 
@@ -91,14 +91,5 @@ public class MinesweeperForm {
             stage.close();
         }
     }
-
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
 
 }

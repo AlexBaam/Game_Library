@@ -32,7 +32,7 @@ public class TicTacToe {
 
     public TicTacToe(User user) {
         this.user = user;
-        this.userId = user.getUser_id();
+        this.userId = user.getUserId();
         this.localWins = 0;
         this.networkWins = 0;
         this.aiWins = 0;

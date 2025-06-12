@@ -36,7 +36,7 @@ public class SavedGameRepository {
                                 INSERT INTO saved_games (user_id, game_type_id, game_state, saved_at)
                                 VALUES (?1, ?2, CAST(?3 AS jsonb), ?4)
                             """)
-                    .setParameter(1, user.getUser_id())
+                    .setParameter(1, user.getUserId())
                     .setParameter(2, gameType.getGameTypeId())
                     .setParameter(3, gameStateJson)
                     .setParameter(4, LocalDateTime.now())
